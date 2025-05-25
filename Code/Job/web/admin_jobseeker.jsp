@@ -420,9 +420,7 @@
                                         <a href="Admin_jobseekersController?action=edit&id=${jobseeker.freelanceID}" class="action-btn btn-edit">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
-                                        <a href="#" class="action-btn btn-delete" onclick="confirmDelete(${jobseeker.freelanceID})">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </a>
+                                      
                                     </div>
                                 </td>
                             </tr>
