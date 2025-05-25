@@ -9,4 +9,14 @@
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+    
+    <servlet>
+        <servlet-name>Admin_jobseekersController</servlet-name>
+        <servlet-class>Controller.Admin_jobseekersController</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>Admin_jobseekersController</servlet-name>
+        <url-pattern>/Admin_jobseekersController</url-pattern>
+    </servlet-mapping>
 </web-app>
