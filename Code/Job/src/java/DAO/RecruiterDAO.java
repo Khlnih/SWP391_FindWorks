@@ -1,183 +1,299 @@
 package DAO;
 
 import Model.Recruiter;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
-public class RecruiterDAO {
-    private Connection conn;
-    private PreparedStatement ps;
-    private ResultSet rs;
+public class RecruiterDAO extends DBContext {
 
-    public RecruiterDAO() {
-    }
+    public ArrayList<Recruiter> getAllRecruiters() {
+        ArrayList<Recruiter> list = new ArrayList<>();
 
-    public Recruiter login(String username, String password) {
-        String sql = "SELECT * FROM Recruiter WHERE username = ? AND password = ?";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, username);
-            ps.setString(2, password);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                return new Recruiter(
-                    rs.getInt("recruiterID"),
-                    rs.getString("username"),
-                    rs.getString("password"),
-                    rs.getString("first_name"),
-                    rs.getString("last_name"),
-                    rs.getBoolean("gender"),
-                    rs.getDate("dob"),
-                    rs.getString("image"),
-                    rs.getInt("money"),
-                    rs.getString("email_contact"),
-                    rs.getString("phone_contact"),
-                    rs.getString("status")
-                );
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return list;
         }
-        return null;
-    }
 
-    public List<Recruiter> getAllRecruiters() {
-        List<Recruiter> list = new ArrayList<>();
-        String sql = "SELECT * FROM Recruiter";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(sql);
-            rs = ps.executeQuery();
+        String sql = "SELECT * FROM Recruiter WHERE status != 'inactive'";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-                list.add(new Recruiter(
-                    rs.getInt("recruiterID"),
-                    rs.getString("username"),
-                    rs.getString("password"),
-                    rs.getString("first_name"),
-                    rs.getString("last_name"),
-                    rs.getBoolean("gender"),
-                    rs.getDate("dob"),
-                    rs.getString("image"),
-                    rs.getInt("money"),
-                    rs.getString("email_contact"),
-                    rs.getString("phone_contact"),
-                    rs.getString("status")
-                ));
+                Recruiter recruiter = new Recruiter();
+                recruiter.setRecruiterID(rs.getInt("recruiterID"));
+                recruiter.setUsername(rs.getString("username"));
+                recruiter.setPassword(rs.getString("password"));
+                recruiter.setFirstName(rs.getString("first_name"));
+                recruiter.setLastName(rs.getString("last_name"));
+                recruiter.setGender(rs.getBoolean("gender"));
+                recruiter.setDob(rs.getDate("dob"));
+                recruiter.setImage(rs.getString("image"));
+                recruiter.setMoney(rs.getInt("money"));
+                recruiter.setEmailContact(rs.getString("email_contact"));
+                recruiter.setPhoneContact(rs.getString("phone_contact"));
+                recruiter.setStatus(rs.getString("status"));
+
+                list.add(recruiter);
             }
-        } catch (Exception e) {
+            System.out.println("Found " + list.size() + " recruiters");
+        } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("Error getting recruiters: " + e.getMessage());
         }
+
         return list;
     }
-
-    public boolean addRecruiter(Recruiter recruiter) {
-        String sql = "INSERT INTO Recruiter(username, password, first_name, last_name, gender, dob, image, money, email_contact, phone_contact, status) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, recruiter.getUsername());
-            ps.setString(2, recruiter.getPassword());
-            ps.setString(3, recruiter.getFirstName());
-            ps.setString(4, recruiter.getLastName());
-            ps.setBoolean(5, recruiter.isGender());
-            ps.setDate(6, recruiter.getDob());
-            ps.setString(7, recruiter.getImage());
-            ps.setInt(8, recruiter.getMoney());
-            ps.setString(9, recruiter.getEmailContact());
-            ps.setString(10, recruiter.getPhoneContact());
-            ps.setString(11, recruiter.getStatus());
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+    
+    public boolean updateStatus(int id, String status) {
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return false;
         }
-        return false;
-    }
-
-    public boolean updateRecruiter(Recruiter recruiter) {
-        String sql = "UPDATE Recruiter SET username = ?, password = ?, first_name = ?, last_name = ?, gender = ?, dob = ?, image = ?, money = ?, email_contact = ?, phone_contact = ?, status = ? WHERE recruiterID = ?";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, recruiter.getUsername());
-            ps.setString(2, recruiter.getPassword());
-            ps.setString(3, recruiter.getFirstName());
-            ps.setString(4, recruiter.getLastName());
-            ps.setBoolean(5, recruiter.isGender());
-            ps.setDate(6, recruiter.getDob());
-            ps.setString(7, recruiter.getImage());
-            ps.setInt(8, recruiter.getMoney());
-            ps.setString(9, recruiter.getEmailContact());
-            ps.setString(10, recruiter.getPhoneContact());
-            ps.setString(11, recruiter.getStatus());
-            ps.setInt(12, recruiter.getRecruiterID());
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
+        
+        String sql = "UPDATE Recruiter SET status = ? WHERE recruiterID = ?";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, status);
+            stm.setInt(2, id);
+            
+            int rowsAffected = stm.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("Error updating recruiter status: " + e.getMessage());
+            return false;
         }
-        return false;
     }
-
-    public boolean deleteRecruiter(int recruiterID) {
-        String sql = "DELETE FROM Recruiter WHERE recruiterID = ?";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setInt(1, recruiterID);
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+    
+    public ArrayList<Recruiter> getRecruitersByPage(int page, int pageSize) {
+        ArrayList<Recruiter> list = new ArrayList<>();
+        
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return list;
         }
-        return false;
-    }
-
-    public boolean checkUsernameExists(String username) {
-        String sql = "SELECT * FROM Recruiter WHERE username = ?";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, username);
-            rs = ps.executeQuery();
-            return rs.next();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public Recruiter getRecruiterByCompany(int companyID) {
-        String sql = "SELECT r.* FROM Recruiter r JOIN Company c ON r.recruiterID = c.recruiterID WHERE c.companyID = ?";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setInt(1, companyID);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                return new Recruiter(
-                    rs.getInt("recruiterID"),
-                    rs.getString("username"),
-                    rs.getString("password"),
-                    rs.getString("first_name"),
-                    rs.getString("last_name"),
-                    rs.getBoolean("gender"),
-                    rs.getDate("dob"),
-                    rs.getString("image"),
-                    rs.getInt("money"),
-                    rs.getString("email_contact"),
-                    rs.getString("phone_contact"),
-                    rs.getString("status")
-                );
+        
+        int offset = (page - 1) * pageSize;
+        String sql = "SELECT * FROM Recruiter WHERE status != 'inactive' ORDER BY recruiterID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, offset);
+            stm.setInt(2, pageSize);
+            
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Recruiter recruiter = new Recruiter();
+                recruiter.setRecruiterID(rs.getInt("recruiterID"));
+                recruiter.setUsername(rs.getString("username"));
+                recruiter.setPassword(rs.getString("password"));
+                recruiter.setFirstName(rs.getString("first_name"));
+                recruiter.setLastName(rs.getString("last_name"));
+                recruiter.setGender(rs.getBoolean("gender"));
+                recruiter.setDob(rs.getDate("dob"));
+                recruiter.setImage(rs.getString("image"));
+                recruiter.setMoney(rs.getInt("money"));
+                recruiter.setEmailContact(rs.getString("email_contact"));
+                recruiter.setPhoneContact(rs.getString("phone_contact"));
+                recruiter.setStatus(rs.getString("status"));
+                
+                list.add(recruiter);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("Error getting paginated recruiters: " + e.getMessage());
         }
-        return null;
+        
+        return list;
+    }
+    
+    public int countTotalRecruiters() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) as total FROM Recruiter WHERE status != 'inactive'";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error counting recruiters: " + e.getMessage());
+        }
+        
+        return count;
+    }
+    
+    public ArrayList<Recruiter> searchRecruiters(String keyword, String searchBy, int page, int pageSize) {
+        ArrayList<Recruiter> list = new ArrayList<>();
+        
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return list;
+        }
+        
+        int offset = (page - 1) * pageSize;
+        StringBuilder sql = new StringBuilder("SELECT * FROM Recruiter WHERE status != 'inactive' ");
+        
+        // Add search conditions based on searchBy parameter
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            switch (searchBy) {
+                case "name":
+                    sql.append("AND (LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ?) ");
+                    break;
+                case "email":
+                    sql.append("AND LOWER(email_contact) LIKE ? ");
+                    break;
+                case "phone":
+                    sql.append("AND phone_contact LIKE ? ");
+                    break;
+                default: // all
+                    sql.append("AND (LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR " +
+                           "LOWER(email_contact) LIKE ? OR phone_contact LIKE ?) ");
+                    break;
+            }
+        }
+        
+        sql.append("ORDER BY recruiterID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            
+            // Set search parameters based on searchBy
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String searchTerm = "%" + keyword.toLowerCase() + "%";
+                switch (searchBy) {
+                    case "name":
+                        stm.setString(paramIndex++, searchTerm);
+                        stm.setString(paramIndex++, searchTerm);
+                        break;
+                    case "email":
+                        stm.setString(paramIndex++, searchTerm);
+                        break;
+                    case "phone":
+                        stm.setString(paramIndex++, "%" + keyword + "%");
+                        break;
+                    default: // all
+                        stm.setString(paramIndex++, searchTerm);
+                        stm.setString(paramIndex++, searchTerm);
+                        stm.setString(paramIndex++, searchTerm);
+                        stm.setString(paramIndex++, "%" + keyword + "%");
+                        break;
+                }
+            }
+            
+            // Set pagination parameters
+            stm.setInt(paramIndex++, offset);
+            stm.setInt(paramIndex, pageSize);
+            
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Recruiter recruiter = new Recruiter();
+                recruiter.setRecruiterID(rs.getInt("recruiterID"));
+                recruiter.setUsername(rs.getString("username"));
+                recruiter.setPassword(rs.getString("password"));
+                recruiter.setFirstName(rs.getString("first_name"));
+                recruiter.setLastName(rs.getString("last_name"));
+                recruiter.setGender(rs.getBoolean("gender"));
+                recruiter.setDob(rs.getDate("dob"));
+                recruiter.setImage(rs.getString("image"));
+                recruiter.setMoney(rs.getInt("money"));
+                recruiter.setEmailContact(rs.getString("email_contact"));
+                recruiter.setPhoneContact(rs.getString("phone_contact"));
+                recruiter.setStatus(rs.getString("status"));
+                
+                list.add(recruiter);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error searching recruiters: " + e.getMessage());
+        }
+        
+        return list;
+    }
+    
+    public int countSearchResults(String keyword, String searchBy) {
+        int count = 0;
+        
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return count;
+        }
+        
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) as total FROM Recruiter WHERE status != 'inactive' ");
+        
+        // Add search conditions based on searchBy parameter
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            switch (searchBy) {
+                case "name":
+                    sql.append("AND (LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ?) ");
+                    break;
+                case "email":
+                    sql.append("AND LOWER(email_contact) LIKE ? ");
+                    break;
+                case "phone":
+                    sql.append("AND phone_contact LIKE ? ");
+                    break;
+                default: // all
+                    sql.append("AND (LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR " +
+                           "LOWER(email_contact) LIKE ? OR phone_contact LIKE ?) ");
+                    break;
+            }
+        }
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+            // Set search parameters based on searchBy
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String searchTerm = "%" + keyword.toLowerCase() + "%";
+                switch (searchBy) {
+                    case "name":
+                        stm.setString(1, searchTerm);
+                        stm.setString(2, searchTerm);
+                        break;
+                    case "email":
+                        stm.setString(1, searchTerm);
+                        break;
+                    case "phone":
+                        stm.setString(1, "%" + keyword + "%");
+                        break;
+                    default: // all
+                        stm.setString(1, searchTerm);
+                        stm.setString(2, searchTerm);
+                        stm.setString(3, searchTerm);
+                        stm.setString(4, "%" + keyword + "%");
+                        break;
+                }
+            }
+            
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error counting search results: " + e.getMessage());
+        }
+        
+        return count;
+    }
+    
+    public boolean deleteRecruiter(int id) {
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return false;
+        }
+        
+        String updateSql = "UPDATE Recruiter SET status = 'inactive' WHERE recruiterID = ?";
+        
+        try (PreparedStatement updateStm = connection.prepareStatement(updateSql)) {
+            updateStm.setInt(1, id);
+            int rowsAffected = updateStm.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error deleting recruiter: " + e.getMessage());
+            return false;
+        }
     }
 }

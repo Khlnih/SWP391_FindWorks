@@ -1,12 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@page import="DAO.JobseekerDAO"%>
-<%@page import="Model.Jobseeker"%>
+<%@page import="DAO.RecruiterDAO"%>
+<%@page import="Model.Recruiter"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
 
 <% 
-    JobseekerDAO jobseekerDAO = new JobseekerDAO();
+    RecruiterDAO recruiterDAO = new RecruiterDAO();
     
     // Lấy tham số tìm kiếm
     String keyword = request.getParameter("keyword");
@@ -44,13 +44,13 @@
     }
     
     // Lấy tổng số bản ghi
-    int totalJobseekers;
+    int totalRecruiters;
     if (keyword != null && !keyword.trim().isEmpty()) {
-        totalJobseekers = jobseekerDAO.countSearchResults(keyword, searchBy);
+        totalRecruiters = recruiterDAO.countSearchResults(keyword, searchBy);
     } else {
-        totalJobseekers = jobseekerDAO.countTotalJobseekers();
+        totalRecruiters = recruiterDAO.countTotalRecruiters();
     }
-    int totalPages = (int) Math.ceil((double) totalJobseekers / pageSize);
+    int totalPages = (int) Math.ceil((double) totalRecruiters / pageSize);
     
     // Đảm bảo currentPage không vượt quá totalPages
     if (currentPage > totalPages) {
@@ -61,23 +61,23 @@
     }
     
     // Lấy dữ liệu phân trang
-    List<Jobseeker> jobseekers;
+    List<Recruiter> recruiters;
     if (keyword != null && !keyword.trim().isEmpty()) {
-        jobseekers = jobseekerDAO.searchJobseekers(keyword, searchBy, currentPage, pageSize);
+        recruiters = recruiterDAO.searchRecruiters(keyword, searchBy, currentPage, pageSize);
     } else {
-        jobseekers = jobseekerDAO.getJobseekersByPage(currentPage, pageSize);
+        recruiters = recruiterDAO.getRecruitersByPage(currentPage, pageSize);
     }
-    request.setAttribute("jobseekers", jobseekers);
+    request.setAttribute("recruiters", recruiters);
     request.setAttribute("currentPage", currentPage);
     request.setAttribute("totalPages", totalPages);
-    request.setAttribute("totalJobseekers", totalJobseekers);
+    request.setAttribute("totalRecruiters", totalRecruiters);
 %>
 <!DOCTYPE html>
 <html class="no-js" lang="zxx">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Manage Jobseekers - Admin Panel</title>
+    <title>Manage Recruiters - Admin Panel</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -110,6 +110,18 @@
             border-color: #dee2e6;
         }
         
+        .pagination-container {
+            margin-top: 20px;
+        }
+        
+        .page-size-control {
+            max-width: 150px;
+        }
+        
+        .page-info {
+            line-height: 38px;
+            margin-left: 15px;
+        }
         /* End Pagination Styles */
         
         :root {
@@ -240,22 +252,13 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        /* Jobseeker Table Styles */
-        .jobseeker-table {
+        /* Recruiter Table Styles */
+        .recruiter-table {
             background: var(--white);
             border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: 0.3s ease;
         }
-
-        .jobseeker-table:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary-color);
-        }
-
+        
         /* Search Container Styles */
         .search-container {
             background: var(--white);
@@ -303,64 +306,23 @@
             justify-content: center;
             font-weight: 500;
             transition: all 0.3s ease;
-            padding: 0.5rem 1.25rem;
-            font-size: 0.95rem;
-            border-radius: 8px;
         }
         
         .search-container .btn i {
             margin-right: 8px;
-            font-size: 1rem;
-        }
-        
-        .search-container .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .search-container .btn-primary:hover {
-            background-color: var(--primary-dark);
-            border-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
-        }
-        
-        .search-container .btn-outline-secondary {
-            border: 1px solid #dee2e6;
-            color: #6c757d;
-        }
-        
-        .search-container .btn-outline-secondary:hover {
-            background-color: #f8f9fa;
-            border-color: #adb5bd;
-            color: #495057;
-            transform: translateY(-2px);
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .search-container .col-md-4,
-            .search-container .col-md-3,
-            .search-container .col-md-2 {
-                margin-bottom: 15px;
-            }
-            
-            .search-container .btn {
-                width: 100%;
-            }
         }
 
         .table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 0;
+            margin-top: 20px;
         }
 
         .table th,
         .table td {
-            padding: 15px;
-            vertical-align: middle;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .table th {
@@ -368,93 +330,29 @@
             color: var(--text-color);
             font-weight: 500;
             text-transform: uppercase;
-            font-size: 0.875rem;
         }
 
         .table td {
             color: var(--text-color);
         }
 
-        .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        .table tr:hover {
+            background-color: var(--primary-light);
         }
 
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 500;
-            display: inline-block;
-        }
-
-        .status-badge.active {
-            background-color: #28a745;
-            color: var(--white);
-        }
-
-        .status-badge.inactive {
-            background-color: #dc3545;
-            color: var(--white);
+        /* Button Styles */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.3s ease;
         }
 
         .action-buttons {
+            position: relative;
             display: flex;
             gap: 10px;
-        }
-
-        .action-btn {
-            padding: 8px 15px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--white);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.3s ease;
-            font-size: 14px;
-        }
-
-        .action-btn i {
-            font-size: 14px;
-        }
-
-        .btn-view {
-            background: var(--primary-color);
-        }
-
-        .btn-edit {
-            background: #ffc107;
-            color: #000;
-        }
-
-        .btn-delete {
-            background: #dc3545;
-        }
-
-        .btn-view:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .btn-edit:hover {
-            background: #e0a800;
-            transform: translateY(-2px);
-        }
-
-        .btn-delete:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
-
-        .status-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
         }
 
         /* Three dot menu button */
@@ -480,7 +378,7 @@
         /* Status buttons container */
         .status-buttons {
             position: absolute;
-            right: 10px;
+            right: 0;
             top: 100%;
             background: white;
             border-radius: 8px;
@@ -582,38 +480,160 @@
             text-align: center;
         }
 
+        .action-btn {
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.3s ease;
+            font-size: 14px;
+        }
+
+        .action-btn i {
+            font-size: 14px;
+        }
+
+        .btn-view {
+            background: var(--primary-color);
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge-info {
+            background-color: #17a2b8;
+            color: var(--white);
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+            color: var(--white);
+        }
+
+        .badge-danger {
+            background-color: #dc3545;
+            color: var(--white);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+
+        /* Search Box */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .search-box button {
+            padding: 10px 20px;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #842029;
+            border: 1px solid #f5c2c7;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Responsive Styles */
         @media (max-width: 768px) {
             .sidebar {
-                width: 200px;
+                width: 100%;
+                height: auto;
+                position: static;
+                left: 0;
+                box-shadow: none;
+            }
+
+            .sidebar.active {
+                height: auto;
             }
 
             .main-content {
                 margin-left: 0;
             }
 
-            .toggle-btn {
-                left: 10px;
-            }
-
-            .jobseeker-table {
-                padding: 20px;
-            }
-
             .search-box {
-                margin-bottom: 20px;
+                flex-direction: column;
+            }
+
+            .search-box input,
+            .search-box button {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <!--[if lte IE 9]>
-        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-    <![endif]-->
-
-    <button class="toggle-btn" onclick="toggleSidebar()">
-        <i class="fa fa-bars"></i>
-    </button>
-
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h3>Admin Panel</h3>
@@ -635,7 +655,7 @@
                 <i class="fas fa-building-columns"></i>
                 Manage Companies
             </a>
-            <a href="AdminController?action=settings" class="menu-item ${param.action == 'settings' ? 'active' : ''}">
+            <a href="AdminController?action=settings" class="menu-item">
                 <i class="fas fa-gear"></i>
                 Settings
             </a>
@@ -646,32 +666,36 @@
         </div>
     </div>
 
+    <button class="toggle-btn" onclick="toggleSidebar()">
+        <i class="fa fa-bars"></i>
+    </button>
+
     <div class="main-content">
         <div class="admin-header">
             <div class="d-flex justify-content-between align-items-center" style="margin-left: 20px;">
-                <h2>Manage Jobseekers <span class="badge bg-secondary">${totalJobseekers} total</span></h2>
+                <h2>Manage Recruiters <span class="badge bg-secondary">${totalRecruiters} total</span></h2>
                 <a href="admin.jsp" class="btn btn-primary">Back to Dashboard</a>
             </div>
         </div>
 
-        <div class="jobseeker-table">
+        <div class="recruiter-table">
             <div class="search-container mb-4">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-4">
                         <label for="searchKeyword" class="form-label">Search Keyword</label>
-                        <input type="text" id="searchKeyword" placeholder="Enter keyword..." class="form-control" value="${param.keyword}">
+                        <input type="text" class="form-control" id="searchKeyword" name="keyword" placeholder="Enter keyword..." value="<%= keyword != null ? keyword : "" %>">
                     </div>
                     <div class="col-md-3">
                         <label for="searchBy" class="form-label">Search By</label>
-                        <select id="searchBy" class="form-select">
-                            <option value="all" ${param.searchBy == 'all' || empty param.searchBy ? 'selected' : ''}>All Fields</option>
-                            <option value="name" ${param.searchBy == 'name' ? 'selected' : ''}>Name</option>
-                            <option value="email" ${param.searchBy == 'email' ? 'selected' : ''}>Email</option>
-                            <option value="phone" ${param.searchBy == 'phone' ? 'selected' : ''}>Phone</option>
+                        <select class="form-select" id="searchBy" name="searchBy">
+                            <option value="all" <%= "all".equals(searchBy) ? "selected" : "" %>>All Fields</option>
+                            <option value="name" <%= "name".equals(searchBy) ? "selected" : "" %>>Name</option>
+                            <option value="email" <%= "email".equals(searchBy) ? "selected" : "" %>>Email</option>
+                            <option value="phone" <%= "phone".equals(searchBy) ? "selected" : "" %>>Phone</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <button type="button" class="btn btn-primary w-100" onclick="searchJobseekers()">
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-primary w-100" onclick="performSearch()">
                             <i class="fa fa-search me-2"></i>Search
                         </button>
                     </div>
@@ -684,164 +708,162 @@
             </div>
             
             <c:if test="${not empty error}">
-                <div class="alert alert-danger">
-                    ${error}
-                </div>
+                <div class="alert alert-danger">${error}</div>
             </c:if>
             
-            <c:if test="${empty jobseekers}">
+            <c:if test="${empty recruiters}">
                 <div class="alert alert-info">
-                    No jobseekers found
+                    No recruiters found
                 </div>
             </c:if>
             
-            <c:if test="${not empty jobseekers}">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Avatar</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Gender</th>
-                            <th>DOB</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach var="jobseeker" items="${jobseekers}">
-                            <tr>
-                                <td>
-                                    <img src="${jobseeker.image}" alt="Avatar" class="user-avatar">
-                                </td>
-                                <td>${jobseeker.firstName} ${jobseeker.lastName}</td>
-                                <td>${jobseeker.email__contact}</td>
-                                <td>${jobseeker.phone_contact}</td>
-                                <td>
-                                    <span class="badge ${jobseeker.gender ? 'badge-info' : 'badge-warning'}">
-                                        ${jobseeker.gender ? 'Male' : 'Female'}
-                                    </span>
-                                </td>
-                                <td>${jobseeker.dob}</td>
-                                <td>
-                                    <span class="badge ${jobseeker.status == 'active' ? 'badge-success' : jobseeker.status == 'pending' ? 'badge-warning' : 'badge-danger'}">
-                                        ${jobseeker.status}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons" style="position: relative;">
-                                        <!-- Three-dot menu button -->
-                                        <button class="action-menu-btn" onclick="toggleStatusMenu(this, event)" aria-label="More actions">
-                                            <i class="fa fa-ellipsis-v"></i>
-                                        </button>
-                                        
-                                        <!-- Status buttons dropdown -->
-                                        <div class="status-buttons">
-                                            <a href="AdminController?action=viewJobseeker&id=${jobseeker.freelanceID}" class="btn-status">
-                                                <i class="fa fa-eye"></i> View Details
-                                            </a>
-                                            <a href="AdminController?action=editJobseeker&id=${jobseeker.freelanceID}" class="btn-status">
-                                                <i class="fa fa-pencil"></i> Edit Profile
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <button class="btn-status ${jobseeker.status == 'active' ? 'active' : ''}" 
-                                                    onclick="changeStatus('${jobseeker.freelanceID}', 'active')">
-                                                <i class="fa fa-check-circle"></i> Active
-                                            </button>
-                                            <button class="btn-status ${jobseeker.status == 'suspended' ? 'suspended' : ''}" 
-                                                    onclick="changeStatus('${jobseeker.freelanceID}', 'suspended')">
-                                                <i class="fa fa-pause-circle"></i> Suspend
-                                            </button>
-                                            <button class="btn-status ${jobseeker.status == 'pending' ? 'pending' : ''}" 
-                                                    onclick="changeStatus('${jobseeker.freelanceID}', 'pending')">
-                                                <i class="fa fa-clock-o"></i> Pending
-                                            </button>
-                                            <div class="dropdown-divider"></div>
-                                            <button class="btn-delete" onclick="confirmDelete('${jobseeker.freelanceID}')">
-                                                <i class="fa fa-trash"></i> Delete
-                                            </button>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
-                
-                <!-- Phân trang -->
-                <div class="pagination-container mt-4">
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <span class="input-group-text">Items per page:</span>
-                                <input type="number" id="itemsPerPage" class="form-control" min="1" max="${totalJobseekers}" 
-                                       value="${param.pageSize != null ? param.pageSize : '5'}" 
-                                       onchange="updateItemsPerPage(this.value)" 
-                                       title="Enter a value between 1 and ${totalJobseekers}"
-                                       style="max-width: 80px;">
-                                <div class="invalid-feedback" id="pageSizeFeedback">
-                                    Please enter a value between 1 and ${totalJobseekers}
+            <c:if test="${not empty recruiters}">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Avatar</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Gender</th>
+                        <th>Date of Birth</th>
+                        <th>Status</th>
+                        <th>Money</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="recruiter" items="${recruiters}">
+                    <tr>
+                        <td>
+                            <img src="${recruiter.image}" alt="Recruiter Image" class="user-avatar">
+                        </td>
+                        <td>${recruiter.firstName} ${recruiter.lastName}</td>
+                        <td>${recruiter.emailContact}</td>
+                        <td>${recruiter.phoneContact}</td>
+                        <td>
+                            <span class="badge ${recruiter.gender ? 'badge-info' : 'badge-warning'}">
+                                ${recruiter.gender ? 'Male' : 'Female'}
+                            </span>
+                        </td>
+                        <td>${recruiter.dob}</td>
+                        <td data-recruiter-id="${recruiter.recruiterID}">
+                            <span class="badge ${recruiter.status == 'active' ? 'badge-success' : recruiter.status == 'suspended' ? 'badge-danger' : 'badge-warning'}">
+                                ${recruiter.status}
+                            </span>
+                        </td>
+                        <td>${recruiter.money}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <!-- Three-dot menu button -->
+                                <button class="action-menu-btn" onclick="toggleStatusMenu(this, event)" aria-label="More actions">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                
+                                <!-- Status buttons dropdown -->
+                                <div class="status-buttons">
+                                    <a href="AdminController?action=viewRecruiter&id=${recruiter.recruiterID}" class="btn-status">
+                                        <i class="fa fa-eye"></i> View Details
+                                    </a>
+                                    <a href="AdminController?action=editRecruiter&id=${recruiter.recruiterID}" class="btn-status">
+                                        <i class="fa fa-pencil"></i> Edit Profile
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <button class="btn-status ${recruiter.status == 'active' ? 'active' : ''}" 
+                                            onclick="changeStatus('${recruiter.recruiterID}', 'active')">
+                                        <i class="fa fa-check-circle"></i> Set as Active
+                                    </button>
+                                    <button class="btn-status ${recruiter.status == 'suspended' ? 'suspended' : ''}" 
+                                            onclick="changeStatus('${recruiter.recruiterID}', 'suspended')">
+                                        <i class="fa fa-pause-circle"></i> Suspend Account
+                                    </button>
+                                    <button class="btn-status ${recruiter.status == 'pending' ? 'pending' : ''}" 
+                                            onclick="changeStatus('${recruiter.recruiterID}', 'pending')">
+                                        <i class="fa fa-clock-o"></i> Set as Pending
+                                    </button>
+                                    <div class="dropdown-divider"></div>
+                                    <button class="btn-delete" onclick="if(confirm('Are you sure you want to delete this recruiter?')) { window.location.href='AdminController?action=deleteRecruiter&id=${recruiter.recruiterID}'; }">
+                                        <i class="fa fa-trash"></i> Delete Recruiter
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-8">
-                            <!-- Pagination info removed as requested -->
+                        </td>
+                    </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+            </c:if>
+            <!-- Phân trang -->
+            <div class="pagination-container mt-4">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text">Items per page:</span>
+                            <input type="number" id="itemsPerPage" class="form-control" min="1" max="${totalRecruiters}" 
+                                   value="${param.pageSize != null ? param.pageSize : '5'}" 
+                                   onchange="updateItemsPerPage(this.value)" 
+                                   title="Enter a value between 1 and ${totalRecruiters}"
+                                   style="max-width: 80px;">
+                            <div class="invalid-feedback" id="pageSizeFeedback">
+                                Please enter a value between 1 and ${totalRecruiters}
+                            </div>
                         </div>
                     </div>
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="?page=1&pageSize=${param.pageSize != null ? param.pageSize : '5'}" aria-label="First">
-                                    <span aria-hidden="true">&laquo;&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="?page=${currentPage - 1}&pageSize=${param.pageSize != null ? param.pageSize : '5'}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            
-                            <!-- Hiển thị các trang gần đó -->
-                            <c:set var="startPage" value="${currentPage - 2}" />
-                            <c:set var="endPage" value="${currentPage + 2}" />
-                            
-                            <c:if test="${startPage < 1}">
-                                <c:set var="endPage" value="${endPage + (1 - startPage)}" />
-                                <c:set var="startPage" value="1" />
-                            </c:if>
-                            
-                            <c:if test="${endPage > totalPages}">
-                                <c:set var="startPage" value="${startPage - (endPage - totalPages) > 0 ? startPage - (endPage - totalPages) : 1}" />
-                                <c:set var="endPage" value="${totalPages}" />
-                            </c:if>
-                            
-                            <c:forEach begin="${startPage > 0 ? startPage : 1}" end="${endPage <= totalPages ? endPage : totalPages}" var="i">
-                                <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                    <a class="page-link" href="?page=${i}&pageSize=${param.pageSize != null ? param.pageSize : '5'}">${i}</a>
-                                </li>
-                            </c:forEach>
-                            
-                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="?page=${currentPage + 1}&pageSize=${param.pageSize != null ? param.pageSize : '5'}" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="?page=${totalPages}&pageSize=${param.pageSize != null ? param.pageSize : '5'}" aria-label="Last">
-                                    <span aria-hidden="true">&raquo;&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                    <div class="text-center text-muted mt-2">
-                        Page ${currentPage} of ${totalPages}
+                    <div class="col-md-8">
+                        <!-- Pagination info removed as requested -->
                     </div>
                 </div>
-            </c:if>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="?page=1&pageSize=${param.pageSize != null ? param.pageSize : '5'}" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="?page=${currentPage - 1}&pageSize=${param.pageSize != null ? param.pageSize : '5'}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        
+                        <!-- Hiển thị các trang gần đó -->
+                        <c:set var="startPage" value="${currentPage - 2}" />
+                        <c:set var="endPage" value="${currentPage + 2}" />
+                        
+                        <c:if test="${startPage < 1}">
+                            <c:set var="endPage" value="${endPage + (1 - startPage)}" />
+                            <c:set var="startPage" value="1" />
+                        </c:if>
+                        
+                        <c:if test="${endPage > totalPages}">
+                            <c:set var="startPage" value="${startPage - (endPage - totalPages) > 0 ? startPage - (endPage - totalPages) : 1}" />
+                            <c:set var="endPage" value="${totalPages}" />
+                        </c:if>
+                        
+                        <c:forEach begin="${startPage > 0 ? startPage : 1}" end="${endPage <= totalPages ? endPage : totalPages}" var="i">
+                            <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                <a class="page-link" href="?page=${i}&pageSize=${param.pageSize != null ? param.pageSize : '5'}">${i}</a>
+                            </li>
+                        </c:forEach>
+                        
+                        <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                            <a class="page-link" href="?page=${currentPage + 1}&pageSize=${param.pageSize != null ? param.pageSize : '5'}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                            <a class="page-link" href="?page=${totalPages}&pageSize=${param.pageSize != null ? param.pageSize : '5'}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="text-center text-muted mt-2">
+                    Page ${currentPage} of ${totalPages}
+                </div>
+            </div>
         </div>
     </div>
-
     
     <!-- Status Change Confirmation Modal -->
     <div id="statusChangeModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
@@ -856,67 +878,53 @@
     </div>
 
     <script>
-        // Confirm before deleting a jobseeker
-        function confirmDelete(id) {
-            if (confirm('Are you sure you want to delete this jobseeker? This action cannot be undone.')) {
-                window.location.href = 'AdminController?action=deleteJobseeker&id=' + id;
-            }
-        }
-
-        // Search function
-        function searchJobseekers() {
-            const keyword = document.getElementById('searchKeyword').value.trim();
-            const searchBy = document.getElementById('searchBy').value;
-            
-            // Lấy các tham số hiện tại từ URL
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            // Cập nhật các tham số tìm kiếm
-            if (keyword) {
-                urlParams.set('keyword', keyword);
-                urlParams.set('searchBy', searchBy);
-            } else {
-                urlParams.delete('keyword');
-                urlParams.delete('searchBy');
-            }
-            
-            // Reset về trang đầu tiên khi tìm kiếm
-            urlParams.set('page', '1');
-            
-            // Chuyển hướng với các tham số mới
-            window.location.href = window.location.pathname + '?' + urlParams.toString();
-        }
-        
-        // Reset search function
-        function resetSearch() {
-            // Xóa các tham số tìm kiếm
-            const urlParams = new URLSearchParams(window.location.search);
-            urlParams.delete('keyword');
-            urlParams.delete('searchBy');
-            urlParams.set('page', '1');
-            
-            // Reset form
-            document.getElementById('searchKeyword').value = '';
-            document.getElementById('searchBy').value = 'all';
-            
-            // Chuyển hướng
-            window.location.href = window.location.pathname + '?' + urlParams.toString();
-        }
-        
-        // Xử lý sự kiện nhấn Enter trong ô tìm kiếm
-        document.getElementById('searchKeyword').addEventListener('keyup', function(event) {
-            if (event.key === 'Enter') {
-                searchJobseekers();
-            }
-        });
-
         // Toggle sidebar
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const content = document.querySelector('.main-content');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
             sidebar.classList.toggle('active');
             content.classList.toggle('active');
+            toggleBtn.classList.toggle('active');
         }
+
+        // Search function
+        function performSearch() {
+            const keyword = document.getElementById('searchKeyword').value.trim();
+            const searchBy = document.getElementById('searchBy').value;
+            
+            // Get current URL and parameters
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+            
+            // Update or add search parameters
+            if (keyword) {
+                params.set('keyword', keyword);
+                params.set('searchBy', searchBy);
+            } else {
+                params.delete('keyword');
+                params.delete('searchBy');
+            }
+            
+            // Reset to first page when searching
+            params.set('page', '1');
+            
+            // Update URL and reload
+            window.location.href = url.pathname + '?' + params.toString();
+        }
+        
+        // Reset search function
+        function resetSearch() {
+            window.location.href = 'admin_recruiter.jsp';
+        }
+        
+        // Handle Enter key in search input
+        document.getElementById('searchKeyword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
 
         // Toggle status menu
         function toggleStatusMenu(button, event) {
@@ -944,23 +952,14 @@
                     menu.classList.remove('show');
                 });
             }
-            
-            // Close sidebar when clicking outside
-            const sidebar = document.getElementById('sidebar');
-            const toggleBtn = document.querySelector('.toggle-btn');
-            
-            if (sidebar && toggleBtn && !sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
-                sidebar.classList.remove('active');
-                document.querySelector('.main-content').classList.remove('active');
-            }
         });
 
-        // Change jobseeker status
-        let currentJobseekerId = null;
+        // Change recruiter status
+        let currentRecruiterId = null;
         let currentNewStatus = null;
         
-        function changeStatus(jobseekerId, newStatus) {
-            currentJobseekerId = jobseekerId;
+        function changeStatus(recruiterId, newStatus) {
+            currentRecruiterId = recruiterId;
             currentNewStatus = newStatus;
             
             // Update modal message
@@ -973,8 +972,8 @@
         
         // Handle confirm button click
         document.getElementById('confirmStatusChange').addEventListener('click', function() {
-            if (currentJobseekerId && currentNewStatus) {
-                window.location.href = 'AdminController?action=changeStatus&id=' + currentJobseekerId + '&status=' + currentNewStatus;
+            if (currentRecruiterId && currentNewStatus) {
+                window.location.href = 'AdminController?action=changeRecruiterStatus&id=' + currentRecruiterId + '&status=' + currentNewStatus;
             }
         });
         
@@ -991,6 +990,13 @@
             }
         });
 
+        // Confirm before deleting a recruiter
+        function confirmDelete(recruiterId) {
+            if (confirm('Are you sure you want to delete this recruiter? This action cannot be undone.')) {
+                window.location.href = `AdminController?action=deleteRecruiter&id=${recruiterId}`;
+            }
+        }
+
         // Close all dropdowns when pressing Escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
@@ -999,6 +1005,72 @@
                 });
             }
         });
+
+        // Initialize event listeners
+        document.getElementById('searchInput')?.addEventListener('keyup', searchRecruiters);
+        
+        // Show alert message
+        function showAlert(message, type = 'info') {
+            // Remove any existing alerts
+            const existingAlert = document.querySelector('.alert-message');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+            
+            // Create alert element
+            const alert = document.createElement('div');
+            alert.className = `alert-message alert alert-${type} alert-dismissible fade show`;
+            alert.role = 'alert';
+            alert.style.position = 'fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '9999';
+            alert.style.minWidth = '300px';
+            alert.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            alert.style.border = 'none';
+            alert.style.borderRadius = '8px';
+            alert.style.animation = 'slideIn 0.3s ease-out';
+            
+            // Add message and close button
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="position: absolute; top: 8px; right: 12px; background: none; border: none; font-size: 1.5rem; cursor: pointer;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            `;
+            
+            // Add to body
+            document.body.appendChild(alert);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                alert.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+            
+            // Close button functionality
+            const closeBtn = alert.querySelector('.close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    alert.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => alert.remove(), 300);
+                });
+            }
+        }
+        
+        // Add keyframes for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
     
     <script>

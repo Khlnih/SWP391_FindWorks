@@ -11,12 +11,12 @@
     </welcome-file-list>
     
     <servlet>
-        <servlet-name>Admin_jobseekersController</servlet-name>
-        <servlet-class>Controller.Admin_jobseekersController</servlet-class>
+        <servlet-name>AdminController</servlet-name>
+        <servlet-class>Controller.AdminController</servlet-class>
     </servlet>
     
     <servlet-mapping>
-        <servlet-name>Admin_jobseekersController</servlet-name>
-        <url-pattern>/Admin_jobseekersController</url-pattern>
+        <servlet-name>AdminController</servlet-name>
+        <url-pattern>/AdminController</url-pattern>
     </servlet-mapping>
 </web-app>

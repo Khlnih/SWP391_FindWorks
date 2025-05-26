@@ -255,23 +255,23 @@
             <h3>Admin Panel</h3>
         </div>
         <div class="sidebar-content">
-            <a href="Admin_jobseekersController?action=dashboard" class="menu-item active">
+            <a href="AdminController?action=dashboard" class="menu-item ${param.action == 'dashboard' || empty param.action ? 'active' : ''}">
                 <i class="fas fa-chart-line"></i>
                 Dashboard
             </a>
-            <a href="Admin_jobseekersController?action=jobseekers" class="menu-item">
+            <a href="AdminController?action=jobseekers" class="menu-item ${param.action == 'jobseekers' ? 'active' : ''}">
                 <i class="fas fa-user-tie"></i>
                 Manage Jobseekers
             </a>
-            <a href="Admin_jobseekersController?action=jobs" class="menu-item">
+            <a href="AdminController?action=recruiter" class="menu-item ${param.action == 'recruiter' ? 'active' : ''}">
                 <i class="fas fa-briefcase-medical"></i>
-                Manage Jobs
+                Manage Recruiter
             </a>
-            <a href="Admin_jobseekersController?action=companies" class="menu-item">
+            <a href="AdminController?action=companies" class="menu-item ${param.action == 'companies' ? 'active' : ''}">
                 <i class="fas fa-building-columns"></i>
                 Manage Companies
             </a>
-            <a href="Admin_jobseekersController?action=settings" class="menu-item">
+            <a href="AdminController?action=settings" class="menu-item">
                 <i class="fas fa-gear"></i>
                 Settings
             </a>
