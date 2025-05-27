@@ -1,7 +1,7 @@
-package Controller;
+package controller;
 
-import DAO.loginDAO;
-import Model.UserLoginInfo;
+import dal.loginDAO;
+import model.UserLoginInfo;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,12 +17,6 @@ public class LoginServlet extends HttpServlet {
 
         String userIdentifier = request.getParameter("usernameOrEmail");
         String passwordInput = request.getParameter("password");
-
-        if (userIdentifier == null || passwordInput == null) {
-            request.setAttribute("error", "Username/email and password are required!");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
-            return;
-        }
 
         loginDAO dao = new loginDAO();
         UserLoginInfo user = dao.getUserLoginInfo(userIdentifier);

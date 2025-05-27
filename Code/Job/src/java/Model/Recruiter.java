@@ -1,14 +1,14 @@
-package Model;
-
+package model;
 import java.sql.Date;
 
 public class Recruiter {
+
     private int recruiterID;
     private String username;
     private String password;
     private String firstName;
     private String lastName;
-    private boolean gender; // 0: nữ, 1: nam
+    private boolean gender;       // true hoặc false tương ứng với 1 hoặc 0
     private Date dob;
     private String image;
     private int money;
@@ -22,8 +22,8 @@ public class Recruiter {
 
     // Constructor đầy đủ
     public Recruiter(int recruiterID, String username, String password, String firstName, String lastName,
-                    boolean gender, Date dob, String image, int money, String emailContact,
-                    String phoneContact, String status) {
+            boolean gender, Date dob, String image, int money, String emailContact,
+            String phoneContact, String status) {
         this.recruiterID = recruiterID;
         this.username = username;
         this.password = password;
@@ -38,8 +38,7 @@ public class Recruiter {
         this.status = status;
     }
 
-    // Getters and Setters
-
+    // Getter và Setter cho từng thuộc tính
     public int getRecruiterID() {
         return recruiterID;
     }
@@ -135,21 +134,23 @@ public class Recruiter {
     public void setStatus(String status) {
         this.status = status;
     }
-    
 
+    // Có thể override toString() để dễ debug, in thông tin
     @Override
     public String toString() {
-        return "Recruiter{" +
-                "recruiterID=" + recruiterID +
-                ", username='" + username + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", gender=" + gender +
-                ", dob=" + dob +
-                ", money=" + money +
-                ", emailContact='" + emailContact + '\'' +
-                ", phoneContact='" + phoneContact + '\'' +
-                ", status='" + status + '\'' +
-                '}';
+        return "Recruiter{"
+                + "recruiterID=" + recruiterID
+                + ", username='" + username + '\''
+                + ", password='" + password + '\''
+                + ", firstName='" + firstName + '\''
+                + ", lastName='" + lastName + '\''
+                + ", gender=" + gender
+                + ", dob=" + dob
+                + ", image='" + image + '\''
+                + ", money=" + money
+                + ", emailContact='" + emailContact + '\''
+                + ", phoneContact='" + phoneContact + '\''
+                + ", status='" + status + '\''
+                + '}';
     }
 }

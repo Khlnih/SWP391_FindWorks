@@ -1,8 +1,7 @@
-package Model;
-
-import java.sql.Date;
+package model;
 
 public class Admin {
+
     private int adminID;
     private String username;
     private String password;
@@ -19,7 +18,7 @@ public class Admin {
 
     // Constructor đầy đủ
     public Admin(int adminID, String username, String password, String firstName, String lastName,
-                String phone, String email, String image, String status) {
+            String phone, String email, String image, String status) {
         this.adminID = adminID;
         this.username = username;
         this.password = password;
@@ -31,46 +30,92 @@ public class Admin {
         this.status = status;
     }
 
-    // Getters and Setters
-    public int getAdminID() { return adminID; }
-    public void setAdminID(int adminID) { this.adminID = adminID; }
+    // Getter và Setter
+    public int getAdminID() {
+        return adminID;
+    }
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public void setAdminID(int adminID) {
+        this.adminID = adminID;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
+    public String getPassword() {
+        return password;
+    }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getFirstName() {
+        return firstName;
+    }
 
-    public String getImage() { return image; }
-    public void setImage(String image) { this.image = image; }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public String getLastName() {
+        return lastName;
+    }
 
-    
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    // toString() tiện debug
     @Override
     public String toString() {
-        return "Admin{" +
-                "adminID=" + adminID +
-                ", username='" + username + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                ", status='" + status + '\'' +
-                '}';
+        return "Admin{"
+                + "adminID=" + adminID
+                + ", username='" + username + '\''
+                + ", password='" + password + '\''
+                + ", firstName='" + firstName + '\''
+                + ", lastName='" + lastName + '\''
+                + ", phone='" + phone + '\''
+                + ", email='" + email + '\''
+                + ", image='" + image + '\''
+                + ", status='" + status + '\''
+                + '}';
     }
 }

@@ -1,6 +1,6 @@
-package Controller;
+package controller;
 
-import DAO.loginDAO;
+import dal.loginDAO;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
