@@ -255,30 +255,12 @@
             <h3>Admin Panel</h3>
         </div>
         <div class="sidebar-content">
-            <a href="AdminController?action=dashboard" class="menu-item ${param.action == 'dashboard' || empty param.action ? 'active' : ''}">
-                <i class="fas fa-chart-line"></i>
-                Dashboard
-            </a>
-            <a href="AdminController?action=jobseekers" class="menu-item ${param.action == 'jobseekers' ? 'active' : ''}">
-                <i class="fas fa-user-tie"></i>
-                Manage Jobseekers
-            </a>
-            <a href="AdminController?action=recruiter" class="menu-item ${param.action == 'recruiter' ? 'active' : ''}">
-                <i class="fas fa-briefcase-medical"></i>
-                Manage Recruiter
-            </a>
-            <a href="AdminController?action=skills" class="menu-item ${param.action == 'skills' ? 'active' : ''}">
-                <i class="fas fa-building-columns"></i>
-                Manage Skill
-            </a>
-            <a href="AdminController?action=settings" class="menu-item">
-                <i class="fas fa-gear"></i>
-                Settings
-            </a>
-            <a href="logout.jsp" class="menu-item">
-                <i class="fas fa-right-from-bracket"></i>
-                Logout
-            </a>
+            <a href="admin?action=dashboard" class="menu-item ${param.action == 'dashboard' || empty param.action ? 'active' : ''}"><i class="fa fa-tachometer"></i> Dashboard</a>
+            <a href="admin?action=jobseekers" class="menu-item ${param.action == 'jobseekers' ? 'active' : ''}"><i class="fa fa-users"></i> Manage Job Seekers</a>
+            <a href="admin?action=recruiters" class="menu-item ${param.action == 'recruiters' ? 'active' : ''}"><i class="fa fa-user-md"></i> Manage Recruiters</a>
+            <a href="admin?action=skills" class="menu-item ${param.action == 'skills' ? 'active' : ''}"><i class="fa fa-cogs"></i> Manage Skills</a>
+            <a href="admin?action=settings" class="menu-item ${param.action == 'settings' ? 'active' : ''}"><i class="fa fa-cog"></i> Settings</a>
+            <a href="logout.jsp" class="menu-item"><i class="fa fa-sign-out"></i> Logout</a>
         </div>
     </div>
 

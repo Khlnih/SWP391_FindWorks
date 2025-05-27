@@ -296,4 +296,41 @@ public class RecruiterDAO extends DBContext {
             return false;
         }
     }
+    public Recruiter getRecruiterById(int id) {
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return null;
+        }
+        
+        String sql = "SELECT * FROM Recruiter WHERE recruiterID = ?";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, id);
+            
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                Recruiter recruiter = new Recruiter();
+                recruiter.setRecruiterID(rs.getInt("recruiterID"));
+                recruiter.setUsername(rs.getString("username"));
+                recruiter.setPassword(rs.getString("password"));
+                recruiter.setFirstName(rs.getString("first_name"));
+                recruiter.setLastName(rs.getString("last_name"));
+                recruiter.setGender(rs.getBoolean("gender"));
+                recruiter.setDob(rs.getDate("dob"));
+                recruiter.setImage(rs.getString("image"));
+                recruiter.setMoney(rs.getInt("money"));
+                recruiter.setEmailContact(rs.getString("email_contact"));
+                recruiter.setPhoneContact(rs.getString("phone_contact"));
+                recruiter.setStatus(rs.getString("status"));
+                
+                return recruiter;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error getting recruiter by ID: " + e.getMessage());
+        }
+        
+        return null;
+    }
+    
 }

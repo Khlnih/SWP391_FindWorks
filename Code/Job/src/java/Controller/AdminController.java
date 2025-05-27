@@ -79,6 +79,12 @@ public class AdminController extends HttpServlet {
             case "deleteRecruiter":
                 deleteRecruiter(request, response);
                 break;
+            case "viewRecruiter":
+                viewRecruiter(request, response);
+                break;
+            case "viewJobseeker":
+                viewJobseeker(request, response);
+                break;
             default:
                 request.getRequestDispatcher("admin.jsp").forward(request, response);
                 break;
@@ -415,7 +421,57 @@ public class AdminController extends HttpServlet {
         }
         response.sendRedirect(request.getContextPath() + "/admin?action=jobseekers");
     }
-
+    private void viewRecruiter(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String id = request.getParameter("id");
+        if (id == null || id.isEmpty()) {
+            response.sendRedirect("AdminController?action=recruiter");
+            return;
+        }
+        
+        try {
+            Recruiter recruiter = recruiterDAO.getRecruiterById(Integer.parseInt(id));
+            if (recruiter != null) {
+                request.setAttribute("recruiter", recruiter);
+                request.getRequestDispatcher("admin_recruiterdetails.jsp").forward(request, response);
+            } else {
+                request.setAttribute("error", "Recruiter not found");
+                response.sendRedirect("AdminController?action=recruiter");
+            }
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Invalid recruiter ID");
+            response.sendRedirect("AdminController?action=recruiter");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error loading recruiter details: " + e.getMessage());
+            response.sendRedirect("AdminController?action=recruiter");
+        }
+    }
+    
+    private void viewJobseeker(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String id = request.getParameter("id");
+        if (id == null || id.isEmpty()) {
+            response.sendRedirect("AdminController?action=jobseekers");
+            return;
+        }
+        
+        try {
+            Jobseeker jobseeker = jobseekerDAO.getJobseekerById(Integer.parseInt(id));
+            if (jobseeker != null) {
+                request.setAttribute("jobseeker", jobseeker);
+                request.getRequestDispatcher("admin_jobseekerdetails.jsp").forward(request, response);
+            } else {
+                request.setAttribute("error", "Jobseeker not found");
+                response.sendRedirect("AdminController?action=jobseekers");
+            }
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Invalid jobseeker ID");
+            response.sendRedirect("AdminController?action=jobseekers");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error loading jobseeker details: " + e.getMessage());
+            response.sendRedirect("AdminController?action=jobseekers");
+        }
+    }
 
     private void changeRecruiterStatus(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();

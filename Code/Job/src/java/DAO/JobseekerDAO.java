@@ -296,4 +296,40 @@ public class JobseekerDAO extends DBContext {
         
         return count;
     }
+    public Jobseeker getJobseekerById(int id) {
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return null;
+        }
+        
+        String sql = "SELECT * FROM Freelancer WHERE freelanceID = ?";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, id);
+            ResultSet rs = stm.executeQuery();
+            
+            if (rs.next()) {
+                Jobseeker jobseeker = new Jobseeker();
+                jobseeker.setFreelanceID(rs.getInt("freelanceID"));
+                jobseeker.setUsername(rs.getString("username"));
+                jobseeker.setPassword(rs.getString("password"));
+                jobseeker.setFirstName(rs.getString("first_name"));
+                jobseeker.setLastName(rs.getString("last_name"));
+                jobseeker.setImage(rs.getString("image"));
+                jobseeker.setGender(rs.getBoolean("gender"));
+                jobseeker.setDob(rs.getString("dob"));
+                jobseeker.setDescribe(rs.getString("describe"));
+                jobseeker.setEmail__contact(rs.getString("email__contact"));
+                jobseeker.setPhone_contact(rs.getString("phone_contact"));
+                jobseeker.setStatus(rs.getString("status"));
+                
+                return jobseeker;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error getting jobseeker by ID: " + e.getMessage());
+        }
+        
+        return null;
+    }
 }
