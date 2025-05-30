@@ -51,7 +51,7 @@
                                     <nav>
                                         <ul id="navigation">
                                             <li><a href="index.jsp">home</a></li>
-                                            <li><a href="jobs.jsp">Browse Job</a></li>
+                                            <li><a href="jobs">Browse Job</a></li>
                                             <li><a href="#">pages <i class="ti-angle-down"></i></a>
                                                 <ul class="submenu">
                                                     <li><a href="candidate.jsp">Candidates </a></li>

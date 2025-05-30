@@ -1,8 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="Model.Jobseeker" %>
+<%@ page import="Model.Education" %>
+<%@ page import="Model.Experience" %>
+<%@ page import="Model.Skill" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="java.util.ArrayList" %>
 
 <% 
     Jobseeker jobseeker = (Jobseeker) request.getAttribute("jobseeker");
@@ -381,10 +386,133 @@
                             <% } %>
                         </div>
                     </div>
+                    
+                    <!-- Education Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="fa fa-graduation-cap mr-2"></i> Education
+                        </div>
+                        <div class="card-body">
+                            <c:choose>
+                                <c:when test="${not empty educationList}">
+                                    <c:forEach var="education" items="${educationList}">
+                                        <div class="education-item mb-4 pb-3 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h5 class="mb-1">${education.universityName}</h5>
+                                                <span class="badge badge-info">${education.degreeName}</span>
+                                            </div>
+                                            <p class="text-muted mb-1">
+                                                <c:choose>
+                                                    <c:when test="${education.startDate != null}">
+                                                        <fmt:formatDate value="${education.startDate}" pattern="MM/yyyy" />
+                                                    </c:when>
+                                                    <c:otherwise>N/A</c:otherwise>
+                                                </c:choose>
+                                                - 
+                                                <c:choose>
+                                                    <c:when test="${education.endDate != null}">
+                                                        <fmt:formatDate value="${education.endDate}" pattern="MM/yyyy" />
+                                                    </c:when>
+                                                    <c:otherwise>Present</c:otherwise>
+                                                </c:choose>
+                                            </p>
+                                        </div>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="empty-state">No education information available</div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </div>
+                    
+                    <!-- Experience Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="fa fa-briefcase mr-2"></i> Work Experience
+                        </div>
+                        <div class="card-body">
+                            <c:choose>
+                                <c:when test="${not empty experienceList}">
+                                    <c:forEach var="experience" items="${experienceList}">
+                                        <div class="experience-item mb-4 pb-3 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h5 class="mb-1">${experience.experienceWorkName}</h5>
+                                                <span class="badge badge-secondary">${experience.position}</span>
+                                            </div>
+                                            <p class="text-muted mb-1">
+                                                <c:choose>
+                                                    <c:when test="${experience.startDate != null}">
+                                                        <fmt:formatDate value="${experience.startDate}" pattern="MM/yyyy" />
+                                                    </c:when>
+                                                    <c:otherwise>N/A</c:otherwise>
+                                                </c:choose>
+                                                - 
+                                                <c:choose>
+                                                    <c:when test="${experience.endDate != null}">
+                                                        <fmt:formatDate value="${experience.endDate}" pattern="MM/yyyy" />
+                                                    </c:when>
+                                                    <c:otherwise>Present</c:otherwise>
+                                                </c:choose>
+                                            </p>
+                                            <c:if test="${not empty experience.yourProject}">
+                                                <div class="project-details mt-2">
+                                                    <p class="mb-0"><strong>Project: </strong>${experience.yourProject}</p>
+                                                </div>
+                                            </c:if>
+                                        </div>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="empty-state">No work experience information available</div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Right Column -->
                 <div class="col-lg-4">
+                    <!-- Skills Card -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="fa fa-code mr-2"></i> Skills
+                        </div>
+                        <div class="card-body">
+                            <c:choose>
+                                <c:when test="${not empty skillsList}">
+                                    <div class="skill-categories">
+                                        <c:forEach var="skill" items="${skillsList}">
+                                            <div class="skill-item mb-3 pb-2 border-bottom">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="skill-name font-weight-bold">${skill.skillSetName}</span>
+                                                    <div class="skill-level">
+                                                        <c:forEach begin="1" end="5" var="i">
+                                                            <c:choose>
+                                                                <c:when test="${skill.level >= i}">
+                                                                    <i class="fa fa-circle text-primary"></i>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <i class="fa fa-circle-o text-muted"></i>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:forEach>
+                                                    </div>
+                                                </div>
+                                                <c:if test="${not empty skill.expertiseName}">
+                                                    <small class="text-muted d-block mt-1">${skill.expertiseName}</small>
+                                                </c:if>
+                                            </div>
+                                        </c:forEach>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="empty-state">No skills information available</div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </div>
+                    
                     <!-- Account Actions Card -->
                     <div class="card mb-4">
                         <div class="card-header">

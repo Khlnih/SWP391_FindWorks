@@ -3,9 +3,15 @@ package Controller;
 import DAO.SkillDAO;
 import DAO.JobseekerDAO;
 import DAO.RecruiterDAO;
+import DAO.EducationDAO;
+import DAO.ExperienceDAO;
+import DAO.JobseekerSkillDAO;
 import Model.Jobseeker;
 import Model.Recruiter;
 import Model.SkillSet;
+import Model.Education;
+import Model.Experience;
+import Model.Skill;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List; // Import List
@@ -16,11 +22,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Servlet implementation class AdminController
+ */
 @WebServlet("/admin")
 public class AdminController extends HttpServlet {
     private JobseekerDAO jobseekerDAO = new JobseekerDAO();
     private RecruiterDAO recruiterDAO = new RecruiterDAO();
     private SkillDAO skillDAO = new SkillDAO();
+    private EducationDAO educationDAO = new EducationDAO();
+    private ExperienceDAO experienceDAO = new ExperienceDAO();
+    private JobseekerSkillDAO jobseekerSkillDAO = new JobseekerSkillDAO();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -455,9 +467,21 @@ public class AdminController extends HttpServlet {
         }
         
         try {
-            Jobseeker jobseeker = jobseekerDAO.getJobseekerById(Integer.parseInt(id));
+            int freelancerId = Integer.parseInt(id);
+            Jobseeker jobseeker = jobseekerDAO.getJobseekerById(freelancerId);
+            
             if (jobseeker != null) {
+                // Load education, experience and skills data
+                ArrayList<Education> educationList = educationDAO.getEducationByFreelancerID(freelancerId);
+                ArrayList<Experience> experienceList = experienceDAO.getExperienceByFreelancerID(freelancerId);
+                ArrayList<Skill> skillsList = jobseekerSkillDAO.getSkillsByFreelancerID(freelancerId);
+                
+                // Set all attributes
                 request.setAttribute("jobseeker", jobseeker);
+                request.setAttribute("educationList", educationList);
+                request.setAttribute("experienceList", experienceList);
+                request.setAttribute("skillsList", skillsList);
+                
                 request.getRequestDispatcher("admin_jobseekerdetails.jsp").forward(request, response);
             } else {
                 request.setAttribute("error", "Jobseeker not found");
