@@ -6,12 +6,19 @@ import DAO.RecruiterDAO;
 import DAO.EducationDAO;
 import DAO.ExperienceDAO;
 import DAO.JobseekerSkillDAO;
+import DAO.RecruiterTransactionDAO;
+import DAO.AccountTierDAO;
+import DAO.CompanyDAO;
 import Model.Jobseeker;
 import Model.Recruiter;
 import Model.SkillSet;
 import Model.Education;
 import Model.Experience;
 import Model.Skill;
+import Model.RecruiterTransaction;
+import Model.AccountTier;
+import Model.Company;
+import java.math.BigDecimal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List; // Import List
@@ -21,6 +28,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.PrintWriter;
 
 /**
  * Servlet implementation class AdminController
@@ -40,14 +48,13 @@ public class AdminController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
-        HttpSession session = request.getSession(); // Get session for PRG messages
+        HttpSession session = request.getSession();
 
         if (action == null) {
-            action = "dashboard"; // Default action
+            action = "dashboard"; 
         }
 
-        // Clear previous messages from session if they were for a different action group
-        // This is a simple way to avoid showing old messages. More sophisticated logic might be needed.
+        
         clearSessionMessages(session, action);
 
 
@@ -79,7 +86,7 @@ public class AdminController extends HttpServlet {
             case "settings":
                 request.getRequestDispatcher("admin_settings.jsp").forward(request, response);
                 break;
-            case "changeStatus": // Assuming this is for Jobseeker
+            case "changeStatus": 
                 changeJobseekerStatus(request, response);
                 break;
             case "deleteJobseeker":
@@ -111,7 +118,7 @@ public class AdminController extends HttpServlet {
     }
 
     private void transferSessionMessagesToRequest(HttpServletRequest request) {
-        HttpSession session = request.getSession(false); // Don't create if not exists
+        HttpSession session = request.getSession(false);
         if (session != null) {
             if (session.getAttribute("message") != null) {
                 request.setAttribute("message", session.getAttribute("message"));
@@ -128,7 +135,6 @@ public class AdminController extends HttpServlet {
     private void showJobseekers(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         transferSessionMessagesToRequest(request); // For PRG
         try {
-            // Add pagination/search for jobseekers here if needed, similar to showSkills
             ArrayList<Jobseeker> jobseekers = jobseekerDAO.getAllJobSeeker();
             request.setAttribute("jobseekers", jobseekers);
         } catch (Exception e) {
@@ -140,9 +146,8 @@ public class AdminController extends HttpServlet {
     }
 
     private void showRecruiters(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        transferSessionMessagesToRequest(request); // For PRG
+        transferSessionMessagesToRequest(request); 
         try {
-            // Add pagination/search for recruiters here if needed
             ArrayList<Recruiter> recruiters = recruiterDAO.getAllRecruiters();
             request.setAttribute("recruiters", recruiters);
         } catch (Exception e) {
@@ -441,9 +446,33 @@ public class AdminController extends HttpServlet {
         }
         
         try {
-            Recruiter recruiter = recruiterDAO.getRecruiterById(Integer.parseInt(id));
+            int recruiterId = Integer.parseInt(id);
+            Recruiter recruiter = recruiterDAO.getRecruiterById(recruiterId);
             if (recruiter != null) {
+                RecruiterDAO reDAO = new RecruiterDAO();
+                RecruiterTransactionDAO rtDAO = new RecruiterTransactionDAO();
+                List<RecruiterTransaction> transactions = rtDAO.getTransactionsByRecruiter(recruiterId);
+                Double totalSpent = rtDAO.getTotalSpent(recruiterId);
+                
+                // Lấy thông tin gói đăng ký
+                AccountTierDAO atDAO = new AccountTierDAO();
+                AccountTier currentTier = atDAO.getCurrentTier(recruiterId);
+                String tierName = reDAO.getTierName(recruiterId);
+                String description = reDAO.getTierNameDescription(recruiterId);
+                
+                // Lấy thông tin công ty
+                CompanyDAO companyDAO = new CompanyDAO();
+                Company company = companyDAO.getCompanyByRecruiterId(recruiterId);
+                
+                // Đặt thuộc tính để hiển thị trong JSP
                 request.setAttribute("recruiter", recruiter);
+                request.setAttribute("transactions", transactions);
+                request.setAttribute("totalSpent", totalSpent);
+                request.setAttribute("currentTier", currentTier);
+                request.setAttribute("tierName", tierName);
+                request.setAttribute("description", description);
+                request.setAttribute("company", company);
+                
                 request.getRequestDispatcher("admin_recruiterdetails.jsp").forward(request, response);
             } else {
                 request.setAttribute("error", "Recruiter not found");
@@ -462,7 +491,7 @@ public class AdminController extends HttpServlet {
     private void viewJobseeker(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getParameter("id");
         if (id == null || id.isEmpty()) {
-            response.sendRedirect("AdminController?action=jobseekers");
+            response.sendRedirect("admin?action=jobseekers");
             return;
         }
         
@@ -471,29 +500,30 @@ public class AdminController extends HttpServlet {
             Jobseeker jobseeker = jobseekerDAO.getJobseekerById(freelancerId);
             
             if (jobseeker != null) {
-                // Load education, experience and skills data
-                ArrayList<Education> educationList = educationDAO.getEducationByFreelancerID(freelancerId);
-                ArrayList<Experience> experienceList = experienceDAO.getExperienceByFreelancerID(freelancerId);
-                ArrayList<Skill> skillsList = jobseekerSkillDAO.getSkillsByFreelancerID(freelancerId);
+                // Lấy dữ liệu từ các DAO
+                List<Education> educations = educationDAO.getEducationByFreelancerID(freelancerId);
+                List<Experience> experiences = experienceDAO.getExperienceByFreelancerID(freelancerId);
+                List<Skill> skills = jobseekerSkillDAO.getSkillsByFreelancerID(freelancerId);
                 
-                // Set all attributes
+                // Đặt các thuộc tính vào request
                 request.setAttribute("jobseeker", jobseeker);
-                request.setAttribute("educationList", educationList);
-                request.setAttribute("experienceList", experienceList);
-                request.setAttribute("skillsList", skillsList);
+                request.setAttribute("educations", educations);
+                request.setAttribute("experiences", experiences);
+                request.setAttribute("skills", skills);
                 
+                // Forward đến trang chi tiết
                 request.getRequestDispatcher("admin_jobseekerdetails.jsp").forward(request, response);
             } else {
-                request.setAttribute("error", "Jobseeker not found");
-                response.sendRedirect("AdminController?action=jobseekers");
+                request.getSession().setAttribute("error", "Không tìm thấy ứng viên");
+                response.sendRedirect("admin?action=jobseekers");
             }
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "Invalid jobseeker ID");
-            response.sendRedirect("AdminController?action=jobseekers");
+            request.getSession().setAttribute("error", "ID ứng viên không hợp lệ");
+            response.sendRedirect("admin?action=jobseekers");
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Error loading jobseeker details: " + e.getMessage());
-            response.sendRedirect("AdminController?action=jobseekers");
+            request.getSession().setAttribute("error", "Lỗi khi tải thông tin ứng viên: " + e.getMessage());
+            response.sendRedirect("admin?action=jobseekers");
         }
     }
 

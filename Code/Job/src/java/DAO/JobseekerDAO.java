@@ -15,7 +15,7 @@ public class JobseekerDAO extends DBContext {
             return false;
         }
         
-        String sql = "UPDATE Freelancer SET status = 'inactive' WHERE freelanceID = ?";
+        String sql = "UPDATE Freelancer SET status = 'inactive' WHERE freelancerID = ?";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, id);
@@ -42,18 +42,18 @@ public class JobseekerDAO extends DBContext {
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
                 Jobseeker jobseeker = new Jobseeker();
-                jobseeker.setFreelanceID(rs.getInt("freelanceID"));
-                jobseeker.setUsername(rs.getString("username"));
-                jobseeker.setPassword(rs.getString("password"));
-                jobseeker.setFirstName(rs.getString("first_name"));
-                jobseeker.setLastName(rs.getString("last_name"));
+                jobseeker.setFreelancerID(rs.getInt("freelancerID"));
+                jobseeker.setPassword_hash(rs.getString("password_hash"));
+                jobseeker.setFirst_name(rs.getString("first_name"));
+                jobseeker.setLast_name(rs.getString("last_name"));
                 jobseeker.setImage(rs.getString("image"));
                 jobseeker.setGender(rs.getBoolean("gender"));
-                jobseeker.setDob(rs.getString("dob"));
+                jobseeker.setDob(rs.getDate("dob"));
                 jobseeker.setDescribe(rs.getString("describe"));
-                jobseeker.setEmail__contact(rs.getString("email__contact"));
+                jobseeker.setEmail_contact(rs.getString("email_contact"));
                 jobseeker.setPhone_contact(rs.getString("phone_contact"));
                 jobseeker.setStatus(rs.getString("status"));
+                jobseeker.setStatusChangedByAdminID(rs.getInt("statusChangedByAdminID") != 0 ? rs.getInt("statusChangedByAdminID") : null);
                 
                 list.add(jobseeker);
             }
@@ -72,7 +72,7 @@ public class JobseekerDAO extends DBContext {
             return false;
         }
         
-        String sql = "UPDATE Freelancer SET status = ? WHERE freelanceID = ?";
+        String sql = "UPDATE Freelancer SET status = ? WHERE freelancerID = ?";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1, status);
@@ -97,7 +97,7 @@ public class JobseekerDAO extends DBContext {
         }
         
         int offset = (page - 1) * pageSize;
-        String sql = "SELECT * FROM Freelancer WHERE status != 'inactive' ORDER BY freelanceID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        String sql = "SELECT * FROM Freelancer WHERE status != 'inactive' ORDER BY freelancerID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, offset);
@@ -106,18 +106,18 @@ public class JobseekerDAO extends DBContext {
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
                 Jobseeker jobseeker = new Jobseeker();
-                jobseeker.setFreelanceID(rs.getInt("freelanceID"));
-                jobseeker.setUsername(rs.getString("username"));
-                jobseeker.setPassword(rs.getString("password"));
-                jobseeker.setFirstName(rs.getString("first_name"));
-                jobseeker.setLastName(rs.getString("last_name"));
+                jobseeker.setFreelancerID(rs.getInt("freelancerID"));
+                jobseeker.setPassword_hash(rs.getString("password_hash"));
+                jobseeker.setFirst_name(rs.getString("first_name"));
+                jobseeker.setLast_name(rs.getString("last_name"));
                 jobseeker.setImage(rs.getString("image"));
                 jobseeker.setGender(rs.getBoolean("gender"));
-                jobseeker.setDob(rs.getString("dob"));
+                jobseeker.setDob(rs.getDate("dob"));
                 jobseeker.setDescribe(rs.getString("describe"));
-                jobseeker.setEmail__contact(rs.getString("email__contact"));
+                jobseeker.setEmail_contact(rs.getString("email_contact"));
                 jobseeker.setPhone_contact(rs.getString("phone_contact"));
                 jobseeker.setStatus(rs.getString("status"));
+                jobseeker.setStatusChangedByAdminID(rs.getInt("statusChangedByAdminID") != 0 ? rs.getInt("statusChangedByAdminID") : null);
                 
                 list.add(jobseeker);
             }
@@ -156,7 +156,7 @@ public class JobseekerDAO extends DBContext {
         }
         
         int offset = (page - 1) * pageSize;
-        StringBuilder sql = new StringBuilder("SELECT * FROM Freelancer WHERE status = 'active' AND 1=1");
+        StringBuilder sql = new StringBuilder("SELECT * FROM Freelancer WHERE status != 'inactive' AND 1=1");
         
         // Thêm điều kiện tìm kiếm dựa trên searchBy
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -165,17 +165,17 @@ public class JobseekerDAO extends DBContext {
                     sql.append(" AND (first_name LIKE ? OR last_name LIKE ?)");
                     break;
                 case "email":
-                    sql.append(" AND email__contact LIKE ?");
+                    sql.append(" AND email_contact LIKE ?");
                     break;
                 case "phone":
                     sql.append(" AND phone_contact LIKE ?");
                     break;
                 default:
-                    sql.append(" AND (first_name LIKE ? OR last_name LIKE ? OR email__contact LIKE ? OR phone_contact LIKE ?)");
+                    sql.append(" AND (first_name LIKE ? OR last_name LIKE ? OR email_contact LIKE ? OR phone_contact LIKE ?)");
             }
         }
         
-        sql.append(" ORDER BY freelanceID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        sql.append(" ORDER BY freelancerID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
         
         try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
@@ -196,10 +196,10 @@ public class JobseekerDAO extends DBContext {
                         stm.setString(paramIndex++, searchPattern);
                         break;
                     default:
-                        stm.setString(paramIndex++, searchPattern);
-                        stm.setString(paramIndex++, searchPattern);
-                        stm.setString(paramIndex++, searchPattern);
-                        stm.setString(paramIndex++, searchPattern);
+                        stm.setString(paramIndex++, searchPattern); // first_name
+                        stm.setString(paramIndex++, searchPattern); // last_name
+                        stm.setString(paramIndex++, searchPattern); // email_contact
+                        stm.setString(paramIndex++, searchPattern); // phone_contact
                 }
             }
             
@@ -210,16 +210,15 @@ public class JobseekerDAO extends DBContext {
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
                 Jobseeker jobseeker = new Jobseeker();
-                jobseeker.setFreelanceID(rs.getInt("freelanceID"));
-                jobseeker.setUsername(rs.getString("username"));
-                jobseeker.setPassword(rs.getString("password"));
-                jobseeker.setFirstName(rs.getString("first_name"));
-                jobseeker.setLastName(rs.getString("last_name"));
+                jobseeker.setFreelancerID(rs.getInt("freelancerID"));
+                jobseeker.setPassword_hash(rs.getString("password_hash"));
+                jobseeker.setFirst_name(rs.getString("first_name"));
+                jobseeker.setLast_name(rs.getString("last_name"));
                 jobseeker.setImage(rs.getString("image"));
                 jobseeker.setGender(rs.getBoolean("gender"));
-                jobseeker.setDob(rs.getString("dob"));
+                jobseeker.setDob(rs.getDate("dob"));
                 jobseeker.setDescribe(rs.getString("describe"));
-                jobseeker.setEmail__contact(rs.getString("email__contact"));
+                jobseeker.setEmail_contact(rs.getString("email_contact"));
                 jobseeker.setPhone_contact(rs.getString("phone_contact"));
                 jobseeker.setStatus(rs.getString("status"));
                 
@@ -251,13 +250,13 @@ public class JobseekerDAO extends DBContext {
                     sql.append(" AND (first_name LIKE ? OR last_name LIKE ?)");
                     break;
                 case "email":
-                    sql.append(" AND email__contact LIKE ?");
+                    sql.append(" AND email_contact LIKE ?");
                     break;
                 case "phone":
                     sql.append(" AND phone_contact LIKE ?");
                     break;
                 default:
-                    sql.append(" AND (first_name LIKE ? OR last_name LIKE ? OR email__contact LIKE ? OR phone_contact LIKE ?)");
+                    sql.append(" AND (first_name LIKE ? OR last_name LIKE ? OR email_contact LIKE ? OR phone_contact LIKE ?)");
             }
         }
         
@@ -302,7 +301,7 @@ public class JobseekerDAO extends DBContext {
             return null;
         }
         
-        String sql = "SELECT * FROM Freelancer WHERE freelanceID = ?";
+        String sql = "SELECT * FROM Freelancer WHERE freelancerID = ?";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, id);
@@ -310,18 +309,18 @@ public class JobseekerDAO extends DBContext {
             
             if (rs.next()) {
                 Jobseeker jobseeker = new Jobseeker();
-                jobseeker.setFreelanceID(rs.getInt("freelanceID"));
-                jobseeker.setUsername(rs.getString("username"));
-                jobseeker.setPassword(rs.getString("password"));
-                jobseeker.setFirstName(rs.getString("first_name"));
-                jobseeker.setLastName(rs.getString("last_name"));
+                jobseeker.setFreelancerID(rs.getInt("freelancerID"));
+                jobseeker.setPassword_hash(rs.getString("password_hash"));
+                jobseeker.setFirst_name(rs.getString("first_name"));
+                jobseeker.setLast_name(rs.getString("last_name"));
                 jobseeker.setImage(rs.getString("image"));
                 jobseeker.setGender(rs.getBoolean("gender"));
-                jobseeker.setDob(rs.getString("dob"));
+                jobseeker.setDob(rs.getDate("dob"));
                 jobseeker.setDescribe(rs.getString("describe"));
-                jobseeker.setEmail__contact(rs.getString("email__contact"));
+                jobseeker.setEmail_contact(rs.getString("email_contact"));
                 jobseeker.setPhone_contact(rs.getString("phone_contact"));
                 jobseeker.setStatus(rs.getString("status"));
+                jobseeker.setStatusChangedByAdminID(rs.getInt("statusChangedByAdminID") != 0 ? rs.getInt("statusChangedByAdminID") : null);
                 
                 return jobseeker;
             }

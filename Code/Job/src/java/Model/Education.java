@@ -15,7 +15,7 @@ public class Education {
     private String universityName;
     private Date startDate;
     private Date endDate;
-    private int freelanceID;
+    private int freelancerID;
     private int degreeID;
     private String degreeName; // Additional field to store degree name when joining with Degree table
     
@@ -24,22 +24,22 @@ public class Education {
     }
     
     // Full constructor
-    public Education(int educationID, String universityName, Date startDate, Date endDate, int freelanceID, int degreeID, String degreeName) {
+    public Education(int educationID, String universityName, Date startDate, Date endDate, int freelancerID, int degreeID, String degreeName) {
         this.educationID = educationID;
         this.universityName = universityName;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.freelanceID = freelanceID;
+        this.freelancerID = freelancerID;
         this.degreeID = degreeID;
         this.degreeName = degreeName;
     }
     
     // Constructor without educationID (for insertion)
-    public Education(String universityName, Date startDate, Date endDate, int freelanceID, int degreeID) {
+    public Education(String universityName, Date startDate, Date endDate, int freelancerID, int degreeID) {
         this.universityName = universityName;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.freelanceID = freelanceID;
+        this.freelancerID = freelancerID;
         this.degreeID = degreeID;
     }
 
@@ -76,12 +76,12 @@ public class Education {
         this.endDate = endDate;
     }
 
-    public int getFreelanceID() {
-        return freelanceID;
+    public int getFreelancerID() {
+        return freelancerID;
     }
 
-    public void setFreelanceID(int freelanceID) {
-        this.freelanceID = freelanceID;
+    public void setFreelancerID(int freelancerID) {
+        this.freelancerID = freelancerID;
     }
 
     public int getDegreeID() {
@@ -107,7 +107,7 @@ public class Education {
                 ", universityName=" + universityName + 
                 ", startDate=" + startDate + 
                 ", endDate=" + endDate + 
-                ", freelanceID=" + freelanceID + 
+                ", freelancerID=" + freelancerID + 
                 ", degreeID=" + degreeID + 
                 ", degreeName=" + degreeName + 
                 '}';

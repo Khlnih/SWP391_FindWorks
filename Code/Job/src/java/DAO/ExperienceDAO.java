@@ -28,7 +28,7 @@ public class ExperienceDAO extends DBContext {
             return list;
         }
         
-        String sql = "SELECT * FROM Experience WHERE freelanceID = ? ORDER BY start_date DESC";
+        String sql = "SELECT * FROM Experience WHERE freelancerID = ? ORDER BY start_date DESC";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, freelancerID);
@@ -42,7 +42,7 @@ public class ExperienceDAO extends DBContext {
                 experience.setStartDate(rs.getDate("start_date"));
                 experience.setEndDate(rs.getDate("end_date"));
                 experience.setYourProject(rs.getString("your_project"));
-                experience.setFreelanceID(rs.getInt("freelanceID"));
+                experience.setFreelancerID(rs.getInt("freelancerID"));
                 
                 list.add(experience);
             }
@@ -66,7 +66,7 @@ public class ExperienceDAO extends DBContext {
             return false;
         }
         
-        String sql = "INSERT INTO Experience (experience_work_name, position, start_date, end_date, your_project, freelanceID) " +
+        String sql = "INSERT INTO Experience (experience_work_name, position, start_date, end_date, your_project, freelancerID) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
@@ -75,7 +75,7 @@ public class ExperienceDAO extends DBContext {
             stm.setDate(3, experience.getStartDate());
             stm.setDate(4, experience.getEndDate());
             stm.setString(5, experience.getYourProject());
-            stm.setInt(6, experience.getFreelanceID());
+            stm.setInt(6, experience.getFreelancerID());
             
             int rowsAffected = stm.executeUpdate();
             return rowsAffected > 0;
@@ -100,7 +100,7 @@ public class ExperienceDAO extends DBContext {
         
         String sql = "UPDATE Experience SET experience_work_name = ?, position = ?, " +
                      "start_date = ?, end_date = ?, your_project = ? " +
-                     "WHERE experienceID = ? AND freelanceID = ?";
+                     "WHERE experienceID = ? AND freelancerID = ?";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1, experience.getExperienceWorkName());
@@ -109,7 +109,7 @@ public class ExperienceDAO extends DBContext {
             stm.setDate(4, experience.getEndDate());
             stm.setString(5, experience.getYourProject());
             stm.setInt(6, experience.getExperienceID());
-            stm.setInt(7, experience.getFreelanceID());
+            stm.setInt(7, experience.getFreelancerID());
             
             int rowsAffected = stm.executeUpdate();
             return rowsAffected > 0;
@@ -133,7 +133,7 @@ public class ExperienceDAO extends DBContext {
             return false;
         }
         
-        String sql = "DELETE FROM Experience WHERE experienceID = ? AND freelanceID = ?";
+        String sql = "DELETE FROM Experience WHERE experienceID = ? AND freelancerID = ?";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, experienceID);
@@ -174,7 +174,7 @@ public class ExperienceDAO extends DBContext {
                 experience.setStartDate(rs.getDate("start_date"));
                 experience.setEndDate(rs.getDate("end_date"));
                 experience.setYourProject(rs.getString("your_project"));
-                experience.setFreelanceID(rs.getInt("freelanceID"));
+                experience.setFreelancerID(rs.getInt("freelancerID"));
                 
                 return experience;
             }

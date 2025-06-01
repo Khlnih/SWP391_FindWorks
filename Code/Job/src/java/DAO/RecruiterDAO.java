@@ -1,6 +1,8 @@
 package DAO;
 
 import Model.Recruiter;
+import Model.Company;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,18 +25,24 @@ public class RecruiterDAO extends DBContext {
             while (rs.next()) {
                 Recruiter recruiter = new Recruiter();
                 recruiter.setRecruiterID(rs.getInt("recruiterID"));
-                recruiter.setUsername(rs.getString("username"));
-                recruiter.setPassword(rs.getString("password"));
-                recruiter.setFirstName(rs.getString("first_name"));
-                recruiter.setLastName(rs.getString("last_name"));
+                // Trường username đã bị bỏ trong DB mới
+                recruiter.setPassword_hash(rs.getString("password_hash"));
+                recruiter.setFirst_name(rs.getString("first_name"));
+                recruiter.setLast_name(rs.getString("last_name"));
                 recruiter.setGender(rs.getBoolean("gender"));
                 recruiter.setDob(rs.getDate("dob"));
                 recruiter.setImage(rs.getString("image"));
-                recruiter.setMoney(rs.getInt("money"));
-                recruiter.setEmailContact(rs.getString("email_contact"));
-                recruiter.setPhoneContact(rs.getString("phone_contact"));
+                recruiter.setMoney(rs.getBigDecimal("money"));
+                recruiter.setEmail_contact(rs.getString("email_contact"));
+                recruiter.setPhone_contact(rs.getString("phone_contact"));
                 recruiter.setStatus(rs.getString("status"));
-
+                // Thêm trường statusChangedByAdminID
+                Integer statusChangedByAdminID = rs.getInt("statusChangedByAdminID");
+                if (rs.wasNull()) {
+                    statusChangedByAdminID = null;
+                }
+                recruiter.setStatusChangedByAdminID(statusChangedByAdminID);
+                
                 list.add(recruiter);
             }
             System.out.println("Found " + list.size() + " recruiters");
@@ -86,17 +94,23 @@ public class RecruiterDAO extends DBContext {
             while (rs.next()) {
                 Recruiter recruiter = new Recruiter();
                 recruiter.setRecruiterID(rs.getInt("recruiterID"));
-                recruiter.setUsername(rs.getString("username"));
-                recruiter.setPassword(rs.getString("password"));
-                recruiter.setFirstName(rs.getString("first_name"));
-                recruiter.setLastName(rs.getString("last_name"));
+                // Trường username đã bị bỏ trong DB mới
+                recruiter.setPassword_hash(rs.getString("password_hash"));
+                recruiter.setFirst_name(rs.getString("first_name"));
+                recruiter.setLast_name(rs.getString("last_name"));
                 recruiter.setGender(rs.getBoolean("gender"));
                 recruiter.setDob(rs.getDate("dob"));
                 recruiter.setImage(rs.getString("image"));
-                recruiter.setMoney(rs.getInt("money"));
-                recruiter.setEmailContact(rs.getString("email_contact"));
-                recruiter.setPhoneContact(rs.getString("phone_contact"));
+                recruiter.setMoney(rs.getBigDecimal("money"));
+                recruiter.setEmail_contact(rs.getString("email_contact"));
+                recruiter.setPhone_contact(rs.getString("phone_contact"));
                 recruiter.setStatus(rs.getString("status"));
+                // Thêm trường statusChangedByAdminID
+                Integer statusChangedByAdminID = rs.getInt("statusChangedByAdminID");
+                if (rs.wasNull()) {
+                    statusChangedByAdminID = null;
+                }
+                recruiter.setStatusChangedByAdminID(statusChangedByAdminID);
                 
                 list.add(recruiter);
             }
@@ -110,6 +124,12 @@ public class RecruiterDAO extends DBContext {
     
     public int countTotalRecruiters() {
         int count = 0;
+        
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return count;
+        }
+        
         String sql = "SELECT COUNT(*) as total FROM Recruiter WHERE status != 'inactive'";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
@@ -191,17 +211,23 @@ public class RecruiterDAO extends DBContext {
             while (rs.next()) {
                 Recruiter recruiter = new Recruiter();
                 recruiter.setRecruiterID(rs.getInt("recruiterID"));
-                recruiter.setUsername(rs.getString("username"));
-                recruiter.setPassword(rs.getString("password"));
-                recruiter.setFirstName(rs.getString("first_name"));
-                recruiter.setLastName(rs.getString("last_name"));
+                // Trường username đã bị bỏ trong DB mới
+                recruiter.setPassword_hash(rs.getString("password_hash"));
+                recruiter.setFirst_name(rs.getString("first_name"));
+                recruiter.setLast_name(rs.getString("last_name"));
                 recruiter.setGender(rs.getBoolean("gender"));
                 recruiter.setDob(rs.getDate("dob"));
                 recruiter.setImage(rs.getString("image"));
-                recruiter.setMoney(rs.getInt("money"));
-                recruiter.setEmailContact(rs.getString("email_contact"));
-                recruiter.setPhoneContact(rs.getString("phone_contact"));
+                recruiter.setMoney(rs.getBigDecimal("money"));
+                recruiter.setEmail_contact(rs.getString("email_contact"));
+                recruiter.setPhone_contact(rs.getString("phone_contact"));
                 recruiter.setStatus(rs.getString("status"));
+                // Thêm trường statusChangedByAdminID
+                Integer statusChangedByAdminID = rs.getInt("statusChangedByAdminID");
+                if (rs.wasNull()) {
+                    statusChangedByAdminID = null;
+                }
+                recruiter.setStatusChangedByAdminID(statusChangedByAdminID);
                 
                 list.add(recruiter);
             }
@@ -296,6 +322,7 @@ public class RecruiterDAO extends DBContext {
             return false;
         }
     }
+    
     public Recruiter getRecruiterById(int id) {
         if (connection == null) {
             System.err.println("Database connection is null");
@@ -311,17 +338,23 @@ public class RecruiterDAO extends DBContext {
             if (rs.next()) {
                 Recruiter recruiter = new Recruiter();
                 recruiter.setRecruiterID(rs.getInt("recruiterID"));
-                recruiter.setUsername(rs.getString("username"));
-                recruiter.setPassword(rs.getString("password"));
-                recruiter.setFirstName(rs.getString("first_name"));
-                recruiter.setLastName(rs.getString("last_name"));
+                // Trường username đã bị bỏ trong DB mới
+                recruiter.setPassword_hash(rs.getString("password_hash"));
+                recruiter.setFirst_name(rs.getString("first_name"));
+                recruiter.setLast_name(rs.getString("last_name"));
                 recruiter.setGender(rs.getBoolean("gender"));
                 recruiter.setDob(rs.getDate("dob"));
                 recruiter.setImage(rs.getString("image"));
-                recruiter.setMoney(rs.getInt("money"));
-                recruiter.setEmailContact(rs.getString("email_contact"));
-                recruiter.setPhoneContact(rs.getString("phone_contact"));
+                recruiter.setMoney(rs.getBigDecimal("money"));
+                recruiter.setEmail_contact(rs.getString("email_contact"));
+                recruiter.setPhone_contact(rs.getString("phone_contact"));
                 recruiter.setStatus(rs.getString("status"));
+                // Thêm trường statusChangedByAdminID
+                Integer statusChangedByAdminID = rs.getInt("statusChangedByAdminID");
+                if (rs.wasNull()) {
+                    statusChangedByAdminID = null;
+                }
+                recruiter.setStatusChangedByAdminID(statusChangedByAdminID);
                 
                 return recruiter;
             }
@@ -332,5 +365,73 @@ public class RecruiterDAO extends DBContext {
         
         return null;
     }
-    
+    public String getTierName(int recruiterID) {
+        String sql = "SELECT AT.tierName AS TierName\n" +
+                    "FROM AccountTiers AS AT\n" +
+                    "JOIN UserTierSubscriptions AS UTS ON AT.tierID = UTS.tierID\n" +
+                    "WHERE UTS.recruiterID = ? AND AT.isActive = 1;";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, recruiterID);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getString("TierName");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error calculating total spent: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public String getTierNameDescription(int recruiterID) {
+        String sql = "SELECT AT.description AS Description\n" +
+                    "FROM AccountTiers AS AT\n" +
+                    "JOIN UserTierSubscriptions AS UTS ON AT.tierID = UTS.tierID\n" +
+                    "WHERE UTS.recruiterID = ? AND AT.isActive = 1;";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, recruiterID);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getString("Description");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error calculating total spent: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public ArrayList<Company> getCompanies(int recruiterID) {
+        ArrayList<Company> list = new ArrayList<>();
+
+        if (connection == null) {
+            System.err.println("Database connection is null for CompanyDAO");
+            return list;
+        }
+        String sql = "SELECT * FROM Company WHERE recruiterID = ?";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, recruiterID);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Company company = new Company();
+                company.setCompanyID(rs.getInt("companyID"));
+                company.setCompany_name(rs.getString("company_name"));
+                company.setTeam_number(rs.getInt("team_number")); 
+                company.setEstablished_on(rs.getString("established_on")); 
+                company.setLogo(rs.getString("logo"));
+                company.setWebsite(rs.getString("website"));
+                company.setDescribe(rs.getString("describe"));
+                company.setLocation(rs.getString("location"));
+                company.setRecruiterID(rs.getInt("recruiterID"));
+
+                list.add(company);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error getting paginated companies: " + e.getMessage());
+        }
+        return list;
+    }
 }
+

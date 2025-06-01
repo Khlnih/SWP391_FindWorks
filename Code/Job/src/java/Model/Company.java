@@ -1,51 +1,112 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Model;
 
+import java.sql.Date;
+
+
+import java.time.LocalDate; 
+
 public class Company {
-    private String companyID;
-    private String companyName;
-    private String email;
-    private String phone;
-    private String address;
-    private String description;
-    private String password;
+    private int companyID;
+    private String company_name;
+    private int team_number;
+    private String established_on; 
+    private String logo;
+    private String website;
+    private String describe;
+    private String location;
+    private int recruiterID; 
 
-    public Company() {}
-
-    public Company(String companyID, String companyName, String email, String phone,
-                   String address, String description, String password) {
-        this.companyID = companyID;
-        this.companyName = companyName;
-        this.email = email;
-        this.phone = phone;
-        this.address = address;
-        this.description = description;
-        this.password = password;
+    public Company() {
     }
 
-    // Getters and Setters
-    public String getCompanyID() { return companyID; }
-    public void setCompanyID(String companyID) { this.companyID = companyID; }
+    public Company(int companyID, String company_name, int team_number, String established_on,
+                   String logo, String website, String describe, String location, int recruiterID) {
+        this.companyID = companyID;
+        this.company_name = company_name;
+        this.team_number = team_number;
+        this.established_on = established_on;
+        this.logo = logo;
+        this.website = website;
+        this.describe = describe;
+        this.location = location;
+        this.recruiterID = recruiterID;
+    }
 
-    public String getCompanyName() { return companyName; }
-    public void setCompanyName(String companyName) { this.companyName = companyName; }
+    public int getCompanyID() {
+        return companyID;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setCompanyID(int companyID) {
+        this.companyID = companyID;
+    }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public String getCompany_name() {
+        return company_name;
+    }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public void setCompany_name(String company_name) {
+        this.company_name = company_name;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public int getTeam_number() {
+        return team_number;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public void setTeam_number(int team_number) {
+        this.team_number = team_number;
+    }
+
+    public String getEstablished_on() {
+        return established_on;
+    }
+
+    public void setEstablished_on(String established_on) {
+        this.established_on = established_on;
+    }
+
+    // Nếu bạn dùng LocalDate:
+    // public LocalDate getEstablished_on() { return established_on; }
+    // public void setEstablished_on(LocalDate established_on) { this.established_on = established_on; }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public String getDescribe() {
+        return describe;
+    }
+
+    public void setDescribe(String describe) {
+        this.describe = describe;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public int getRecruiterID() {
+        return recruiterID;
+    }
+
+    public void setRecruiterID(int recruiterID) {
+        this.recruiterID = recruiterID;
+    }
+    
 }
 

@@ -28,32 +28,41 @@ public class JobseekerSkillDAO extends DBContext {
             return list;
         }
         
-        String sql = "SELECT s.*, ss.skill_set_name, ss.description, ss.ExpertiID, e.ExpertiseName " +
-                     "FROM Skills s " +
-                     "JOIN Skill_Set ss ON s.skill_set_ID = ss.skill_set_ID " +
-                     "LEFT JOIN Expertise e ON ss.ExpertiID = e.ExpertiseID " +
-                     "WHERE s.freelancerID = ? " +
-                     "ORDER BY e.ExpertiseName, ss.skill_set_name";
+        String sql = "SELECT s.*, ss.skill_set_name, ss.description, ss.expertiseID, e.ExpertiseName \n" +
+"                     FROM Skills s \n" +
+"                     JOIN Skill_Set ss ON s.skill_set_ID = ss.skill_set_ID \n" +
+"                     LEFT JOIN Expertise e ON ss.expertiseID = e.ExpertiseID \n" +
+"                     WHERE s.freelancerID = ?\n" +
+"                     ORDER BY e.ExpertiseName, ss.skill_set_name";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, freelancerID);
-            ResultSet rs = stm.executeQuery();
-            
-            while (rs.next()) {
-                Skill skill = new Skill();
-                skill.setSkillID(rs.getInt("skillID"));
-                skill.setSkillSetID(rs.getInt("skill_set_ID"));
-                skill.setFreelancerID(rs.getInt("freelancerID"));
-                skill.setLevel(rs.getInt("level"));
-                skill.setSkillSetName(rs.getString("skill_set_name"));
-                skill.setDescription(rs.getString("description"));
-                skill.setExpertiseID(rs.getInt("ExpertiID"));
-                skill.setExpertiseName(rs.getString("ExpertiseName"));
-                
-                list.add(skill);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs != null && rs.next()) {
+                    Skill skill = new Skill();
+                    skill.setSkillID(rs.getInt("skillID"));
+                    skill.setSkillSetID(rs.getInt("skill_set_ID"));
+                    skill.setFreelancerID(rs.getInt("freelancerID"));
+                    skill.setLevel(rs.getInt("level"));
+                    
+                    // Handle possible null values
+                    String skillName = rs.getString("skill_set_name");
+                    skill.setSkillSetName(skillName != null ? skillName : "");
+                    
+                    String description = rs.getString("description");
+                    skill.setDescription(description != null ? description : "");
+                    
+                    // Fixed column name from ExpertiID to expertiseID
+                    skill.setExpertiseID(rs.getInt("expertiseID"));
+                    
+                    String expertiseName = rs.getString("ExpertiseName");
+                    skill.setExpertiseName(expertiseName != null ? expertiseName : "");
+                    
+                    list.add(skill);
+                }
             }
         } catch (SQLException e) {
-            Logger.getLogger(JobseekerSkillDAO.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(JobseekerSkillDAO.class.getName()).log(Level.SEVERE, "Error getting skills by freelancer ID: " + freelancerID, e);
             System.err.println("Error getting skills by freelancer ID: " + e.getMessage());
         }
         

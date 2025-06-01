@@ -4,81 +4,77 @@
  */
 package Model;
 
+import java.sql.Date;
+
 /**
- *
+ * Model lớp Jobseeker mapping với bảng Freelancer trong CSDL
  * @author ADMIN
  */
 public class Jobseeker {
     
-    private int freelanceID;
-    private String username;
-    private String password;
-    private String firstName;
-    private String lastName;
+    private int freelancerID;
+    private String password_hash;
+    private String first_name;
+    private String last_name;
     private String image; 
     private boolean gender;
-    private String dob;
+    private Date dob;
     private String describe;
-    private String email__contact;
+    private String email_contact;
     private String phone_contact;
     private String status;
+    private Integer statusChangedByAdminID; // Có thể null
 
     public Jobseeker() {
     }
 
-    public Jobseeker(int freelanceID, String username, String password, String firstName, String lastName, String image, boolean gender, String dob, String describe, String email__contact, String phone_contact, String status) {
-        this.freelanceID = freelanceID;
-        this.username = username;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public Jobseeker(int freelancerID, String password_hash, String first_name, String last_name, String image, boolean gender, Date dob, String describe, String email_contact, String phone_contact, String status, Integer statusChangedByAdminID) {
+        this.freelancerID = freelancerID;
+        this.password_hash = password_hash;
+        this.first_name = first_name;
+        this.last_name = last_name;
         this.image = image;
         this.gender = gender;
         this.dob = dob;
         this.describe = describe;
-        this.email__contact = email__contact;
+        this.email_contact = email_contact;
         this.phone_contact = phone_contact;
         this.status = status;
+        this.statusChangedByAdminID = statusChangedByAdminID;
     }
 
-    public int getFreelanceID() {
-        return freelanceID;
+    public int getFreelancerID() {
+        return freelancerID;
     }
 
-    public void setFreelanceID(int freelanceID) {
-        this.freelanceID = freelanceID;
+    public void setFreelancerID(int freelancerID) {
+        this.freelancerID = freelancerID;
     }
 
-    public String getUsername() {
-        return username;
+   
+
+    public String getPassword_hash() {
+        return password_hash;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setPassword_hash(String password_hash) {
+        this.password_hash = password_hash;
     }
 
-    public String getPassword() {
-        return password;
+    public String getFirst_name() {
+        return first_name;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setFirst_name(String first_name) {
+        this.first_name = first_name;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getLast_name() {
+        return last_name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLast_name(String last_name) {
+        this.last_name = last_name;
     }
 
     public String getImage() {
@@ -97,11 +93,11 @@ public class Jobseeker {
         this.gender = gender;
     }
 
-    public String getDob() {
+    public Date getDob() {
         return dob;
     }
 
-    public void setDob(String dob) {
+    public void setDob(Date dob) {
         this.dob = dob;
     }
 
@@ -113,12 +109,12 @@ public class Jobseeker {
         this.describe = describe;
     }
 
-    public String getEmail__contact() {
-        return email__contact;
+    public String getEmail_contact() {
+        return email_contact;
     }
 
-    public void setEmail__contact(String email__contact) {
-        this.email__contact = email__contact;
+    public void setEmail_contact(String email_contact) {
+        this.email_contact = email_contact;
     }
 
     public String getPhone_contact() {
@@ -137,5 +133,29 @@ public class Jobseeker {
         this.status = status;
     }
     
+    public Integer getStatusChangedByAdminID() {
+        return statusChangedByAdminID;
+    }
+
+    public void setStatusChangedByAdminID(Integer statusChangedByAdminID) {
+        this.statusChangedByAdminID = statusChangedByAdminID;
+    }
     
+    @Override
+    public String toString() {
+        return "Jobseeker{" +
+                "freelancerID=" + freelancerID +
+                ", password_hash='" + password_hash + '\'' +
+                ", first_name='" + first_name + '\'' +
+                ", last_name='" + last_name + '\'' +
+                ", image='" + image + '\'' +
+                ", gender=" + gender +
+                ", dob=" + dob +
+                ", describe='" + describe + '\'' +
+                ", email_contact='" + email_contact + '\'' +
+                ", phone_contact='" + phone_contact + '\'' +
+                ", status='" + status + '\'' +
+                ", statusChangedByAdminID=" + statusChangedByAdminID +
+                '}';
+    }
 }

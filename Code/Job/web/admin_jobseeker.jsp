@@ -697,8 +697,8 @@
                                 <td>
                                     <img src="${jobseeker.image}" alt="Avatar" class="user-avatar">
                                 </td>
-                                <td>${jobseeker.firstName} ${jobseeker.lastName}</td>
-                                <td>${jobseeker.email__contact}</td>
+                                <td>${jobseeker.first_name} ${jobseeker.last_name}</td>
+                                <td>${jobseeker.email_contact}</td>
                                 <td>${jobseeker.phone_contact}</td>
                                 <td>
                                     <span class="badge ${jobseeker.gender ? 'badge-info' : 'badge-warning'}">
@@ -720,27 +720,27 @@
                                         
                                         <!-- Status buttons dropdown -->
                                         <div class="status-buttons">
-                                            <a href="AdminController?action=viewJobseeker&id=${jobseeker.freelanceID}" class="btn-status">
+                                            <a href="admin?action=viewJobseeker&id=${jobseeker.freelancerID}" class="btn-status">
                                                 <i class="fa fa-eye"></i> View Details
                                             </a>
-                                            <a href="AdminController?action=editJobseeker&id=${jobseeker.freelanceID}" class="btn-status">
+                                            <a href="AdminController?action=editJobseeker&id=${jobseeker.freelancerID}" class="btn-status">
                                                 <i class="fa fa-pencil"></i> Edit Profile
                                             </a>
                                             <div class="dropdown-divider"></div>
                                             <button class="btn-status ${jobseeker.status == 'active' ? 'active' : ''}" 
-                                                    onclick="changeStatus('${jobseeker.freelanceID}', 'active')">
+                                                    onclick="changeStatus('${jobseeker.freelancerID}', 'active')">
                                                 <i class="fa fa-check-circle"></i> Active
                                             </button>
                                             <button class="btn-status ${jobseeker.status == 'suspended' ? 'suspended' : ''}" 
-                                                    onclick="changeStatus('${jobseeker.freelanceID}', 'suspended')">
+                                                    onclick="changeStatus('${jobseeker.freelancerID}', 'suspended')">
                                                 <i class="fa fa-pause-circle"></i> Suspend
                                             </button>
                                             <button class="btn-status ${jobseeker.status == 'pending' ? 'pending' : ''}" 
-                                                    onclick="changeStatus('${jobseeker.freelanceID}', 'pending')">
+                                                    onclick="changeStatus('${jobseeker.freelancerID}', 'pending')">
                                                 <i class="fa fa-clock-o"></i> Pending
                                             </button>
                                             <div class="dropdown-divider"></div>
-                                            <button class="btn-delete" onclick="confirmDelete('${jobseeker.freelanceID}')">
+                                            <button class="btn-delete" onclick="confirmDelete('${jobseeker.freelancerID}')">
                                                 <i class="fa fa-trash"></i> Delete
                                             </button>
                                         </div>

@@ -14,8 +14,8 @@ public class SkillDAO {
             rs.getInt("skill_set_ID"),      // Tên cột trong CSDL
             rs.getString("skill_set_name"), // Tên cột trong CSDL
             rs.getString("description"),    // Tên cột trong CSDL
-            rs.getInt("statusSkill"),       // Tên cột trong CSDL
-            rs.getInt("ExpertiID")          // Tên cột trong CSDL
+            rs.getInt("isActive"),       // Tên cột trong CSDL
+            rs.getInt("expertiseID")          // Tên cột trong CSDL
         );
     }
 

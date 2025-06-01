@@ -30,8 +30,8 @@ public class EducationDAO extends DBContext {
         
         String sql = "SELECT e.*, d.degree_name " +
                      "FROM Education e " +
-                     "JOIN Degree d ON e.degreeID = d.dregeeID " +
-                     "WHERE e.freelanceID = ? " +
+                     "JOIN Degree d ON e.degreeID = d.degreeID " +
+                     "WHERE e.freelancerID = ? " +
                      "ORDER BY e.start_date DESC";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
@@ -44,7 +44,7 @@ public class EducationDAO extends DBContext {
                 education.setUniversityName(rs.getString("university_name"));
                 education.setStartDate(rs.getDate("start_date"));
                 education.setEndDate(rs.getDate("end_date"));
-                education.setFreelanceID(rs.getInt("freelanceID"));
+                education.setFreelancerID(rs.getInt("freelancerID"));
                 education.setDegreeID(rs.getInt("degreeID"));
                 education.setDegreeName(rs.getString("degree_name"));
                 
@@ -70,14 +70,14 @@ public class EducationDAO extends DBContext {
             return false;
         }
         
-        String sql = "INSERT INTO Education (university_name, start_date, end_date, freelanceID, degreeID) " +
+        String sql = "INSERT INTO Education (university_name, start_date, end_date, freelancerID, degreeID) " +
                      "VALUES (?, ?, ?, ?, ?)";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1, education.getUniversityName());
             stm.setDate(2, education.getStartDate());
             stm.setDate(3, education.getEndDate());
-            stm.setInt(4, education.getFreelanceID());
+            stm.setInt(4, education.getFreelancerID());
             stm.setInt(5, education.getDegreeID());
             
             int rowsAffected = stm.executeUpdate();
@@ -102,7 +102,7 @@ public class EducationDAO extends DBContext {
         }
         
         String sql = "UPDATE Education SET university_name = ?, start_date = ?, end_date = ?, degreeID = ? " +
-                     "WHERE educationID = ? AND freelanceID = ?";
+                     "WHERE educationID = ? AND freelancerID = ?";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1, education.getUniversityName());
@@ -110,7 +110,7 @@ public class EducationDAO extends DBContext {
             stm.setDate(3, education.getEndDate());
             stm.setInt(4, education.getDegreeID());
             stm.setInt(5, education.getEducationID());
-            stm.setInt(6, education.getFreelanceID());
+            stm.setInt(6, education.getFreelancerID());
             
             int rowsAffected = stm.executeUpdate();
             return rowsAffected > 0;
@@ -134,7 +134,7 @@ public class EducationDAO extends DBContext {
             return false;
         }
         
-        String sql = "DELETE FROM Education WHERE educationID = ? AND freelanceID = ?";
+        String sql = "DELETE FROM Education WHERE educationID = ? AND freelancerID = ?";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, educationID);
@@ -176,7 +176,7 @@ public class EducationDAO extends DBContext {
                 education.setUniversityName(rs.getString("university_name"));
                 education.setStartDate(rs.getDate("start_date"));
                 education.setEndDate(rs.getDate("end_date"));
-                education.setFreelanceID(rs.getInt("freelanceID"));
+                education.setFreelancerID(rs.getInt("freelancerID"));
                 education.setDegreeID(rs.getInt("degreeID"));
                 education.setDegreeName(rs.getString("degree_name"));
                 

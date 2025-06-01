@@ -18,14 +18,12 @@
     
     // Format date of birth
     String formattedDob = "";
-    if (jobseeker.getDob() != null && !jobseeker.getDob().isEmpty()) {
+    if (jobseeker.getDob() != null) {
         try {
-            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
-            Date date = inputFormat.parse(jobseeker.getDob());
-            formattedDob = outputFormat.format(date);
+            formattedDob = outputFormat.format(jobseeker.getDob());
         } catch (Exception e) {
-            formattedDob = jobseeker.getDob();
+            formattedDob = "Not provided";
         }
     }
 %>
@@ -240,16 +238,28 @@
             opacity: 0.9;
         }
 
-        .status-active {
-            background-color: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            border-color: rgba(40, 167, 69, 0.3);
+        .badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: capitalize;
+            display: inline-block;
         }
-
-        .status-inactive {
-            background-color: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
-            border-color: rgba(220, 53, 69, 0.3);
+        
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .badge-warning {
+            background-color: #ffc107;
+            color: #000;
         }
 
         .about-section {
@@ -273,17 +283,14 @@
     <div class="main-content">
         <div class="profile-header text-center">
             <div class="container">
-                <div class="d-flex justify-content-start mb-4">
-                    <a href="admin_jobseeker.jsp" class="btn-back">
-                        <i class="fa fa-arrow-left"></i> Back to Jobseekers
-                    </a>
-                </div>
+                
                 <div class="text-center">
                     <img src="<%= jobseeker.getImage() != null && !jobseeker.getImage().isEmpty() ? jobseeker.getImage() : "images/default-avatar.png" %>" 
                          alt="Profile Image" class="profile-avatar">
-                    <h1 class="profile-name"><%= jobseeker.getFirstName() %> <%= jobseeker.getLastName() %></h1>
-                    <div class="profile-username">@<%= jobseeker.getUsername() %></div>
-                    <span class="profile-status <%= "active".equalsIgnoreCase(jobseeker.getStatus()) ? "status-active" : "status-inactive" %>">
+                    <h1 class="profile-name"><%= jobseeker.getFirst_name() != null ? jobseeker.getFirst_name() : "" %> <%= jobseeker.getLast_name() != null ? jobseeker.getLast_name() : "" %></h1>
+                    <div class="profile-username">@<%= jobseeker.getFreelancerID() %></div>
+                    <span class="badge <%= "active".equalsIgnoreCase(jobseeker.getStatus()) ? "badge-success" : 
+                                               ("suspended".equalsIgnoreCase(jobseeker.getStatus()) ? "badge-danger" : "badge-warning") %>">
                         <%= jobseeker.getStatus() != null ? jobseeker.getStatus().toUpperCase() : "UNKNOWN" %>
                     </span>
                 </div>
@@ -291,8 +298,12 @@
         </div>
 
         <div class="container">
+            <div class="d-flex justify-content-start mb-4">
+                    <a href="admin_jobseeker.jsp" class="btn-back">
+                        <i class="fa fa-arrow-left"></i> Back to Jobseekers
+                    </a>
+                </div>
             <div class="row">
-                <!-- Left Column -->
                 <div class="col-lg-8">
                     <!-- Personal Information Card -->
                     <div class="card mb-4">
@@ -304,15 +315,15 @@
                                 <div class="col-md-6">
                                     <div class="info-item">
                                         <div class="info-label">First Name</div>
-                                        <div class="info-value"><%= jobseeker.getFirstName() != null ? jobseeker.getFirstName() : "<span class='empty'>Not provided</span>" %></div>
+                                        <div class="info-value"><%= jobseeker.getFirst_name() != null ? jobseeker.getFirst_name() : "<span class='empty'>Not provided</span>" %></div>
                                     </div>
                                     <div class="info-item">
                                         <div class="info-label">Last Name</div>
-                                        <div class="info-value"><%= jobseeker.getLastName() != null ? jobseeker.getLastName() : "<span class='empty'>Not provided</span>" %></div>
+                                        <div class="info-value"><%= jobseeker.getLast_name() != null ? jobseeker.getLast_name() : "<span class='empty'>Not provided</span>" %></div>
                                     </div>
                                     <div class="info-item">
-                                        <div class="info-label">Username</div>
-                                        <div class="info-value"><%= jobseeker.getUsername() %></div>
+                                        <div class="info-label">User ID</div>
+                                        <div class="info-value"><%= jobseeker.getFreelancerID() %></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -330,7 +341,7 @@
                                         <div class="info-label">Account Status</div>
                                         <div class="info-value">
                                             <span class="status-toggle <%= "active".equalsIgnoreCase(jobseeker.getStatus()) ? "status-active" : "status-inactive" %>" 
-                                                  onclick="toggleStatus(<%= jobseeker.getFreelanceID() %>, '<%= jobseeker.getStatus() %>')">
+                                                  onclick="toggleStatus(<%= jobseeker.getFreelancerID() %>, '<%= jobseeker.getStatus() %>')">
                                                 <%= jobseeker.getStatus() != null ? jobseeker.getStatus().toUpperCase() : "UNKNOWN" %>
                                             </span>
                                         </div>
@@ -351,8 +362,8 @@
                                     <div class="info-item">
                                         <div class="info-label">Email</div>
                                         <div class="info-value">
-                                            <%= jobseeker.getEmail__contact() != null && !jobseeker.getEmail__contact().isEmpty() ? 
-                                                "<a href='mailto:" + jobseeker.getEmail__contact() + "'>" + jobseeker.getEmail__contact() + "</a>" : 
+                                            <%= jobseeker.getEmail_contact() != null && !jobseeker.getEmail_contact().isEmpty() ? 
+                                                "<a href='mailto:" + jobseeker.getEmail_contact() + "'>" + jobseeker.getEmail_contact() + "</a>" : 
                                                 "<span class='empty'>Not provided</span>" %>
                                         </div>
                                     </div>
@@ -394,8 +405,8 @@
                         </div>
                         <div class="card-body">
                             <c:choose>
-                                <c:when test="${not empty educationList}">
-                                    <c:forEach var="education" items="${educationList}">
+                                <c:when test="${not empty educations}">
+                                    <c:forEach var="education" items="${educations}">
                                         <div class="education-item mb-4 pb-3 border-bottom">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <h5 class="mb-1">${education.universityName}</h5>
@@ -433,8 +444,8 @@
                         </div>
                         <div class="card-body">
                             <c:choose>
-                                <c:when test="${not empty experienceList}">
-                                    <c:forEach var="experience" items="${experienceList}">
+                                <c:when test="${not empty experiences}">
+                                    <c:forEach var="experience" items="${experiences}">
                                         <div class="experience-item mb-4 pb-3 border-bottom">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <h5 class="mb-1">${experience.experienceWorkName}</h5>
@@ -479,34 +490,91 @@
                             <i class="fa fa-code mr-2"></i> Skills
                         </div>
                         <div class="card-body">
+                            <style>
+                                .skill-container {
+                                    margin-bottom: 1.5rem;
+                                }
+                                .skill-header {
+                                    display: flex;
+                                    justify-content: space-between;
+                                    margin-bottom: 0.5rem;
+                                }
+                                .skill-name {
+                                    font-weight: 600;
+                                    color: #2d3436;
+                                }
+                                .skill-level {
+                                    color: #636e72;
+                                    font-size: 0.9em;
+                                }
+                                .progress-container {
+                                    background-color: #f1f2f6;
+                                    border-radius: 10px;
+                                    height: 10px;
+                                    margin-bottom: 1rem;
+                                    overflow: hidden;
+                                }
+                                .progress-bar {
+                                    height: 100%;
+                                    border-radius: 10px;
+                                    background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+                                    transition: width 0.5s ease-in-out;
+                                    position: relative;
+                                }
+                                .progress-bar::after {
+                                    content: '';
+                                    position: absolute;
+                                    top: 0;
+                                    left: 0;
+                                    right: 0;
+                                    bottom: 0;
+                                    background: linear-gradient(
+                                        to right,
+                                        rgba(255, 255, 255, 0.2) 0%,
+                                        rgba(255, 255, 255, 0.5) 50%,
+                                        rgba(255, 255, 255, 0.2) 100%
+                                    );
+                                    background-size: 200% 100%;
+                                    animation: shimmer 2s infinite linear;
+                                }
+                                @keyframes shimmer {
+                                    0% { background-position: 200% 0; }
+                                    100% { background-position: -200% 0; }
+                                }
+                            </style>
+                            
                             <c:choose>
-                                <c:when test="${not empty skillsList}">
+                                <c:when test="${not empty skills}">
                                     <div class="skill-categories">
-                                        <c:forEach var="skill" items="${skillsList}">
-                                            <div class="skill-item mb-3 pb-2 border-bottom">
-                                                <div class="d-flex justify-content-between">
-                                                    <span class="skill-name font-weight-bold">${skill.skillSetName}</span>
-                                                    <div class="skill-level">
-                                                        <c:forEach begin="1" end="5" var="i">
-                                                            <c:choose>
-                                                                <c:when test="${skill.level >= i}">
-                                                                    <i class="fa fa-circle text-primary"></i>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <i class="fa fa-circle-o text-muted"></i>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </c:forEach>
+                                        <c:forEach var="skill" items="${skills}">
+                                            <div class="skill-container">
+                                                <div class="skill-header">
+                                                    <span class="skill-name">${skill.skillSetName}</span>
+                                                    <span class="skill-level">
+                                                        <c:choose>
+                                                            <c:when test="${skill.level == 1}">Beginner</c:when>
+                                                            <c:when test="${skill.level == 2}">Basic</c:when>
+                                                            <c:when test="${skill.level == 3}">Intermediate</c:when>
+                                                            <c:when test="${skill.level == 4}">Advanced</c:when>
+                                                            <c:when test="${skill.level == 5}">Expert</c:when>
+                                                            <c:otherwise>${skill.level}/5</c:otherwise>
+                                                        </c:choose>
+                                                    </span>
+                                                </div>
+                                                <div class="progress-container">
+                                                    <div class="progress-bar" 
+                                                         style="width: ${skill.level * 20}%">
                                                     </div>
                                                 </div>
-                                                <c:if test="${not empty skill.expertiseName}">
-                                                    <small class="text-muted d-block mt-1">${skill.expertiseName}</small>
-                                                </c:if>
                                             </div>
                                         </c:forEach>
                                     </div>
                                 </c:when>
                                 <c:otherwise>
+                                    <div class="text-center py-4">
+                                        <i class="fa fa-code fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No skills added yet</p>
+                                    </div>
                                     <div class="empty-state">No skills information available</div>
                                 </c:otherwise>
                             </c:choose>
@@ -523,7 +591,7 @@
                                 <a href="#" class="btn btn-edit btn-block">
                                     <i class="fa fa-edit mr-2"></i> Edit Profile
                                 </a>
-                                <button type="button" class="btn btn-delete btn-block" onclick="confirmDelete(<%= jobseeker.getFreelanceID() %>)">
+                                <button type="button" class="btn btn-delete btn-block" onclick="confirmDelete(<%= jobseeker.getFreelancerID() %>)">
                                     <i class="fa fa-trash mr-2"></i> Delete Account
                                 </button>
                                 <a href="#" class="btn btn-primary btn-block">
@@ -555,7 +623,7 @@
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Account ID</div>
-                                <div class="info-value">#<%= jobseeker.getFreelanceID() %></div>
+                                <div class="info-value">#<%= jobseeker.getFreelancerID() %></div>
                             </div>
                         </div>
                     </div>

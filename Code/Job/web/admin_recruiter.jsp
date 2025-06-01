@@ -475,6 +475,23 @@
             transform: translateX(2px);
         }
         
+        .recruiter-name-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease, transform 0.2s ease;
+            display: inline-block;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+        
+        .recruiter-name-link:hover {
+            color: #1a73e8;
+            text-decoration: underline;
+            transform: translateY(-1px);
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
         .btn-delete i {
             width: 18px;
             text-align: center;
@@ -720,7 +737,7 @@
                         <td>
                             <img src="${recruiter.image}" alt="Recruiter Image" class="user-avatar">
                         </td>
-                        <td>${recruiter.firstName} ${recruiter.lastName}</td>
+                        <td>${recruiter.firstName} ${recruiter.lastName}</a></td>
                         <td>${recruiter.emailContact}</td>
                         <td>${recruiter.phoneContact}</td>
                         <td>

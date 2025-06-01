@@ -17,7 +17,7 @@ public class Experience {
     private Date startDate;
     private Date endDate;
     private String yourProject;
-    private int freelanceID;
+    private int freelancerID;
     
     // Default constructor
     public Experience() {
@@ -25,25 +25,25 @@ public class Experience {
     
     // Full constructor
     public Experience(int experienceID, String experienceWorkName, String position, 
-                      Date startDate, Date endDate, String yourProject, int freelanceID) {
+                      Date startDate, Date endDate, String yourProject, int freelancerID) {
         this.experienceID = experienceID;
         this.experienceWorkName = experienceWorkName;
         this.position = position;
         this.startDate = startDate;
         this.endDate = endDate;
         this.yourProject = yourProject;
-        this.freelanceID = freelanceID;
+        this.freelancerID = freelancerID;
     }
     
     // Constructor without experienceID (for insertion)
     public Experience(String experienceWorkName, String position, 
-                      Date startDate, Date endDate, String yourProject, int freelanceID) {
+                      Date startDate, Date endDate, String yourProject, int freelancerID) {
         this.experienceWorkName = experienceWorkName;
         this.position = position;
         this.startDate = startDate;
         this.endDate = endDate;
         this.yourProject = yourProject;
-        this.freelanceID = freelanceID;
+        this.freelancerID = freelancerID;
     }
 
     // Getters and Setters
@@ -95,12 +95,12 @@ public class Experience {
         this.yourProject = yourProject;
     }
 
-    public int getFreelanceID() {
-        return freelanceID;
+    public int getFreelancerID() {
+        return freelancerID;
     }
 
-    public void setFreelanceID(int freelanceID) {
-        this.freelanceID = freelanceID;
+    public void setFreelancerID(int freelancerID) {
+        this.freelancerID = freelancerID;
     }
 
     @Override
@@ -112,7 +112,7 @@ public class Experience {
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", yourProject='" + yourProject + '\'' +
-                ", freelanceID=" + freelanceID +
+                ", freelancerID=" + freelancerID +
                 '}';
     }
 }
