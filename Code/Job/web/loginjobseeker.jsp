@@ -89,7 +89,7 @@
 
 <div class="login-container">
     <h2>Login to Your Account</h2>
-    <form action="login" method="post">
+    <form action="loginjobseeker" method="post">
         <input type="text" id="Email" name="Email" placeholder="Email" required>
 
         <input type="password" id="password" name="password" placeholder="Password" required>
@@ -102,8 +102,8 @@
     </form>
 
     <div class="login-links">
-        <a href="register.jsp">Register</a>
-        <a href="forgotpassword.jsp">Forgot Password?</a>
+        <a href="registerjoseeker.jsp">Register</a>
+        <a href="forgotpasswordjob.jsp">Forgot Password?</a>
     </div>
 </div>
 

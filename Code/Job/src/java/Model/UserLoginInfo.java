@@ -10,28 +10,18 @@ package Model;
  */
 public class UserLoginInfo {
 
-    private String username;
     private String email;
     private String password;
 
     public UserLoginInfo() {
     }
 
-    public UserLoginInfo(String username, String email, String password) {
-        this.username = username;
+    public UserLoginInfo(String email, String password) {
         this.email = email;
         this.password = password;
     }
 
     // Getters và setters
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getEmail() {
         return email;
     }
