@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
@@ -27,16 +28,15 @@ public class LoginServlet extends HttpServlet {
 
         loginDAO dao = new loginDAO();
         UserLoginInfo user = dao.getUserLoginInfo(emailInput);
-
+//        PrintWriter out = response.getWriter();
+//        out.print(user);
         if (user != null && user.getPassword().equals(passwordInput)) {
             HttpSession session = request.getSession();
-            session.setAttribute("user", user); // lưu thông tin user vào session
-            // Có thể lưu thêm email vào session nếu cần truy cập nhanh
-            // session.setAttribute("email", user.getEmail()); 
+            session.setAttribute("user", user); 
+           
 
-            response.sendRedirect("index.jsp"); // điều hướng đến trang chính sau khi login
+            response.sendRedirect("index.jsp"); 
         } else {
-            // 3. Cập nhật thông báo lỗi
             request.setAttribute("error", "Invalid email or password!");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }

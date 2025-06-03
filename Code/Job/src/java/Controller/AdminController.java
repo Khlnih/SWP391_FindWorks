@@ -41,6 +41,8 @@ public class AdminController extends HttpServlet {
     private EducationDAO educationDAO = new EducationDAO();
     private ExperienceDAO experienceDAO = new ExperienceDAO();
     private JobseekerSkillDAO jobseekerSkillDAO = new JobseekerSkillDAO();
+    private AccountTierDAO accountTierDAO = new AccountTierDAO();
+
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -70,6 +72,9 @@ public class AdminController extends HttpServlet {
                 break;
             case "skills":
                 showSkills(request, response);
+                break;
+            case "accounttier":
+//                showAccountTier(request, response);
                 break;
             case "addSkill":
                 addSkill(request, response);
@@ -157,7 +162,7 @@ public class AdminController extends HttpServlet {
         }
         request.getRequestDispatcher("admin_recruiter.jsp").forward(request, response);
     }
-
+   
     // --- Skill Management Methods ---
 
     private void showSkills(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

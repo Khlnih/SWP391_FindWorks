@@ -20,9 +20,9 @@ public class loginDAO {
         String sql =
                 "SELECT email_contact AS email, password_hash AS password FROM Recruiter WHERE email_contact = ? " +
                 "UNION ALL " +
-                "SELECT email__contact AS email, password_hash AS password FROM Freelancer WHERE email__contact = ? " +
+                "SELECT email_contact AS email, password_hash AS password FROM Freelancer WHERE email_contact = ? " +
                 "UNION ALL " +
-                "SELECT email, password AS password FROM Admin WHERE email = ?"; // Nếu Admin.password cũng là hash
+                "SELECT email, password_hash AS password FROM Admin WHERE email = ?"; // Nếu Admin.password cũng là hash
 
         try (DBContext db = new DBContext()) {
             Connection conn = db.connection;
@@ -56,7 +56,7 @@ public class loginDAO {
     public boolean checkEmailExists(String email) {
         String sql = "SELECT email_contact AS email FROM Recruiter WHERE email_contact = ? "
                    + "UNION ALL "
-                   + "SELECT email__contact AS email FROM Freelancer WHERE email__contact = ? "
+                   + "SELECT email_contact AS email FROM Freelancer WHERE email_contact = ? "
                    + "UNION ALL "
                    + "SELECT email FROM Admin WHERE email = ?";
 
@@ -90,7 +90,7 @@ public class loginDAO {
         // Giả sử các cột mật khẩu là password_hash trong Recruiter, Freelancer và password trong Admin
         String[] updateSQLs = {
             "UPDATE Recruiter SET password_hash = ? WHERE email_contact = ?",
-            "UPDATE Freelancer SET password_hash = ? WHERE email__contact = ?",
+            "UPDATE Freelancer SET password_hash = ? WHERE email_contact = ?",
             "UPDATE Admin SET password = ? WHERE email = ?" // Nếu Admin.password cũng là hash
         };
 

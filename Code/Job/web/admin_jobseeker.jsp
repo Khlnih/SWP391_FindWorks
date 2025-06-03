@@ -606,27 +606,7 @@
     </style>
 </head>
 <body>
-    <!--[if lte IE 9]>
-        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-    <![endif]-->
-
-    <button class="toggle-btn" onclick="toggleSidebar()">
-        <i class="fa fa-bars"></i>
-    </button>
-
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3>Admin Panel</h3>
-        </div>
-        <div class="sidebar-content">
-            <a href="admin?action=dashboard" class="menu-item ${param.action == 'dashboard' || empty param.action ? 'active' : ''}"><i class="fa fa-tachometer"></i> Dashboard</a>
-            <a href="admin?action=jobseekers" class="menu-item ${param.action == 'jobseekers' ? 'active' : ''}"><i class="fa fa-users"></i> Manage Job Seekers</a>
-            <a href="admin?action=recruiters" class="menu-item ${param.action == 'recruiters' ? 'active' : ''}"><i class="fa fa-user-md"></i> Manage Recruiters</a>
-            <a href="admin?action=skills" class="menu-item ${param.action == 'skills' ? 'active' : ''}"><i class="fa fa-cogs"></i> Manage Skills</a>
-            <a href="admin?action=settings" class="menu-item ${param.action == 'settings' ? 'active' : ''}"><i class="fa fa-cog"></i> Settings</a>
-            <a href="logout.jsp" class="menu-item"><i class="fa fa-sign-out"></i> Logout</a>
-        </div>
-    </div>
+    <jsp:include page="/includes/admin_sidebar.jsp" />
 
     <div class="main-content">
         <div class="admin-header">
