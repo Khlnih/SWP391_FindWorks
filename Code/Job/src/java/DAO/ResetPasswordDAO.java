@@ -8,8 +8,8 @@ public class ResetPasswordDAO {
 
     public boolean updatePasswordByEmail(String email, String newPassword) {
         String sql = "UPDATE Recruiter SET password = ? WHERE email_contact = ?"
-                   + " OR EXISTS (SELECT 1 FROM Freelancer WHERE email__contact = ?)"
-                   + " OR EXISTS (SELECT 1 FROM Admin WHERE email = ?)";
+                   + " OR EXISTS (SELECT 1 FROM Freelancer WHERE email_contact = ?)"
+                   + " OR EXISTS (SELECT 1 FROM Admin WHERE email_contact = ?)";
 
         try (DBContext db = new DBContext()) {
             Connection conn = db.connection;
@@ -25,7 +25,7 @@ public class ResetPasswordDAO {
 
             // Next, try Freelancer
             try (PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE Freelancer SET password = ? WHERE email__contact = ?")) {
+                    "UPDATE Freelancer SET password = ? WHERE email_contact = ?")) {
                 ps.setString(1, newPassword);
                 ps.setString(2, email);
                 int rows = ps.executeUpdate();
@@ -34,7 +34,7 @@ public class ResetPasswordDAO {
 
             // Finally, try Admin
             try (PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE Admin SET password = ? WHERE email = ?")) {
+                    "UPDATE Admin SET password = ? WHERE email_contact = ?")) {
                 ps.setString(1, newPassword);
                 ps.setString(2, email);
                 int rows = ps.executeUpdate();

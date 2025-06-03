@@ -51,7 +51,7 @@ public class ResetPasswordController extends HttpServlet {
 
     private void handleSendOTP(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws ServletException, IOException {
-        String email = request.getParameter("email");
+        String email = request.getParameter("email_contact");
 
         if (email == null || email.trim().isEmpty() || !isValidEmail(email)) {
             request.setAttribute("errorMessage", "Invalid email format!");
