@@ -90,7 +90,7 @@
 <div class="login-container">
     <h2>Login to Your Account</h2>
     <form action="login" method="post">
-        <input type="text" id="Email" name="Email" placeholder="Email" required>
+        <input type="text" id="usernameOrEmail" name="usernameOrEmail" placeholder="Username or Email" required>
 
         <input type="password" id="password" name="password" placeholder="Password" required>
 

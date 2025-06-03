@@ -5,7 +5,7 @@
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
 
-<% s
+<% 
     JobseekerDAO jobseekerDAO = new JobseekerDAO();
     
     // Lấy tham số tìm kiếm
@@ -606,7 +606,45 @@
     </style>
 </head>
 <body>
-    <jsp:include page="/includes/admin_sidebar.jsp" />
+    <!--[if lte IE 9]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+    <![endif]-->
+
+    <button class="toggle-btn" onclick="toggleSidebar()">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Admin Panel</h3>
+        </div>
+        <div class="sidebar-content">
+            <a href="AdminController?action=dashboard" class="menu-item ${param.action == 'dashboard' ? 'active' : ''}">
+                <i class="fas fa-chart-line"></i>
+                Dashboard
+            </a>
+            <a href="AdminController?action=jobseekers" class="menu-item ${param.action == 'jobseekers' ? 'active' : ''}">
+                <i class="fas fa-user-tie"></i>
+                Manage Jobseekers
+            </a>
+            <a href="AdminController?action=recruiter" class="menu-item ${param.action == 'recruiter' ? 'active' : ''}">
+                <i class="fas fa-briefcase-medical"></i>
+                Manage Recruiters
+            </a>
+            <a href="AdminController?action=companies" class="menu-item ${param.action == 'companies' ? 'active' : ''}">
+                <i class="fas fa-building-columns"></i>
+                Manage Companies
+            </a>
+            <a href="AdminController?action=settings" class="menu-item ${param.action == 'settings' ? 'active' : ''}">
+                <i class="fas fa-gear"></i>
+                Settings
+            </a>
+            <a href="logout.jsp" class="menu-item">
+                <i class="fas fa-right-from-bracket"></i>
+                Logout
+            </a>
+        </div>
+    </div>
 
     <div class="main-content">
         <div class="admin-header">
@@ -677,8 +715,8 @@
                                 <td>
                                     <img src="${jobseeker.image}" alt="Avatar" class="user-avatar">
                                 </td>
-                                <td>${jobseeker.first_name} ${jobseeker.last_name}</td>
-                                <td>${jobseeker.email_contact}</td>
+                                <td>${jobseeker.firstName} ${jobseeker.lastName}</td>
+                                <td>${jobseeker.email__contact}</td>
                                 <td>${jobseeker.phone_contact}</td>
                                 <td>
                                     <span class="badge ${jobseeker.gender ? 'badge-info' : 'badge-warning'}">
@@ -700,27 +738,27 @@
                                         
                                         <!-- Status buttons dropdown -->
                                         <div class="status-buttons">
-                                            <a href="admin?action=viewJobseeker&id=${jobseeker.freelancerID}" class="btn-status">
+                                            <a href="AdminController?action=viewJobseeker&id=${jobseeker.freelanceID}" class="btn-status">
                                                 <i class="fa fa-eye"></i> View Details
                                             </a>
-                                            <a href="AdminController?action=editJobseeker&id=${jobseeker.freelancerID}" class="btn-status">
+                                            <a href="AdminController?action=editJobseeker&id=${jobseeker.freelanceID}" class="btn-status">
                                                 <i class="fa fa-pencil"></i> Edit Profile
                                             </a>
                                             <div class="dropdown-divider"></div>
                                             <button class="btn-status ${jobseeker.status == 'active' ? 'active' : ''}" 
-                                                    onclick="changeStatus('${jobseeker.freelancerID}', 'active')">
+                                                    onclick="changeStatus('${jobseeker.freelanceID}', 'active')">
                                                 <i class="fa fa-check-circle"></i> Active
                                             </button>
                                             <button class="btn-status ${jobseeker.status == 'suspended' ? 'suspended' : ''}" 
-                                                    onclick="changeStatus('${jobseeker.freelancerID}', 'suspended')">
+                                                    onclick="changeStatus('${jobseeker.freelanceID}', 'suspended')">
                                                 <i class="fa fa-pause-circle"></i> Suspend
                                             </button>
                                             <button class="btn-status ${jobseeker.status == 'pending' ? 'pending' : ''}" 
-                                                    onclick="changeStatus('${jobseeker.freelancerID}', 'pending')">
+                                                    onclick="changeStatus('${jobseeker.freelanceID}', 'pending')">
                                                 <i class="fa fa-clock-o"></i> Pending
                                             </button>
                                             <div class="dropdown-divider"></div>
-                                            <button class="btn-delete" onclick="confirmDelete('${jobseeker.freelancerID}')">
+                                            <button class="btn-delete" onclick="confirmDelete('${jobseeker.freelanceID}')">
                                                 <i class="fa fa-trash"></i> Delete
                                             </button>
                                         </div>

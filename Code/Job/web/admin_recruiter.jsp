@@ -475,23 +475,6 @@
             transform: translateX(2px);
         }
         
-        .recruiter-name-link {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease, transform 0.2s ease;
-            display: inline-block;
-            padding: 2px 5px;
-            border-radius: 4px;
-        }
-        
-        .recruiter-name-link:hover {
-            color: #1a73e8;
-            text-decoration: underline;
-            transform: translateY(-1px);
-            background-color: rgba(52, 152, 219, 0.1);
-        }
-        
         .btn-delete i {
             width: 18px;
             text-align: center;
@@ -651,9 +634,41 @@
     </style>
 </head>
 <body>
-    <jsp:include page="/includes/admin_sidebar.jsp" />
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Admin Panel</h3>
+        </div>
+        <div class="sidebar-content">
+            <a href="AdminController?action=dashboard" class="menu-item ${param.action == 'dashboard' ? 'active' : ''}">
+                <i class="fas fa-chart-line"></i>
+                Dashboard
+            </a>
+            <a href="AdminController?action=jobseekers" class="menu-item ${param.action == 'jobseekers' ? 'active' : ''}">
+                <i class="fas fa-user-tie"></i>
+                Manage Jobseekers
+            </a>
+            <a href="AdminController?action=recruiter" class="menu-item ${param.action == 'recruiter' ? 'active' : ''}">
+                <i class="fas fa-briefcase-medical"></i>
+                Manage Recruiters
+            </a>
+            <a href="AdminController?action=companies" class="menu-item ${param.action == 'companies' ? 'active' : ''}">
+                <i class="fas fa-building-columns"></i>
+                Manage Companies
+            </a>
+            <a href="AdminController?action=settings" class="menu-item">
+                <i class="fas fa-gear"></i>
+                Settings
+            </a>
+            <a href="logout.jsp" class="menu-item">
+                <i class="fas fa-right-from-bracket"></i>
+                Logout
+            </a>
+        </div>
+    </div>
 
-    
+    <button class="toggle-btn" onclick="toggleSidebar()">
+        <i class="fa fa-bars"></i>
+    </button>
 
     <div class="main-content">
         <div class="admin-header">
@@ -723,7 +738,7 @@
                         <td>
                             <img src="${recruiter.image}" alt="Recruiter Image" class="user-avatar">
                         </td>
-                        <td>${recruiter.firstName} ${recruiter.lastName}</a></td>
+                        <td>${recruiter.firstName} ${recruiter.lastName}</td>
                         <td>${recruiter.emailContact}</td>
                         <td>${recruiter.phoneContact}</td>
                         <td>

@@ -139,8 +139,10 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="skillDescription" class="form-label">Description</label>
-                            <input type="text" class="form-control" id="skillDescription" name="skillDescription" value="<c:out value='${skillToEdit.description}'/>">
+                            <%-- MODIFICATION START --%>
+                            <label for="skillDescription" class="form-label">Description <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="skillDescription" name="skillDescription" value="<c:out value='${skillToEdit.description}'/>" required>
+                            <%-- MODIFICATION END --%>
                         </div>
 
                         <div class="row">
@@ -198,17 +200,7 @@
             }
         });
 
-        // Optional: Clear message/error from URL
-        /*
-        if (window.history.replaceState) {
-            const url = new URL(window.location.href);
-            url.searchParams.delete('message'); // if you pass it via URL for some reason
-            url.searchParams.delete('error');   // if you pass it via URL for some reason
-            // Better to use requestScope attributes for messages on forward
-            // For redirects, use session attributes then remove them after display
-            // window.history.replaceState({ path: url.href }, '', url.href);
-        }
-        */
+        
     </script>
 </body>
 </html>

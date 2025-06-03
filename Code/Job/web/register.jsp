@@ -147,12 +147,10 @@
                 <input type="email" id="email" name="email" placeholder="Sử dụng email có thật để xác thực" required>
             </div>
 
-            <%-- Removed Username field
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required>
             </div>
-            --%>
 
             <div class="form-group">
                 <label for="password">Mật khẩu</label>
@@ -194,7 +192,7 @@
             const phoneRegex = /^[0-9]{9,11}$/;
             const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{6,50}$/;
 
-            if (phone && !phoneRegex.test(phone)) { // Added a check if phone is not empty before validating
+            if (!phoneRegex.test(phone)) {
                 alert("Số điện thoại phải từ 9 đến 11 chữ số.");
                 return false;
             }
