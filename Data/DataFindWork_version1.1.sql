@@ -79,19 +79,19 @@ CREATE TABLE [Admin] (
     [first_name] [nvarchar](50) NOT NULL,
     [last_name] [nvarchar](50) NOT NULL,
     [phone] [nvarchar](50) NOT NULL,
-    [email] [nvarchar](50) NOT NULL,
+    [email_contact] [nvarchar](50) NOT NULL,
     [image] [nvarchar](220) NULL,
     [status] [nvarchar](50) NOT NULL, -- Ví dụ: 'Active', 'Inactive'
     CONSTRAINT [PK_Admin] PRIMARY KEY CLUSTERED ([adminID] ASC),
     CONSTRAINT [UQ_Admin_Username] UNIQUE NONCLUSTERED ([username] ASC),
-    CONSTRAINT [UQ_Admin_Email] UNIQUE NONCLUSTERED ([email] ASC)
+    CONSTRAINT [UQ_Admin_Email] UNIQUE NONCLUSTERED ([email_contact] ASC)
 );
 GO
 
 CREATE TABLE [Recruiter] (
     [recruiterID] [int] IDENTITY(1,1) NOT NULL,
-    -- [username] [nvarchar](50) NOT NULL, -- Giữ lại nếu bạn vẫn muốn có username riêng, bỏ đi nếu chỉ dùng email để login
-    [password_hash] [nvarchar](255) NOT NULL, -- Đổi tên và kiểu dữ liệu cho password
+    [username] [nvarchar](50) NOT NULL, 
+    [password] [nvarchar](255) NOT NULL, 
     [first_name] [nvarchar](50) NOT NULL,
     [last_name] [nvarchar](50) NOT NULL,
     [gender] [bit] NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE [Recruiter] (
     [status] [nvarchar](50) NOT NULL, -- Ví dụ: 'PendingVerification', 'Active', 'Suspended'
     [statusChangedByAdminID] [int] NULL,
     CONSTRAINT [PK_Recruiter] PRIMARY KEY CLUSTERED ([recruiterID] ASC),
-    -- CONSTRAINT [UQ_Recruiter_Username] UNIQUE NONCLUSTERED ([username] ASC), -- Nếu giữ lại username
+    CONSTRAINT [UQ_Recruiter_Username] UNIQUE NONCLUSTERED ([username] ASC), -- Nếu giữ lại username
     CONSTRAINT [UQ_Recruiter_EmailContact] UNIQUE NONCLUSTERED ([email_contact] ASC),
     CONSTRAINT [UQ_Recruiter_PhoneContact] UNIQUE NONCLUSTERED ([phone_contact] ASC),
     CONSTRAINT [FK_Recruiter_AdminStatusChangedBy] FOREIGN KEY ([statusChangedByAdminID]) REFERENCES [Admin]([adminID])
@@ -113,8 +113,8 @@ GO
 
 CREATE TABLE [Freelancer] (
     [freelancerID] [int] IDENTITY(1,1) NOT NULL, -- Đổi freelanceID
-    -- [username] [nvarchar](50) NOT NULL, -- Giữ lại nếu bạn vẫn muốn có username riêng, bỏ đi nếu chỉ dùng email để login
-    [password_hash] [nvarchar](255) NOT NULL, -- Đổi tên và kiểu dữ liệu cho password
+    [username] [nvarchar](50) NOT NULL, 
+    [password] [nvarchar](255) NOT NULL, 
     [first_name] [nvarchar](50) NOT NULL,
     [last_name] [nvarchar](50) NOT NULL,
     [image] [nvarchar](220) NULL,
@@ -126,7 +126,7 @@ CREATE TABLE [Freelancer] (
     [status] [nvarchar](50) NOT NULL, -- Ví dụ: 'PendingVerification', 'Active', 'Suspended'
     [statusChangedByAdminID] [int] NULL,
     CONSTRAINT [PK_Freelancer] PRIMARY KEY CLUSTERED ([freelancerID] ASC),
-    -- CONSTRAINT [UQ_Freelancer_Username] UNIQUE NONCLUSTERED ([username] ASC), -- Nếu giữ lại username
+    CONSTRAINT [UQ_Freelancer_Username] UNIQUE NONCLUSTERED ([username] ASC), -- Nếu giữ lại username
     CONSTRAINT [UQ_Freelancer_EmailContact] UNIQUE NONCLUSTERED ([email_contact] ASC),
     CONSTRAINT [UQ_Freelancer_PhoneContact] UNIQUE NONCLUSTERED ([phone_contact] ASC),
     CONSTRAINT [FK_Freelancer_AdminStatusChangedBy] FOREIGN KEY ([statusChangedByAdminID]) REFERENCES [Admin]([adminID])
