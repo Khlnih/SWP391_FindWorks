@@ -5,7 +5,7 @@
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
 
-<% 
+<% s
     JobseekerDAO jobseekerDAO = new JobseekerDAO();
     
     // Lấy tham số tìm kiếm
