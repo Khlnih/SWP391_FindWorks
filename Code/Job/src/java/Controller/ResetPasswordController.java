@@ -4,8 +4,8 @@ import DAO.loginDAO;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
-import javax.mail.*;
-import javax.mail.internet.*;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -35,10 +35,17 @@ public class ResetPasswordController extends HttpServlet {
         }
 
         switch (action) {
-            case "sendOTP" -> handleSendOTP(request, response, session);
-            case "verifyOTP" -> handleVerifyOTP(request, response, session);
-            case "resetPassword" -> handleResetPassword(request, response, session);
-            default -> response.sendRedirect("forgotpassword.jsp");
+            case "sendOTP":
+                handleSendOTP(request, response, session);
+                break;
+            case "verifyOTP":
+                handleVerifyOTP(request, response, session);
+                break;
+            case "resetPassword":
+                handleResetPassword(request, response, session);
+                break;
+            default:
+                response.sendRedirect("forgotpassword.jsp");
         }
     }
 
@@ -123,8 +130,8 @@ public class ResetPasswordController extends HttpServlet {
     }
 
     private boolean sendEmail(String toEmail, String otp) {
-        final String senderEmail = "ebookvn123@gmail.com";
-        final String senderPassword = "vsur gxvg joms oftf";
+        final String senderEmail = "jobaboard22@gmail.com";
+        final String senderPassword = "hzxe ulsa atwk hgsz";
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

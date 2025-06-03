@@ -16,28 +16,32 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String emailInput = request.getParameter("Email");
+        String userIdentifier = request.getParameter("usernameOrEmail");
         String passwordInput = request.getParameter("password");
 
-        if (emailInput == null || emailInput.trim().isEmpty() ||
-            passwordInput == null || passwordInput.isEmpty()) {
-            request.setAttribute("error", "Email and password are required!");
+        // Cải thiện kiểm tra đầu vào
+        if (userIdentifier == null || userIdentifier.trim().isEmpty() ||
+            passwordInput == null || passwordInput.trim().isEmpty()) { // SỬA Ở ĐÂY
+            request.setAttribute("error", "Tên đăng nhập/Email và mật khẩu không được để trống!"); // SỬA Ở ĐÂY
             request.getRequestDispatcher("login.jsp").forward(request, response);
             return;
         }
 
         loginDAO dao = new loginDAO();
-        UserLoginInfo user = dao.getUserLoginInfo(emailInput);
+        UserLoginInfo user = dao.getUserLoginInfo(userIdentifier);
 //        PrintWriter out = response.getWriter();
 //        out.print(user);
+        // So sánh mật khẩu dạng thuần
         if (user != null && user.getPassword().equals(passwordInput)) {
             HttpSession session = request.getSession();
-            session.setAttribute("user", user); 
-           
+            session.setAttribute("user", user); // lưu thông tin user vào session
 
-            response.sendRedirect("index.jsp"); 
+             
+            
+            response.sendRedirect(request.getContextPath() + "/index_recruiter.jsp"); 
         } else {
-            request.setAttribute("error", "Invalid email or password!");
+            System.out.println("Login failed for identifier: " + userIdentifier); // Thêm log để debug
+            request.setAttribute("error", "Tên đăng nhập/Email hoặc mật khẩu không chính xác!"); // SỬA Ở ĐÂY
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
@@ -45,7 +49,6 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       
         request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 }

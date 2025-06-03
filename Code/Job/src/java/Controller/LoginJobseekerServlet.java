@@ -26,7 +26,7 @@ public class LoginJobseekerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String userIdentifier = request.getParameter("Email");
+        String userIdentifier = request.getParameter("usernameOrEmail");
         String passwordInput = request.getParameter("password");
 
         if (userIdentifier == null || passwordInput == null) {
@@ -37,12 +37,13 @@ public class LoginJobseekerServlet extends HttpServlet {
 
         loginjobseekerDAO dao = new loginjobseekerDAO();
         UserLoginInfo user = dao.getUserLoginInfo(userIdentifier);
-
+//PrintWriter out = response.getWriter();
+//        out.print(user);
         if (user != null && user.getPassword().equals(passwordInput)) {
             HttpSession session = request.getSession();
-            session.setAttribute("user", user); // lưu thông tin user vào session
+            session.setAttribute("user", user); 
 
-            response.sendRedirect("index.jsp"); // điều hướng đến trang chính sau khi login
+            response.sendRedirect("index.jsp"); 
         } else {
             request.setAttribute("error", "Invalid username/email or password!");
             request.getRequestDispatcher("loginjobseeker.jsp").forward(request, response);

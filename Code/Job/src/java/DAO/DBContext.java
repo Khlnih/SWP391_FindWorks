@@ -13,7 +13,7 @@ public class DBContext implements AutoCloseable {
     public DBContext(){
         String user = "sa";
         String password = "123";
-        String url = "jdbc:sqlserver://localhost:1433;databaseName=SU25_SWP391";
+        String url = "jdbc:sqlserver://localhost:1433;databaseName=SU25_SWP391_V2";
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(url, user, password);
@@ -28,14 +28,11 @@ public class DBContext implements AutoCloseable {
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
         String user = "sa";
         String password = "123";
-        String url = "jdbc:sqlserver://localhost:1433;databaseName=SU25_SWP391";
+        String url = "jdbc:sqlserver://localhost:1433;databaseName=SU25_SWP391_V2";
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         return DriverManager.getConnection(url, user, password);
     }
 
-    /**
-     * Đóng connection khi gọi close()
-     */
     @Override
     public void close() {
         if (connection != null) {
