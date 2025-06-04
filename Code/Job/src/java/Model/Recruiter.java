@@ -1,5 +1,6 @@
 package Model;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 
 public class Recruiter {
@@ -11,20 +12,28 @@ public class Recruiter {
     private boolean gender; // 0: nữ, 1: nam
     private String dob;
     private String image;
-    private int money;
+    private BigDecimal money;
     private String emailContact;
     private String phoneContact;
     private String status;
-    
+    private Integer statusChangedByAdminID;
 
-    // Constructor mặc định
     public Recruiter() {
     }
 
-    // Constructor đầy đủ
-    public Recruiter(int recruiterID, String username, String password, String firstName, String lastName,
-                    boolean gender, String dob, String image, int money, String emailContact,
-                    String phoneContact, String status) {
+    public Recruiter(String username, String password, String firstName, String lastName, boolean gender, String dob, String image, String emailContact, String phoneContact) {
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.dob = dob;
+        this.image = image;
+        this.emailContact = emailContact;
+        this.phoneContact = phoneContact;
+    }
+    
+    public Recruiter(int recruiterID, String username, String password, String firstName, String lastName, boolean gender, String dob, String image, BigDecimal money, String emailContact, String phoneContact, String status, Integer statusChangedByAdminID) {
         this.recruiterID = recruiterID;
         this.username = username;
         this.password = password;
@@ -37,26 +46,8 @@ public class Recruiter {
         this.emailContact = emailContact;
         this.phoneContact = phoneContact;
         this.status = status;
+        this.statusChangedByAdminID = statusChangedByAdminID;
     }
-    
-  
-public Recruiter(String username, String password, String firstName, String lastName, boolean gender,
-                     String dob, String image, String emailContact, String phoneContact) {
-        this.username = username;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.gender = gender;
-        this.dob = dob;
-        this.image = image;
-        this.emailContact = emailContact;
-        this.phoneContact = phoneContact;
-    }
- 
-
-   
-
-    // Getters and Setters
 
     public int getRecruiterID() {
         return recruiterID;
@@ -122,11 +113,11 @@ public Recruiter(String username, String password, String firstName, String last
         this.image = image;
     }
 
-    public int getMoney() {
+    public BigDecimal getMoney() {
         return money;
     }
 
-    public void setMoney(int money) {
+    public void setMoney(BigDecimal money) {
         this.money = money;
     }
 
@@ -153,21 +144,16 @@ public Recruiter(String username, String password, String firstName, String last
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public Integer getStatusChangedByAdminID() {
+        return statusChangedByAdminID;
+    }
+
+    public void setStatusChangedByAdminID(Integer statusChangedByAdminID) {
+        this.statusChangedByAdminID = statusChangedByAdminID;
+    }
+    
     
 
-    @Override
-    public String toString() {
-        return "Recruiter{" +
-                "recruiterID=" + recruiterID +
-                ", username='" + username + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", gender=" + gender +
-                ", dob=" + dob +
-                ", money=" + money +
-                ", emailContact='" + emailContact + '\'' +
-                ", phoneContact='" + phoneContact + '\'' +
-                ", status='" + status + '\'' +
-                '}';
-    }
+    
 }

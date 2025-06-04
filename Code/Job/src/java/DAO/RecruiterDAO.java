@@ -30,7 +30,7 @@ public class RecruiterDAO extends DBContext {
                 recruiter.setGender(rs.getBoolean("gender"));
                 recruiter.setDob(rs.getString("dob"));
                 recruiter.setImage(rs.getString("image"));
-                recruiter.setMoney(rs.getInt("money"));
+                recruiter.setMoney(rs.getBigDecimal("money"));
                 recruiter.setEmailContact(rs.getString("email_contact"));
                 recruiter.setPhoneContact(rs.getString("phone_contact"));
                 recruiter.setStatus(rs.getString("status"));
@@ -93,7 +93,7 @@ public class RecruiterDAO extends DBContext {
                 recruiter.setGender(rs.getBoolean("gender"));
                 recruiter.setDob(rs.getString("dob"));
                 recruiter.setImage(rs.getString("image"));
-                recruiter.setMoney(rs.getInt("money"));
+                recruiter.setMoney(rs.getBigDecimal("money"));
                 recruiter.setEmailContact(rs.getString("email_contact"));
                 recruiter.setPhoneContact(rs.getString("phone_contact"));
                 recruiter.setStatus(rs.getString("status"));
@@ -198,7 +198,7 @@ public class RecruiterDAO extends DBContext {
                 recruiter.setGender(rs.getBoolean("gender"));
                 recruiter.setDob(rs.getString("dob"));
                 recruiter.setImage(rs.getString("image"));
-                recruiter.setMoney(rs.getInt("money"));
+                recruiter.setMoney(rs.getBigDecimal("money"));
                 recruiter.setEmailContact(rs.getString("email_contact"));
                 recruiter.setPhoneContact(rs.getString("phone_contact"));
                 recruiter.setStatus(rs.getString("status"));
@@ -296,7 +296,80 @@ public class RecruiterDAO extends DBContext {
             return false;
         }
     }
-    
+    public Recruiter getRecruiterById(int id) {
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return null;
+        }
+
+        String sql = "SELECT * FROM Recruiter WHERE recruiterID = ?";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, id);
+
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                Recruiter recruiter = new Recruiter();
+                recruiter.setRecruiterID(rs.getInt("recruiterID"));
+                recruiter.setUsername(rs.getString("username"));
+                recruiter.setPassword(rs.getString("password"));
+                recruiter.setFirstName(rs.getString("first_name"));
+                recruiter.setLastName(rs.getString("last_name"));
+                recruiter.setGender(rs.getBoolean("gender"));
+                recruiter.setDob(rs.getString("dob"));
+                recruiter.setImage(rs.getString("image"));
+                recruiter.setMoney(rs.getBigDecimal("money"));
+                recruiter.setEmailContact(rs.getString("email_contact"));
+                recruiter.setPhoneContact(rs.getString("phone_contact"));
+                recruiter.setStatus(rs.getString("status"));
+                
+                return recruiter;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error getting recruiter by ID: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    public String getTierName(int recruiterID) {
+        String sql = "SELECT AT.tierName AS TierName\n"
+                + "FROM AccountTiers AS AT\n"
+                + "JOIN UserTierSubscriptions AS UTS ON AT.tierID = UTS.tierID\n"
+                + "WHERE UTS.recruiterID = ? AND AT.isActive = 1;";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, recruiterID);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getString("TierName");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error calculating total spent: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getTierNameDescription(int recruiterID) {
+        String sql = "SELECT AT.description AS Description\n"
+                + "FROM AccountTiers AS AT\n"
+                + "JOIN UserTierSubscriptions AS UTS ON AT.tierID = UTS.tierID\n"
+                + "WHERE UTS.recruiterID = ? AND AT.isActive = 1;";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, recruiterID);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getString("Description");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error calculating total spent: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
 
      public boolean isUsernameOrEmailExists(String username, String email) {
         String sql = "SELECT * FROM Recruiter WHERE username = ? OR email_contact = ?";

@@ -385,7 +385,7 @@
                 <div class="position-relative">
                     <img src="<%= recruiter.getImage() != null && !recruiter.getImage().isEmpty() ? recruiter.getImage() : "img/avatar/default-avatar.png" %>" 
                          alt="Recruiter Avatar" class="profile-avatar">
-                    <h1 class="profile-name"><%= recruiter.getFirst_name() + " " + recruiter.getLast_name() %></h1>
+                    <h1 class="profile-name"><%= recruiter.getFirstName() + " " + recruiter.getLastName() %></h1>
                     <div class="profile-title">
                         <span class="badge <%= "active".equalsIgnoreCase(recruiter.getStatus()) ? "badge-success" : 
                                                ("suspended".equalsIgnoreCase(recruiter.getStatus()) ? "badge-danger" : "badge-warning") %>">
@@ -414,13 +414,13 @@
                                 <div class="col-md-6">
                                     <div class="info-item">
                                         <span class="info-label">First Name</span>
-                                        <p class="info-value"><%= recruiter.getFirst_name() %></p>
+                                        <p class="info-value"><%= recruiter.getFirstName() %></p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="info-item">
                                         <span class="info-label">Last Name</span>
-                                        <p class="info-value"><%= recruiter.getLast_name() %></p>
+                                        <p class="info-value"><%= recruiter.getLastName() %></p>
                                     </div>
                                 </div>
                             </div>
@@ -453,8 +453,8 @@
                                     <div class="info-item">
                                         <span class="info-label">Email</span>
                                         <p class="info-value">
-                                            <a href="mailto:<%= recruiter.getEmail_contact() %>" class="text-primary">
-                                                <%= recruiter.getEmail_contact() != null ? recruiter.getEmail_contact() : "Not provided" %>
+                                            <a href="mailto:<%= recruiter.getEmailContact() %>" class="text-primary">
+                                                <%= recruiter.getEmailContact() != null ? recruiter.getEmailContact() : "Not provided" %>
                                             </a>
                                         </p>
                                     </div>
@@ -463,7 +463,7 @@
                                     <div class="info-item">
                                         <span class="info-label">Phone</span>
                                         <p class="info-value">
-                                            <%= recruiter.getPhone_contact() != null ? recruiter.getPhone_contact() : "Not provided" %>
+                                            <%= recruiter.getPhoneContact() != null ? recruiter.getPhoneContact() : "Not provided" %>
                                         </p>
                                     </div>
                                 </div>
