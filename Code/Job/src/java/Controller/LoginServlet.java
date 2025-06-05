@@ -36,9 +36,16 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("user", user); // lưu thông tin user vào session
 
-             
-            
-            response.sendRedirect(request.getContextPath() + "/index_recruiter.jsp"); 
+            String userType = user.getUserType();
+            if ("recruiter".equals(userType)) {
+                response.sendRedirect(request.getContextPath() + "/index_recruiter.jsp");
+            } else if ("freelancer".equals(userType)) {
+                response.sendRedirect(request.getContextPath() + "/index.jsp");
+            } else if ("admin".equals(userType)) {
+                response.sendRedirect(request.getContextPath() + "/admin_dashboard.jsp");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/index.jsp");
+            }
         } else {
             System.out.println("Login failed for identifier: " + userIdentifier); // Thêm log để debug
             request.setAttribute("error", "Tên đăng nhập/Email hoặc mật khẩu không chính xác!"); // SỬA Ở ĐÂY

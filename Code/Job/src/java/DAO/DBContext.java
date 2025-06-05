@@ -11,9 +11,9 @@ public class DBContext implements AutoCloseable {
     public Connection connection;
 
     public DBContext(){
-        String user = "sa";
-        String password = "123";
-        String url = "jdbc:sqlserver://localhost:1433;databaseName=SU25_SWP391_V2";
+        String user = "SE1903";
+        String password = "123456";
+        String url = "jdbc:sqlserver://DESKTOP-H6G4KKB\\MSSQLSERVER01:1433;databaseName=SU25_SWP391_V2";
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(url, user, password);
@@ -26,8 +26,8 @@ public class DBContext implements AutoCloseable {
      * Optional: static method để lấy Connection trực tiếp
      */
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
-        String user = "sa";
-        String password = "123";
+        String user = "SE1903";
+        String password = "123456";
         String url = "jdbc:sqlserver://localhost:1433;databaseName=SU25_SWP391_V2";
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         return DriverManager.getConnection(url, user, password);

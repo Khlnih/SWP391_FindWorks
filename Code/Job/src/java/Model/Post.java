@@ -4,6 +4,7 @@
  */
 package Model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -11,48 +12,73 @@ import java.util.Date;
  * @author ADMIN
  */
 public class Post {
-    private int postId;         // từ [postID] [int] IDENTITY(1,1) NOT NULL
-    private String title;       // từ [title] [nvarchar](50) NULL
-    private String image;       // từ [image] [nvarchar](220) NULL
-    private int jobTypeId;      // từ [job_type_ID] [int] NOT NULL
-    private int durationId;     // từ [durationID] [int] NOT NULL
-    private Date datePost;      // từ [date_post] [date] NOT NULL
-    private Date expired;       // từ [expired] [date] NULL
-    private int quantity;       // từ [quantity] [int] NOT NULL
-    private String description; // từ [description] [nvarchar](max) NULL
-    private Integer budget;     // từ [budget] [int] NULL (Integer cho phép null)
-    private String location;    // từ [location] [nvarchar](50) NULL
-    private String skill;       // từ [skill] [nvarchar](50) NULL
-    private int recruiterId;    // từ [recruiterID] [int] NOT NULL
-    private Integer status;     // từ [status] [int] NULL (Integer cho phép null)
-    private int caId;           // từ [caID] [int] NOT NULL
-    private Integer checking;   // từ [checking] [int] NULL (Integer cho phép null)
-    private Integer approvedByAdminID;   // từ [approvedByAdminID] [int] NULL (Integer cho phép null)
+    private int postId;                 // từ [postID] [int] IDENTITY(1,1) NOT NULL
+    private String title;               // từ [title] [nvarchar](220) NULL
+    private String image;               // từ [image] [nvarchar](220) NULL
+    private int jobTypeId;              // từ [jobTypeID] [int] NOT NULL
+    private int durationId;             // từ [durationID] [int] NOT NULL
+    private Date datePost;              // từ [date_post] [datetime] NOT NULL
+    private Date expiredDate;           // từ [expired_date] [datetime] NULL
+    private int quantity;               // từ [quantity] [int] NOT NULL
+    private String description;         // từ [description] [nvarchar](max) NULL
+    private BigDecimal budgetMin;       // từ [budget_min] [decimal](18,2) NULL
+    private BigDecimal budgetMax;       // từ [budget_max] [decimal](18,2) NULL
+    private String budgetType;          // từ [budget_type] [nvarchar](20) NULL
+    private String location;            // từ [location] [nvarchar](255) NULL
+    private int recruiterId;            // từ [recruiterID] [int] NOT NULL
+    private String statusPost;          // từ [statusPost] [nvarchar](20) NOT NULL
+    private int categoryId;             // từ [categoryID] [int] NOT NULL
+    private Integer approvedByAdminID;  // từ [approvedByAdminID] [int] NULL
 
 
     // Constructors
     public Post() {
     }
 
+    // Constructor đầy đủ
     public Post(int postId, String title, String image, int jobTypeId, int durationId,
-                Date datePost, Date expired, int quantity, String description, Integer budget,
-                String location, String skill, int recruiterId, Integer status, int caId, Integer checking) {
+                Date datePost, Date expiredDate, int quantity, String description,
+                BigDecimal budgetMin, BigDecimal budgetMax, String budgetType,
+                String location, int recruiterId, String statusPost, int categoryId,
+                Integer approvedByAdminID) {
         this.postId = postId;
         this.title = title;
         this.image = image;
         this.jobTypeId = jobTypeId;
         this.durationId = durationId;
         this.datePost = datePost;
-        this.expired = expired;
+        this.expiredDate = expiredDate;
         this.quantity = quantity;
         this.description = description;
-        this.budget = budget;
+        this.budgetMin = budgetMin;
+        this.budgetMax = budgetMax;
+        this.budgetType = budgetType;
         this.location = location;
-        this.skill = skill;
         this.recruiterId = recruiterId;
-        this.status = status;
-        this.caId = caId;
-        this.checking = checking;
+        this.statusPost = statusPost;
+        this.categoryId = categoryId;
+        this.approvedByAdminID = approvedByAdminID;
+    }
+
+    // Constructor cho tạo mới (không có ID)
+    public Post(String title, String image, int jobTypeId, int durationId,
+                Date expiredDate, int quantity, String description,
+                BigDecimal budgetMin, BigDecimal budgetMax, String budgetType,
+                String location, int recruiterId, String statusPost, int categoryId) {
+        this.title = title;
+        this.image = image;
+        this.jobTypeId = jobTypeId;
+        this.durationId = durationId;
+        this.expiredDate = expiredDate;
+        this.quantity = quantity;
+        this.description = description;
+        this.budgetMin = budgetMin;
+        this.budgetMax = budgetMax;
+        this.budgetType = budgetType;
+        this.location = location;
+        this.recruiterId = recruiterId;
+        this.statusPost = statusPost;
+        this.categoryId = categoryId;
     }
 
     // Getters and Setters
@@ -104,12 +130,12 @@ public class Post {
         this.datePost = datePost;
     }
 
-    public Date getExpired() {
-        return expired;
+    public Date getExpiredDate() {
+        return expiredDate;
     }
 
-    public void setExpired(Date expired) {
-        this.expired = expired;
+    public void setExpiredDate(Date expiredDate) {
+        this.expiredDate = expiredDate;
     }
 
     public int getQuantity() {
@@ -128,12 +154,28 @@ public class Post {
         this.description = description;
     }
 
-    public Integer getBudget() {
-        return budget;
+    public BigDecimal getBudgetMin() {
+        return budgetMin;
     }
 
-    public void setBudget(Integer budget) {
-        this.budget = budget;
+    public void setBudgetMin(BigDecimal budgetMin) {
+        this.budgetMin = budgetMin;
+    }
+
+    public BigDecimal getBudgetMax() {
+        return budgetMax;
+    }
+
+    public void setBudgetMax(BigDecimal budgetMax) {
+        this.budgetMax = budgetMax;
+    }
+
+    public String getBudgetType() {
+        return budgetType;
+    }
+
+    public void setBudgetType(String budgetType) {
+        this.budgetType = budgetType;
     }
 
     public String getLocation() {
@@ -144,14 +186,6 @@ public class Post {
         this.location = location;
     }
 
-    public String getSkill() {
-        return skill;
-    }
-
-    public void setSkill(String skill) {
-        this.skill = skill;
-    }
-
     public int getRecruiterId() {
         return recruiterId;
     }
@@ -160,28 +194,20 @@ public class Post {
         this.recruiterId = recruiterId;
     }
 
-    public Integer getStatus() {
-        return status;
+    public String getStatusPost() {
+        return statusPost;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setStatusPost(String statusPost) {
+        this.statusPost = statusPost;
     }
 
-    public int getCaId() {
-        return caId;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setCaId(int caId) {
-        this.caId = caId;
-    }
-
-    public Integer getChecking() {
-        return checking;
-    }
-
-    public void setChecking(Integer checking) {
-        this.checking = checking;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
     public Integer getApprovedByAdminID() {
@@ -190,5 +216,28 @@ public class Post {
 
     public void setApprovedByAdminID(Integer approvedByAdminID) {
         this.approvedByAdminID = approvedByAdminID;
+    }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "postId=" + postId +
+                ", title='" + title + '\'' +
+                ", image='" + image + '\'' +
+                ", jobTypeId=" + jobTypeId +
+                ", durationId=" + durationId +
+                ", datePost=" + datePost +
+                ", expiredDate=" + expiredDate +
+                ", quantity=" + quantity +
+                ", description='" + description + '\'' +
+                ", budgetMin=" + budgetMin +
+                ", budgetMax=" + budgetMax +
+                ", budgetType='" + budgetType + '\'' +
+                ", location='" + location + '\'' +
+                ", recruiterId=" + recruiterId +
+                ", statusPost='" + statusPost + '\'' +
+                ", categoryId=" + categoryId +
+                ", approvedByAdminID=" + approvedByAdminID +
+                '}';
     }
 }

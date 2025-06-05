@@ -152,6 +152,7 @@
                                 <nav>
                                     <ul id="navigation">
                                         <li><a href="index_recruiter.jsp">home</a></li>
+                                        <li><a href="post?action=list">My Jobs</a></li>
                                         <li><a href="jobs.jsp">Browse Job</a></li>
                                         <li><a href="#">pages <i class="ti-angle-down"></i></a>
                                             <ul class="submenu">
@@ -180,7 +181,7 @@
                                      <a href="${pageContext.request.contextPath}/logout">Log out</a>
                                 </div>
                                 <div class="d-none d-lg-block">
-                                    <a class="boxed-btn3" href="post_job.jsp">Post a Job</a>
+                                    <a class="boxed-btn3" href="post?action=create">Post a Job</a>
                                 </div>
                             </div>
                         </div>
