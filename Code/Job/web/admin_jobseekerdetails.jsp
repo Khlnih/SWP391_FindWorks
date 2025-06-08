@@ -287,7 +287,7 @@
                 <div class="text-center">
                     <img src="<%= jobseeker.getImage() != null && !jobseeker.getImage().isEmpty() ? jobseeker.getImage() : "images/default-avatar.png" %>" 
                          alt="Profile Image" class="profile-avatar">
-                    <h1 class="profile-name"><%= jobseeker.getFirst_name() != null ? jobseeker.getFirst_name() : "" %> <%= jobseeker.getLast_name() != null ? jobseeker.getLast_name() : "" %></h1>
+                    <h1 class="profile-name"><%= jobseeker.getFirst_Name() != null ? jobseeker.getFirst_Name() : "" %> <%= jobseeker.getLast_Name() != null ? jobseeker.getLast_Name() : "" %></h1>
                     <div class="profile-username">@<%= jobseeker.getFreelancerID() %></div>
                     <span class="badge <%= "active".equalsIgnoreCase(jobseeker.getStatus()) ? "badge-success" : 
                                                ("suspended".equalsIgnoreCase(jobseeker.getStatus()) ? "badge-danger" : "badge-warning") %>">
@@ -315,11 +315,11 @@
                                 <div class="col-md-6">
                                     <div class="info-item">
                                         <div class="info-label">First Name</div>
-                                        <div class="info-value"><%= jobseeker.getFirst_name() != null ? jobseeker.getFirst_name() : "<span class='empty'>Not provided</span>" %></div>
+                                        <div class="info-value"><%= jobseeker.getFirst_Name() != null ? jobseeker.getFirst_Name() : "<span class='empty'>Not provided</span>" %></div>
                                     </div>
                                     <div class="info-item">
                                         <div class="info-label">Last Name</div>
-                                        <div class="info-value"><%= jobseeker.getLast_name() != null ? jobseeker.getLast_name() : "<span class='empty'>Not provided</span>" %></div>
+                                        <div class="info-value"><%= jobseeker.getLast_Name() != null ? jobseeker.getLast_Name() : "<span class='empty'>Not provided</span>" %></div>
                                     </div>
                                     <div class="info-item">
                                         <div class="info-label">User ID</div>

@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "JobListController", urlPatterns = { "/jobs" })
+@WebServlet(name = "JobListController", urlPatterns = { "/jobss" })
 public class JobListController extends HttpServlet {
     
     private PostDAO postDAO;

@@ -4,49 +4,52 @@
  */
 package Model;
 
+import java.util.Date;
+
 /**
  *
  * @author ADMIN
  */
 public class Jobseeker {
     
-    private int freelanceID;
+    private int freelancerID;
     private String username;
     private String password;
-    private String firstName;
-    private String lastName;
+    private String first_Name;
+    private String last_Name;
     private String image; 
     private boolean gender;
-    private String dob;
+    private Date dob;
     private String describe;
-    private String email__contact;
+    private String email_contact;
     private String phone_contact;
     private String status;
-
+    private Integer statusChangedByAdminID;
     public Jobseeker() {
     }
 
-    public Jobseeker(int freelanceID, String username, String password, String firstName, String lastName, String image, boolean gender, String dob, String describe, String email__contact, String phone_contact, String status) {
-        this.freelanceID = freelanceID;
+    public Jobseeker(int freelancerID, String username, String password, String first_Name, String last_Name, String image, boolean gender, Date dob, String describe, String email_contact, String phone_contact, String status, Integer statusChangedByAdminID) {
+        this.freelancerID = freelancerID;
         this.username = username;
         this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.first_Name = first_Name;
+        this.last_Name = last_Name;
         this.image = image;
         this.gender = gender;
         this.dob = dob;
         this.describe = describe;
-        this.email__contact = email__contact;
+        this.email_contact = email_contact;
         this.phone_contact = phone_contact;
         this.status = status;
+        this.statusChangedByAdminID = statusChangedByAdminID;
     }
 
-    public int getFreelanceID() {
-        return freelanceID;
+    public int getFreelancerID() {
+        return freelancerID;
     }
 
-    public void setFreelanceID(int freelanceID) {
-        this.freelanceID = freelanceID;
+    public void setFreelancerID(int freelancerID) {
+        this.freelancerID = freelancerID;
     }
 
     public String getUsername() {
@@ -65,20 +68,20 @@ public class Jobseeker {
         this.password = password;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFirst_Name() {
+        return first_Name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFirst_Name(String first_Name) {
+        this.first_Name = first_Name;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getLast_Name() {
+        return last_Name;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLast_Name(String last_Name) {
+        this.last_Name = last_Name;
     }
 
     public String getImage() {
@@ -97,11 +100,11 @@ public class Jobseeker {
         this.gender = gender;
     }
 
-    public String getDob() {
+    public Date getDob() {
         return dob;
     }
 
-    public void setDob(String dob) {
+    public void setDob(Date dob) {
         this.dob = dob;
     }
 
@@ -113,12 +116,12 @@ public class Jobseeker {
         this.describe = describe;
     }
 
-    public String getEmail__contact() {
-        return email__contact;
+    public String getEmail_contact() {
+        return email_contact;
     }
 
-    public void setEmail__contact(String email__contact) {
-        this.email__contact = email__contact;
+    public void setEmail_contact(String email_contact) {
+        this.email_contact = email_contact;
     }
 
     public String getPhone_contact() {
@@ -136,6 +139,15 @@ public class Jobseeker {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public Integer getStatusChangedByAdminID() {
+        return statusChangedByAdminID;
+    }
+
+    public void setStatusChangedByAdminID(Integer statusChangedByAdminID) {
+        this.statusChangedByAdminID = statusChangedByAdminID;
+    }
+
     
     
 }

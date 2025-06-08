@@ -246,41 +246,8 @@
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
         <![endif]-->
 
-    <button class="toggle-btn" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-    </button>
-    
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3>Admin Panel</h3>
-        </div>
-        <div class="sidebar-content">
-            <a href="AdminController?action=dashboard" class="menu-item ${param.action == 'dashboard' || empty param.action ? 'active' : ''}">
-                <i class="fas fa-chart-line"></i>
-                Dashboard
-            </a>
-            <a href="AdminController?action=jobseekers" class="menu-item ${param.action == 'jobseekers' ? 'active' : ''}">
-                <i class="fas fa-user-tie"></i>
-                Manage Jobseekers
-            </a>
-            <a href="AdminController?action=recruiter" class="menu-item ${param.action == 'recruiter' ? 'active' : ''}">
-                <i class="fas fa-briefcase-medical"></i>
-                Manage Recruiter
-            </a>
-            <a href="AdminController?action=skills" class="menu-item ${param.action == 'skills' ? 'active' : ''}">
-                <i class="fas fa-building-columns"></i>
-                Manage Skill
-            </a>
-            <a href="AdminController?action=settings" class="menu-item">
-                <i class="fas fa-gear"></i>
-                Settings
-            </a>
-            <a href="logout.jsp" class="menu-item">
-                <i class="fas fa-right-from-bracket"></i>
-                Logout
-            </a>
-        </div>
-    </div>
+        <jsp:include page="/includes/admin_sidebar.jsp" />
+
 
     <div class="main-content">
         <div class="admin-header">

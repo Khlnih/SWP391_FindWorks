@@ -37,8 +37,8 @@ public class LoginJobseekerServlet extends HttpServlet {
 
         loginjobseekerDAO dao = new loginjobseekerDAO();
         UserLoginInfo user = dao.getUserLoginInfo(userIdentifier);
-//PrintWriter out = response.getWriter();
-//        out.print(user);
+PrintWriter out = response.getWriter();
+        out.print(user);
         if (user != null && user.getPassword().equals(passwordInput)) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user); 

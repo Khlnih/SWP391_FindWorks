@@ -9,29 +9,22 @@ import Model.UserLoginInfo;
 public class loginDAO {
 
     public UserLoginInfo getUserLoginInfo(String userIdentifier) {
-        String sql =
-                "SELECT username, email_contact AS email_retrieved, password AS password FROM Recruiter WHERE username = ? OR email_contact = ? "
-                + "UNION ALL "
-                + "SELECT username, email_contact AS email_retrieved, password AS password FROM Freelancer WHERE username = ? OR email_contact = ? "
-                + "UNION ALL "
-                + "SELECT username, email_contact AS email_retrieved, password_hash AS password FROM Admin WHERE username = ? OR email_contact = ?";
-
+        // Thử tìm trong bảng Recruiter trước
+        String recruiterSQL = "SELECT recruiterID, username, email_contact, password FROM Recruiter WHERE username = ? OR email_contact = ?";
         try (DBContext db = new DBContext()) {
             Connection conn = db.connection;
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (PreparedStatement ps = conn.prepareStatement(recruiterSQL)) {
                 ps.setString(1, userIdentifier);
                 ps.setString(2, userIdentifier);
-                ps.setString(3, userIdentifier);
-                ps.setString(4, userIdentifier);
-                ps.setString(5, userIdentifier);
-                ps.setString(6, userIdentifier);
 
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return new UserLoginInfo(
+                                rs.getInt("recruiterID"),
                                 rs.getString("username"),
-                                rs.getString("email_retrieved"),
-                                rs.getString("password")
+                                rs.getString("email_contact"),
+                                rs.getString("password"),
+                                "recruiter"
                         );
                     }
                 }
@@ -39,6 +32,55 @@ public class loginDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        // Thử tìm trong bảng Freelancer
+        String freelancerSQL = "SELECT freelancerID, username, email_contact, password FROM Freelancer WHERE username = ? OR email_contact = ?";
+        try (DBContext db = new DBContext()) {
+            Connection conn = db.connection;
+            try (PreparedStatement ps = conn.prepareStatement(freelancerSQL)) {
+                ps.setString(1, userIdentifier);
+                ps.setString(2, userIdentifier);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new UserLoginInfo(
+                                rs.getInt("freelancerID"),
+                                rs.getString("username"),
+                                rs.getString("email_contact"),
+                                rs.getString("password"),
+                                "freelancer"
+                        );
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Thử tìm trong bảng Admin
+        String adminSQL = "SELECT adminID, username, email_contact, password_hash FROM Admin WHERE username = ? OR email_contact = ?";
+        try (DBContext db = new DBContext()) {
+            Connection conn = db.connection;
+            try (PreparedStatement ps = conn.prepareStatement(adminSQL)) {
+                ps.setString(1, userIdentifier);
+                ps.setString(2, userIdentifier);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new UserLoginInfo(
+                                rs.getInt("adminID"),
+                                rs.getString("username"),
+                                rs.getString("email_contact"),
+                                rs.getString("password_hash"),
+                                "admin"
+                        );
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
@@ -110,7 +152,7 @@ public class loginDAO {
         } finally {
             if (conn != null) {
                 try {
-                    conn.setAutoCommit(true); // Restore default auto-commit behavior
+                    conn.setAutoCommit(true); 
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }

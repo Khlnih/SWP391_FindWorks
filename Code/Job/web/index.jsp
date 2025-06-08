@@ -1,4 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="Model.UserLoginInfo" %>
+<%
+    UserLoginInfo user = (UserLoginInfo) session.getAttribute("user");
+%>
 <!doctype html>
 <html class="no-js" lang="zxx">
     <head>
@@ -152,18 +156,18 @@
                                         <nav>
                                             <ul id="navigation">
                                                 <li><a href="index.jsp">home</a></li>
-                                                <li><a href="jobs.jsp">Browse Job</a></li>
+                                                <li><a href="jobs">Browse Jobs</a></li>
+                                                <% if (user != null && "freelancer".equals(user.getUserType())) { %>
+                                                    <li><a href="favorite?action=list">My Favorites</a></li>
+                                                <% } %>
+                                                <% if (user != null && "recruiter".equals(user.getUserType())) { %>
+                                                    <li><a href="post?action=list">My Jobs</a></li>
+                                                <% } %>
                                                 <li><a href="#">pages <i class="ti-angle-down"></i></a>
                                                     <ul class="submenu">
                                                         <li><a href="candidate.jsp">Candidates </a></li>
                                                         <li><a href="job_details.jsp">job details </a></li>
                                                         <li><a href="elements.jsp">elements</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li><a href="#">blog <i class="ti-angle-down"></i></a>
-                                                    <ul class="submenu">
-                                                        <li><a href="blog.jsp">blog</a></li>
-                                                        <li><a href="single-blog.jsp">single-blog</a></li>
                                                     </ul>
                                                 </li>
                                                 <li><a href="contact.jsp">Contact</a></li>
