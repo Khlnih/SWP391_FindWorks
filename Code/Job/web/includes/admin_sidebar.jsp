@@ -66,9 +66,15 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="admin?action=skills" class="nav-link ${param.action == 'skills' ? 'active' : ''}">
+                <a href="admin?action=accounttier" class="nav-link ${param.action == 'skills' ? 'active' : ''}">
 <!--                    <i class="fa fa-cogs"></i>-->
                     <span class="link-text">Manager account tier</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="admin?action=registration" class="nav-link ${param.action == 'skills' ? 'active' : ''}">
+<!--                    <i class="fa fa-cogs"></i>-->
+                    <span class="link-text">Manager tier registrations</span>
                 </a>
             </li>
             

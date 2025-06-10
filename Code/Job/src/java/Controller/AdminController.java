@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List; // Import List
+import java.util.Arrays;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -42,6 +43,7 @@ public class AdminController extends HttpServlet {
     private ExperienceDAO experienceDAO = new ExperienceDAO();
     private JobseekerSkillDAO jobseekerSkillDAO = new JobseekerSkillDAO();
     private AccountTierDAO accountTierDAO = new AccountTierDAO();
+    
 
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -74,7 +76,10 @@ public class AdminController extends HttpServlet {
                 showSkills(request, response);
                 break;
             case "accounttier":
-//                showAccountTier(request, response);
+                showAccountTier(request, response);
+                break;
+            case "registration":
+                showAccountRegistration(request, response);
                 break;
             case "addSkill":
                 addSkill(request, response);
@@ -96,6 +101,18 @@ public class AdminController extends HttpServlet {
                 break;
             case "deleteJobseeker":
                 deleteJobseeker(request, response);
+                break;
+            case "addTier":
+                addTier(request, response);
+                break;
+            case "editTier":
+                showEditTierForm(request, response);
+                break;
+            case "updateTier":
+                updateTier(request, response);
+                break;
+            case "deleteTier":
+                deleteTier(request, response);
                 break;
             case "changeRecruiterStatus":
                 changeRecruiterStatus(request, response);
@@ -222,6 +239,195 @@ public class AdminController extends HttpServlet {
             request.setAttribute("recruiters", new ArrayList<Recruiter>()); // Ensure not null for JSP
         }
         request.getRequestDispatcher("admin_recruiter.jsp").forward(request, response);
+    }
+    private void showAccountTier(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Get search parameters
+        String minPriceStr = request.getParameter("minPrice");
+        String maxPriceStr = request.getParameter("maxPrice");
+        String isActiveStr = request.getParameter("isActive");
+        String minDurationStr = request.getParameter("minDuration");
+        String maxDurationStr = request.getParameter("maxDuration");
+        String userTypeScope = request.getParameter("userTypeScope");
+        
+        // Parse parameters
+        BigDecimal minPrice = null;
+        BigDecimal maxPrice = null;
+        Boolean isActive = null;
+        Integer minDuration = null;
+        Integer maxDuration = null;
+        
+        try {
+            if (minPriceStr != null && !minPriceStr.isEmpty()) {
+                minPrice = new BigDecimal(minPriceStr);
+            }
+            if (maxPriceStr != null && !maxPriceStr.isEmpty()) {
+                maxPrice = new BigDecimal(maxPriceStr);
+            }
+            if (isActiveStr != null && !isActiveStr.isEmpty()) {
+                isActive = Boolean.parseBoolean(isActiveStr);
+            }
+            if (minDurationStr != null && !minDurationStr.isEmpty()) {
+                minDuration = Integer.parseInt(minDurationStr);
+            }
+            if (maxDurationStr != null && !maxDurationStr.isEmpty()) {
+                maxDuration = Integer.parseInt(maxDurationStr);
+            }
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("errorMessage", "❌ Định dạng dữ liệu tìm kiếm không hợp lệ");
+        }
+        
+        // Get search results
+        List<AccountTier> accountTiers = accountTierDAO.searchTiers(
+            minPrice, maxPrice, isActive, minDuration, maxDuration, userTypeScope);
+            
+        // Get all user types for dropdown
+        List<String> userTypes = Arrays.asList("RECRUITER", "JOBSEEKER", "BOTH");
+        
+        // Set attributes for JSP
+        request.setAttribute("accountTiers", accountTiers);
+        request.setAttribute("userTypes", userTypes);
+        
+        // Keep search parameters for form
+        request.setAttribute("minPrice", minPriceStr);
+        request.setAttribute("maxPrice", maxPriceStr);
+        request.setAttribute("isActive", isActiveStr);
+        request.setAttribute("minDuration", minDurationStr);
+        request.setAttribute("maxDuration", maxDurationStr);
+        request.setAttribute("selectedUserType", userTypeScope);
+        
+        request.getRequestDispatcher("admin_account_tiers.jsp").forward(request, response);
+    }
+    
+    private void showAccountRegistration(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("admin_tier_registrations.jsp").forward(request, response);
+    }
+    private void showEditTierForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            int tierId = Integer.parseInt(request.getParameter("id"));
+            AccountTier tier = accountTierDAO.getTierById(tierId);
+            
+            if (tier != null) {
+                request.setAttribute("tier", tier);
+                request.getRequestDispatcher("edit_tier.jsp").forward(request, response);
+            } else {
+                request.getSession().setAttribute("errorMessage", "Không tìm thấy gói tài khoản");
+                response.sendRedirect("admin?action=accounttier");
+            }
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("errorMessage", "ID không hợp lệ");
+            response.sendRedirect("admin?action=accounttier");
+        } catch (Exception e) {
+            request.getSession().setAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            response.sendRedirect("admin?action=accounttier");
+        }
+    }
+    
+    private void updateTier(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            int tierId = Integer.parseInt(request.getParameter("tierId"));
+            
+            // Get form parameters
+            String tierName = request.getParameter("tierName");
+            String priceStr = request.getParameter("price").replaceAll("[^0-9]", "");
+            BigDecimal price = new BigDecimal(priceStr);
+            int durationDays = Integer.parseInt(request.getParameter("durationDays"));
+            String description = request.getParameter("description");
+            String typeScope = request.getParameter("typeScope");
+            int jobPostLimit = Integer.parseInt(request.getParameter("jobPostLimit"));
+            boolean status = request.getParameter("status").equals("1");
+            
+            // Create updated AccountTier object
+            AccountTier tier = new AccountTier();
+            tier.setTierID(tierId);
+            tier.setTierName(tierName);
+            tier.setPrice(price);
+            tier.setDurationDays(durationDays);
+            tier.setDescription(description);
+            tier.setStatus(status);
+            tier.setJobPostLimit(jobPostLimit);
+            tier.setUserTypeScope(typeScope);
+            
+            // Update in database
+            boolean success = accountTierDAO.updateTier(tier);
+            
+            if (success) {
+                request.getSession().setAttribute("successMessage", "✅ Đã cập nhật gói tài khoản thành công!");
+            } else {
+                request.getSession().setAttribute("errorMessage", "❌ Có lỗi xảy ra khi cập nhật gói tài khoản. Vui lòng thử lại sau.");
+            }
+            
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("errorMessage", "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.");
+            e.printStackTrace();
+        } catch (Exception e) {
+            request.getSession().setAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        response.sendRedirect("admin?action=accounttier");
+    }
+    
+    private void deleteTier(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            int tierId = Integer.parseInt(request.getParameter("id"));
+            boolean success = accountTierDAO.deleteTier(tierId);
+            
+            if (success) {
+                request.getSession().setAttribute("successMessage", "✅ Đã xóa gói tài khoản thành công!");
+            } else {
+                request.getSession().setAttribute("errorMessage", "❌ Không thể xóa gói tài khoản. Vui lòng thử lại sau.");
+            }
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("errorMessage", "❌ Lỗi: ID gói tài khoản không hợp lệ");
+        } catch (Exception e) {
+            request.getSession().setAttribute("errorMessage", "❌ Lỗi hệ thống: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        response.sendRedirect("admin?action=accounttier");
+    }
+    
+    private void addTier(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            // Get form parameters
+            String tierName = request.getParameter("tierName");
+            String priceStr = request.getParameter("price").replaceAll("[^0-9]", "");
+            BigDecimal price = new BigDecimal(priceStr);
+            int durationDays = Integer.parseInt(request.getParameter("durationDays"));
+            String description = request.getParameter("description");
+            String typeScope = request.getParameter("typeScope");
+            int jobPostLimit = Integer.parseInt(request.getParameter("jobPostLimit"));
+            boolean status = request.getParameter("status").equals("1");
+            
+            // Create new AccountTier object
+            AccountTier tier = new AccountTier();
+            tier.setTierName(tierName);
+            tier.setPrice(price);
+            tier.setDurationDays(durationDays);
+            tier.setDescription(description);
+            tier.setStatus(status);
+            tier.setJobPostLimit(jobPostLimit); // Default value
+            tier.setUserTypeScope(typeScope);
+            
+            // Add to database
+            boolean success = accountTierDAO.addAccountTier(tier);
+            
+            if (success) {
+                request.getSession().setAttribute("successMessage", "Thêm gói tài khoản thành công!");
+            } else {
+                request.getSession().setAttribute("errorMessage", "Có lỗi xảy ra khi thêm gói tài khoản. Vui lòng thử lại.");
+            }
+            
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("errorMessage", "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.");
+            e.printStackTrace();
+        } catch (Exception e) {
+            request.getSession().setAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        // Redirect back to the account tiers page
+        response.sendRedirect("admin?action=accounttier");
     }
    
     // --- Skill Management Methods ---
@@ -523,7 +729,6 @@ public class AdminController extends HttpServlet {
                 
                 // Lấy thông tin gói đăng ký
                 AccountTierDAO atDAO = new AccountTierDAO();
-                AccountTier currentTier = atDAO.getCurrentTier(recruiterId);
                 String tierName = reDAO.getTierName(recruiterId);
                 String description = reDAO.getTierNameDescription(recruiterId);
                 
@@ -535,7 +740,6 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("recruiter", recruiter);
                 request.setAttribute("transactions", transactions);
                 request.setAttribute("totalSpent", totalSpent);
-                request.setAttribute("currentTier", currentTier);
                 request.setAttribute("tierName", tierName);
                 request.setAttribute("description", description);
                 request.setAttribute("company", company);
