@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <!DOCTYPE html>
 <html class="no-js" lang="zxx">
 <head>
@@ -614,7 +616,10 @@
                                         ${jobseeker.gender ? 'Male' : 'Female'}
                                     </span>
                                 </td>
-                                <td>${jobseeker.dob}</td>
+                                <!--<td>${jobseeker.dob}</td>-->
+                                <td>
+                                    <fmt:formatDate value="${jobseeker.dob}" pattern="dd/MM/yyyy" />
+                                </td>
                                 <td>
                                     <span class="badge ${jobseeker.status == 'active' ? 'badge-success' : jobseeker.status == 'pending' ? 'badge-warning' : 'badge-danger'}">
                                         ${jobseeker.status}
@@ -622,12 +627,10 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons" style="position: relative;">
-                                        <!-- Three-dot menu button -->
                                         <button class="action-menu-btn" onclick="toggleStatusMenu(this, event)" aria-label="More actions">
                                             <i class="fa fa-ellipsis-v"></i>
                                         </button>
                                         
-                                        <!-- Status buttons dropdown -->
                                         <div class="status-buttons">
                                             <a href="AdminController?action=viewJobseeker&id=${jobseeker.freelancerID}" class="btn-status">
                                                 <i class="fa fa-eye"></i> View Details

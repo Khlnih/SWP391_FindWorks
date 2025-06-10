@@ -12,8 +12,8 @@ public class Freelancer {
     private String image;
     private boolean gender;
     private String dob;
-    private String describe;       // Mô tả dài, tương ứng nvarchar(max)
-    private String emailContact;   // mapping từ email__contact trong DB
+    private String describe;       
+    private String emailContact;   
     private String phoneContact;
     private String status;
     private Integer statusChangedByAdminID;
@@ -22,7 +22,6 @@ public class Freelancer {
     public Freelancer() {
     }
 
-    // Constructor đầy đủ
     public Freelancer(int freelanceID, String username, String password, String firstName, String lastName,
             String image, boolean gender, String dob, String describe, String emailContact,
             String phoneContact, String status) {
@@ -40,7 +39,6 @@ public class Freelancer {
         this.status = status;
     }
     
-    // Constructor đầy đủ
     public Freelancer( String username, String password, String firstName, String lastName,
             String image, boolean gender, String dob, String describe, String emailContact,
             String phoneContact, String status, Integer statusChangedByAdminID) {
