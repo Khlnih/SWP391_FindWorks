@@ -30,12 +30,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.PrintWriter;
+import DAO.CategoryDAO;
+import Model.Category;
 
 /**
  * Servlet implementation class AdminController
  */
 @WebServlet("/admin")
 public class AdminController extends HttpServlet {
+
     private JobseekerDAO jobseekerDAO = new JobseekerDAO();
     private RecruiterDAO recruiterDAO = new RecruiterDAO();
     private SkillDAO skillDAO = new SkillDAO();
@@ -43,8 +46,7 @@ public class AdminController extends HttpServlet {
     private ExperienceDAO experienceDAO = new ExperienceDAO();
     private JobseekerSkillDAO jobseekerSkillDAO = new JobseekerSkillDAO();
     private AccountTierDAO accountTierDAO = new AccountTierDAO();
-    
-
+    private CategoryDAO categoryDAO = new CategoryDAO();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -55,12 +57,10 @@ public class AdminController extends HttpServlet {
         HttpSession session = request.getSession();
 
         if (action == null) {
-            action = "dashboard"; 
+            action = "dashboard";
         }
 
-        
         clearSessionMessages(session, action);
-
 
         switch (action) {
             case "dashboard":
@@ -72,31 +72,35 @@ public class AdminController extends HttpServlet {
             case "recruiters":
                 showRecruiters(request, response);
                 break;
-            case "skills":
-                showSkills(request, response);
-                break;
+
             case "accounttier":
                 showAccountTier(request, response);
                 break;
             case "registration":
                 showAccountRegistration(request, response);
                 break;
+            case "skills":
+
+                showSkillSets(request, response);
+                break;
             case "addSkill":
-                addSkill(request, response);
+
                 break;
             case "editSkill":
-                showEditSkillForm(request, response);
+
+                showEditSkillSetForm(request, response);
                 break;
             case "updateSkill":
-                updateSkill(request, response);
+
                 break;
             case "deleteSkill":
-                deleteSkill(request, response);
+
+                deleteSkillSet(request, response);
                 break;
             case "settings":
                 request.getRequestDispatcher("admin_settings.jsp").forward(request, response);
                 break;
-            case "changeStatus": 
+            case "changeStatus":
                 changeJobseekerStatus(request, response);
                 break;
             case "deleteJobseeker":
@@ -126,12 +130,31 @@ public class AdminController extends HttpServlet {
             case "viewJobseeker":
                 viewJobseeker(request, response);
                 break;
+           case "categories":
+                showCategories(request, response);
+                break;
+            case "addCategory":
+                showAddCategoryForm(request, response);
+                break;
+            case "createCategory":
+                createCategory(request, response);
+                break;
+            case "editCategory":
+                showEditCategoryForm(request, response);
+                break;
+            case "updateCategory":
+                updateCategory(request, response);
+                break;
+            case "deleteCategory":
+                deleteCategory(request, response);
+                break;
+                
             default:
                 request.getRequestDispatcher("admin.jsp").forward(request, response);
                 break;
         }
     }
-    
+
     private void clearSessionMessages(HttpSession session, String currentAction) {
         // Example: If current action is related to skills, clear any old jobseeker/recruiter messages
         // This needs to be tailored to your specific message usage.
@@ -153,7 +176,6 @@ public class AdminController extends HttpServlet {
         }
     }
 
-
     private void showJobseekers(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         transferSessionMessagesToRequest(request); // For PRG
         try {
@@ -171,8 +193,11 @@ public class AdminController extends HttpServlet {
             if (pageSizeParam != null && !pageSizeParam.isEmpty()) {
                 try {
                     int customPageSize = Integer.parseInt(pageSizeParam);
-                    if (customPageSize > 0) pageSize = customPageSize;
-                } catch (NumberFormatException e) { /* use default */ }
+                    if (customPageSize > 0) {
+                        pageSize = customPageSize;
+                    }
+                } catch (NumberFormatException e) {
+                    /* use default */ }
             }
 
             int currentPage = 1;
@@ -180,8 +205,11 @@ public class AdminController extends HttpServlet {
             if (pageParam != null && !pageParam.isEmpty()) {
                 try {
                     currentPage = Integer.parseInt(pageParam);
-                    if (currentPage < 1) currentPage = 1;
-                } catch (NumberFormatException e) { /* use default */ }
+                    if (currentPage < 1) {
+                        currentPage = 1;
+                    }
+                } catch (NumberFormatException e) {
+                    /* use default */ }
             }
 
             // Get total count
@@ -229,7 +257,7 @@ public class AdminController extends HttpServlet {
     }
 
     private void showRecruiters(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        transferSessionMessagesToRequest(request); 
+        transferSessionMessagesToRequest(request);
         try {
             ArrayList<Recruiter> recruiters = recruiterDAO.getAllRecruiters();
             request.setAttribute("recruiters", recruiters);
@@ -240,6 +268,7 @@ public class AdminController extends HttpServlet {
         }
         request.getRequestDispatcher("admin_recruiter.jsp").forward(request, response);
     }
+
     private void showAccountTier(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Get search parameters
         String minPriceStr = request.getParameter("minPrice");
@@ -248,14 +277,14 @@ public class AdminController extends HttpServlet {
         String minDurationStr = request.getParameter("minDuration");
         String maxDurationStr = request.getParameter("maxDuration");
         String userTypeScope = request.getParameter("userTypeScope");
-        
+
         // Parse parameters
         BigDecimal minPrice = null;
         BigDecimal maxPrice = null;
         Boolean isActive = null;
         Integer minDuration = null;
         Integer maxDuration = null;
-        
+
         try {
             if (minPriceStr != null && !minPriceStr.isEmpty()) {
                 minPrice = new BigDecimal(minPriceStr);
@@ -275,18 +304,18 @@ public class AdminController extends HttpServlet {
         } catch (NumberFormatException e) {
             request.getSession().setAttribute("errorMessage", "❌ Định dạng dữ liệu tìm kiếm không hợp lệ");
         }
-        
+
         // Get search results
         List<AccountTier> accountTiers = accountTierDAO.searchTiers(
-            minPrice, maxPrice, isActive, minDuration, maxDuration, userTypeScope);
-            
+                minPrice, maxPrice, isActive, minDuration, maxDuration, userTypeScope);
+
         // Get all user types for dropdown
         List<String> userTypes = Arrays.asList("RECRUITER", "JOBSEEKER", "BOTH");
-        
+
         // Set attributes for JSP
         request.setAttribute("accountTiers", accountTiers);
         request.setAttribute("userTypes", userTypes);
-        
+
         // Keep search parameters for form
         request.setAttribute("minPrice", minPriceStr);
         request.setAttribute("maxPrice", maxPriceStr);
@@ -294,18 +323,19 @@ public class AdminController extends HttpServlet {
         request.setAttribute("minDuration", minDurationStr);
         request.setAttribute("maxDuration", maxDurationStr);
         request.setAttribute("selectedUserType", userTypeScope);
-        
+
         request.getRequestDispatcher("admin_account_tiers.jsp").forward(request, response);
     }
-    
+
     private void showAccountRegistration(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("admin_tier_registrations.jsp").forward(request, response);
     }
+
     private void showEditTierForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             int tierId = Integer.parseInt(request.getParameter("id"));
             AccountTier tier = accountTierDAO.getTierById(tierId);
-            
+
             if (tier != null) {
                 request.setAttribute("tier", tier);
                 request.getRequestDispatcher("edit_tier.jsp").forward(request, response);
@@ -321,11 +351,11 @@ public class AdminController extends HttpServlet {
             response.sendRedirect("admin?action=accounttier");
         }
     }
-    
+
     private void updateTier(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             int tierId = Integer.parseInt(request.getParameter("tierId"));
-            
+
             // Get form parameters
             String tierName = request.getParameter("tierName");
             String priceStr = request.getParameter("price").replaceAll("[^0-9]", "");
@@ -335,7 +365,7 @@ public class AdminController extends HttpServlet {
             String typeScope = request.getParameter("typeScope");
             int jobPostLimit = Integer.parseInt(request.getParameter("jobPostLimit"));
             boolean status = request.getParameter("status").equals("1");
-            
+
             // Create updated AccountTier object
             AccountTier tier = new AccountTier();
             tier.setTierID(tierId);
@@ -346,16 +376,16 @@ public class AdminController extends HttpServlet {
             tier.setStatus(status);
             tier.setJobPostLimit(jobPostLimit);
             tier.setUserTypeScope(typeScope);
-            
+
             // Update in database
             boolean success = accountTierDAO.updateTier(tier);
-            
+
             if (success) {
                 request.getSession().setAttribute("successMessage", "✅ Đã cập nhật gói tài khoản thành công!");
             } else {
                 request.getSession().setAttribute("errorMessage", "❌ Có lỗi xảy ra khi cập nhật gói tài khoản. Vui lòng thử lại sau.");
             }
-            
+
         } catch (NumberFormatException e) {
             request.getSession().setAttribute("errorMessage", "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.");
             e.printStackTrace();
@@ -363,15 +393,15 @@ public class AdminController extends HttpServlet {
             request.getSession().setAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         response.sendRedirect("admin?action=accounttier");
     }
-    
+
     private void deleteTier(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             int tierId = Integer.parseInt(request.getParameter("id"));
             boolean success = accountTierDAO.deleteTier(tierId);
-            
+
             if (success) {
                 request.getSession().setAttribute("successMessage", "✅ Đã xóa gói tài khoản thành công!");
             } else {
@@ -383,10 +413,10 @@ public class AdminController extends HttpServlet {
             request.getSession().setAttribute("errorMessage", "❌ Lỗi hệ thống: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         response.sendRedirect("admin?action=accounttier");
     }
-    
+
     private void addTier(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             // Get form parameters
@@ -398,7 +428,7 @@ public class AdminController extends HttpServlet {
             String typeScope = request.getParameter("typeScope");
             int jobPostLimit = Integer.parseInt(request.getParameter("jobPostLimit"));
             boolean status = request.getParameter("status").equals("1");
-            
+
             // Create new AccountTier object
             AccountTier tier = new AccountTier();
             tier.setTierName(tierName);
@@ -408,16 +438,16 @@ public class AdminController extends HttpServlet {
             tier.setStatus(status);
             tier.setJobPostLimit(jobPostLimit); // Default value
             tier.setUserTypeScope(typeScope);
-            
+
             // Add to database
             boolean success = accountTierDAO.addAccountTier(tier);
-            
+
             if (success) {
                 request.getSession().setAttribute("successMessage", "Thêm gói tài khoản thành công!");
             } else {
                 request.getSession().setAttribute("errorMessage", "Có lỗi xảy ra khi thêm gói tài khoản. Vui lòng thử lại.");
             }
-            
+
         } catch (NumberFormatException e) {
             request.getSession().setAttribute("errorMessage", "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.");
             e.printStackTrace();
@@ -425,15 +455,202 @@ public class AdminController extends HttpServlet {
             request.getSession().setAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         // Redirect back to the account tiers page
         response.sendRedirect("admin?action=accounttier");
     }
-   
-    // --- Skill Management Methods ---
 
-    private void showSkills(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        transferSessionMessagesToRequest(request); // For PRG messages
+    // --- Category Management Methods ---
+
+    /**
+     * Hiển thị danh sách tất cả các danh mục.
+     */
+    private void showCategories(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        transferSessionMessagesToRequest(request); // Lấy message từ session sau khi redirect
+        try {
+            List<Category> categories = categoryDAO.getAllCategories();
+            request.setAttribute("categories", categories);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi khi tải danh sách danh mục: " + e.getMessage());
+            request.setAttribute("categories", new ArrayList<Category>());
+        }
+        request.getRequestDispatcher("admin_categories.jsp").forward(request, response);
+        
+    }
+
+    /**
+     * Hiển thị form để tạo một danh mục mới.
+     */
+    private void showAddCategoryForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Chỉ cần chuyển hướng đến trang JSP chứa form
+        request.getRequestDispatcher("admin_category_add.jsp").forward(request, response);
+    }
+
+    /**
+     * Xử lý dữ liệu từ form và tạo danh mục mới trong CSDL.
+     */
+    private void createCategory(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        try {
+            String categoryName = request.getParameter("categoryName");
+            String description = request.getParameter("description");
+            String categoryImg = request.getParameter("categoryImg"); // Giả sử bạn có trường nhập URL ảnh
+            boolean isActive = "1".equals(request.getParameter("status"));
+
+            // Validate đầu vào
+            if (categoryName == null || categoryName.trim().isEmpty()) {
+                session.setAttribute("error", "Tên danh mục không được để trống.");
+                response.sendRedirect("admin?action=addCategory"); // Gửi lại form
+                return;
+            }
+
+            Category newCategory = new Category();
+            newCategory.setCategoryName(categoryName.trim());
+            newCategory.setDescription(description);
+            newCategory.setCategoryImg(categoryImg);
+            newCategory.setStatus(isActive);
+
+            boolean success = categoryDAO.createCategory(newCategory);
+
+            if (success) {
+                session.setAttribute("message", "Thêm danh mục '" + newCategory.getCategoryName() + "' thành công!");
+            } else {
+                session.setAttribute("error", "Có lỗi xảy ra khi thêm danh mục. Vui lòng thử lại.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+        }
+        // Sử dụng PRG pattern
+        response.sendRedirect("admin?action=categories");
+    }
+
+    private void showEditCategoryForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        try {
+            int categoryId = Integer.parseInt(request.getParameter("id"));
+            Category category = categoryDAO.getCategoryById(categoryId);
+
+            if (category != null) {
+                request.setAttribute("category", category);
+                request.getRequestDispatcher("admin_category_edit.jsp").forward(request, response);
+            } else {
+                session.setAttribute("error", "Không tìm thấy danh mục với ID: " + categoryId);
+                response.sendRedirect("admin?action=categories");
+            }
+        } catch (NumberFormatException e) {
+            session.setAttribute("error", "ID danh mục không hợp lệ.");
+            response.sendRedirect("admin?action=categories");
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            response.sendRedirect("admin?action=categories");
+        }
+    }
+
+    /**
+     * Xử lý dữ liệu từ form và cập nhật thông tin danh mục.
+     */
+    private void updateCategory(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        try {
+            int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+            String categoryName = request.getParameter("categoryName");
+            String description = request.getParameter("description");
+            String categoryImg = request.getParameter("categoryImg");
+            boolean isActive = "1".equals(request.getParameter("status"));
+
+            // Validate
+            if (categoryName == null || categoryName.trim().isEmpty()) {
+                session.setAttribute("error", "Tên danh mục không được để trống.");
+                response.sendRedirect("admin?action=editCategory&id=" + categoryId);
+                return;
+            }
+
+            Category categoryToUpdate = new Category();
+            categoryToUpdate.setCategoryID(categoryId);
+            categoryToUpdate.setCategoryName(categoryName.trim());
+            categoryToUpdate.setDescription(description);
+            categoryToUpdate.setCategoryImg(categoryImg);
+            categoryToUpdate.setStatus(isActive);
+
+            boolean success = categoryDAO.updateCategory(categoryToUpdate);
+
+            if (success) {
+                session.setAttribute("message", "Cập nhật danh mục '" + categoryToUpdate.getCategoryName() + "' thành công!");
+            } else {
+                session.setAttribute("error", "Có lỗi xảy ra khi cập nhật danh mục.");
+            }
+        } catch (NumberFormatException e) {
+            session.setAttribute("error", "ID danh mục không hợp lệ.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+        }
+        response.sendRedirect("admin?action=categories");
+    }
+
+    // Thay thế phương thức deleteCategory cũ bằng phương thức này trong AdminController.java
+
+    /**
+     * Xóa vĩnh viễn một danh mục.
+     */
+    private void deleteCategory(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String categoryIdStr = request.getParameter("id");
+
+        if (categoryIdStr == null || categoryIdStr.trim().isEmpty()) {
+            session.setAttribute("error", "ID danh mục không được cung cấp.");
+            response.sendRedirect("admin?action=categories");
+            return;
+        }
+
+        try {
+            int categoryId = Integer.parseInt(categoryIdStr);
+            
+            // Gọi phương thức xóa vĩnh viễn mới trong DAO
+            boolean success = categoryDAO.hardDeleteCategory(categoryId);
+
+            if (success) {
+                session.setAttribute("message", "Đã xóa vĩnh viễn danh mục (ID: " + categoryId + ") thành công.");
+            } else {
+                // Trường hợp này ít xảy ra nếu không có lỗi, vì nếu ID không tồn tại, 
+                // hardDeleteCategory sẽ trả về false.
+                session.setAttribute("error", "Không thể xóa danh mục. Nó có thể không tồn tại.");
+            }
+        } catch (NumberFormatException e) {
+            session.setAttribute("error", "ID danh mục không hợp lệ: " + categoryIdStr);
+        } catch (RuntimeException e) {
+            // Bắt lỗi được ném từ DAO (thường là do ràng buộc khóa ngoại)
+            e.printStackTrace(); // In stack trace ra console để debug
+            if (e.getCause() instanceof java.sql.SQLException) {
+                 // Kiểm tra thông điệp lỗi để cung cấp thông tin hữu ích hơn
+                 String dbErrorMessage = e.getCause().getMessage().toLowerCase();
+                 if (dbErrorMessage.contains("foreign key") || dbErrorMessage.contains("constraint")) {
+                     session.setAttribute("error", "Không thể xóa danh mục này vì nó đang được sử dụng bởi các công việc hoặc bản ghi khác.");
+                 } else {
+                     session.setAttribute("error", "Lỗi cơ sở dữ liệu khi xóa danh mục: " + e.getCause().getMessage());
+                 }
+            } else {
+                session.setAttribute("error", "Lỗi hệ thống khi xóa danh mục: " + e.getMessage());
+            }
+        }
+        
+        response.sendRedirect("admin?action=categories");
+    }
+
+    // --- End of Category Management Methods ---
+    // --- Skill Management Methods ---
+    
+    private void showSkillSets(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        transferSessionMessagesToRequest(request);
 
         try {
             String keyword = request.getParameter("keyword");
@@ -443,8 +660,11 @@ public class AdminController extends HttpServlet {
             if (pageSizeParam != null && !pageSizeParam.isEmpty()) {
                 try {
                     int customPageSize = Integer.parseInt(pageSizeParam);
-                    if (customPageSize > 0) pageSize = customPageSize;
-                } catch (NumberFormatException e) { /* use default */ }
+                    if (customPageSize > 0) {
+                        pageSize = customPageSize;
+                    }
+                } catch (NumberFormatException e) {
+                    /* use default */ }
             }
 
             int currentPage = 1;
@@ -452,32 +672,34 @@ public class AdminController extends HttpServlet {
             if (pageParam != null && !pageParam.isEmpty()) {
                 try {
                     currentPage = Integer.parseInt(pageParam);
-                    if (currentPage < 1) currentPage = 1;
-                } catch (NumberFormatException e) { /* use default */ }
+                    if (currentPage < 1) {
+                        currentPage = 1;
+                    }
+                } catch (NumberFormatException e) {
+                    /* use default */ }
             }
 
             int totalSkills;
             List<SkillSet> skillList;
 
+            // SỬA LẠI: Dùng đúng tên phương thức mới từ SkillDAO
             if (keyword != null && !keyword.trim().isEmpty()) {
-                totalSkills = skillDAO.countSearchedSkills(keyword);
-                skillList = skillDAO.searchSkills(keyword, currentPage, pageSize);
+                totalSkills = skillDAO.countSearchedSkillSets(keyword);
+                skillList = skillDAO.searchSkillSets(keyword, currentPage, pageSize);
             } else {
-                totalSkills = skillDAO.countTotalSkills();
-                skillList = skillDAO.getSkillsByPage(currentPage, pageSize);
+                totalSkills = skillDAO.countTotalSkillSets();
+                skillList = skillDAO.getSkillSetsByPage(currentPage, pageSize);
             }
 
             int totalPages = (int) Math.ceil((double) totalSkills / pageSize);
-            if (totalPages == 0 && totalSkills > 0) totalPages = 1; // Handle case with few items
+            if (totalPages == 0 && totalSkills > 0) {
+                totalPages = 1;
+            }
 
             if (currentPage > totalPages && totalPages > 0) {
                 currentPage = totalPages;
-                // Optionally re-fetch data if currentPage changed
-                // skillList = (keyword != null && !keyword.trim().isEmpty()) ?
-                //             skillDAO.searchSkills(keyword, currentPage, pageSize) :
-                //             skillDAO.getSkillsByPage(currentPage, pageSize);
             }
-             if (currentPage < 1) {
+            if (currentPage < 1) {
                 currentPage = 1;
             }
 
@@ -486,12 +708,11 @@ public class AdminController extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("totalSkills", totalSkills);
             request.setAttribute("currentKeyword", keyword);
-            request.setAttribute("pageSize", pageSize); // Send pageSize back to JSP
+            request.setAttribute("pageSize", pageSize);
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Error loading skills: " + e.getMessage());
-            // Initialize to avoid nulls in JSP if error occurs before setting these
             request.setAttribute("skillList", new ArrayList<SkillSet>());
             request.setAttribute("currentPage", 1);
             request.setAttribute("totalPages", 0);
@@ -501,44 +722,46 @@ public class AdminController extends HttpServlet {
         request.getRequestDispatcher("admin_skill.jsp").forward(request, response);
     }
 
-    private void addSkill(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    // SỬA LẠI: Đổi tên phương thức để rõ nghĩa hơn
+    private void addSkillSet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         String skillName = request.getParameter("skillName");
         String skillDescription = request.getParameter("skillDescription");
-        String statusSkillStr = request.getParameter("statusSkill");
-        String expertIdStr = request.getParameter("expertId");
+        // SỬA LẠI: Tên tham số là 'isActive' để khớp với model
+        String isActiveStr = request.getParameter("isActive");
+        String expertiseIdStr = request.getParameter("expertiseId");
 
         if (skillName == null || skillName.trim().isEmpty()) {
             session.setAttribute("error", "Skill name cannot be empty.");
             response.sendRedirect(request.getContextPath() + "/admin?action=skills");
             return;
         }
-        
+
         try {
-            int statusSkill = 1; // Default to active
-            if (statusSkillStr != null && !statusSkillStr.trim().isEmpty()) {
-                statusSkill = Integer.parseInt(statusSkillStr);
+            // SỬA LẠI: Chuyển đổi sang kiểu boolean
+            boolean isActive = "1".equals(isActiveStr) || "true".equalsIgnoreCase(isActiveStr);
+
+            int expertiseId = 0;
+            if (expertiseIdStr != null && !expertiseIdStr.trim().isEmpty()) {
+                expertiseId = Integer.parseInt(expertiseIdStr);
             }
 
-            int expertId = 0; // Default (adjust if 0 is not suitable)
-            if (expertIdStr != null && !expertIdStr.trim().isEmpty()) {
-                expertId = Integer.parseInt(expertIdStr);
-            }
+            SkillSet newSkillSet = new SkillSet();
+            newSkillSet.setSkillSetName(skillName.trim());
+            newSkillSet.setDescription(skillDescription != null ? skillDescription.trim() : "");
+            // SỬA LẠI: Dùng đúng setter của model SkillSet
+            newSkillSet.setActive(isActive);
+            newSkillSet.setExpertiseId(expertiseId);
 
-            SkillSet newSkill = new SkillSet();
-            newSkill.setSkillSetName(skillName.trim());
-            newSkill.setDescription(skillDescription != null ? skillDescription.trim() : "");
-            newSkill.setStatusSkill(statusSkill);
-            newSkill.setExpertId(expertId);
-
-            boolean success = skillDAO.addSkill(newSkill);
+            // SỬA LẠI: Dùng đúng tên phương thức mới từ SkillDAO
+            boolean success = skillDAO.addSkillSet(newSkillSet);
             if (success) {
-                session.setAttribute("message", "Skill '" + newSkill.getSkillSetName() + "' added successfully!");
+                session.setAttribute("message", "Skill '" + newSkillSet.getSkillSetName() + "' added successfully!");
             } else {
                 session.setAttribute("error", "Failed to add skill. It might already exist or there was a database error.");
             }
         } catch (NumberFormatException e) {
-            session.setAttribute("error", "Invalid format for Status or Expert ID.");
+            session.setAttribute("error", "Invalid format for Expert ID.");
         } catch (Exception e) {
             e.printStackTrace();
             session.setAttribute("error", "Error adding skill: " + e.getMessage());
@@ -546,104 +769,99 @@ public class AdminController extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/admin?action=skills");
     }
 
-    private void showEditSkillForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        transferSessionMessagesToRequest(request); // If redirecting here with messages
+    // SỬA LẠI: Đổi tên phương thức
+    private void showEditSkillSetForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        transferSessionMessagesToRequest(request);
         String skillIdStr = request.getParameter("id");
         if (skillIdStr != null) {
             try {
                 int skillId = Integer.parseInt(skillIdStr);
-                SkillSet skill = skillDAO.getSkillById(skillId);
+                // SỬA LẠI: Dùng đúng tên phương thức mới từ SkillDAO
+                SkillSet skill = skillDAO.getSkillSetById(skillId);
                 if (skill != null) {
                     request.setAttribute("skillToEdit", skill);
                     request.getRequestDispatcher("admin_skill_edit.jsp").forward(request, response);
                 } else {
                     request.setAttribute("error", "Skill not found for editing (ID: " + skillId + ").");
-                    // Forward to the list page with an error, or stay on edit page with error
-                    showSkills(request, response); // Or custom error on edit page
+                    showSkillSets(request, response);
                 }
             } catch (NumberFormatException e) {
                 request.setAttribute("error", "Invalid skill ID format for editing.");
-                showSkills(request, response);
+                showSkillSets(request, response);
             } catch (Exception e) {
                 e.printStackTrace();
                 request.setAttribute("error", "Error retrieving skill for editing: " + e.getMessage());
-                showSkills(request, response);
+                showSkillSets(request, response);
             }
         } else {
             request.setAttribute("error", "No skill ID provided for editing.");
-            showSkills(request, response);
+            showSkillSets(request, response);
         }
     }
 
-    private void updateSkill(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    // SỬA LẠI: Đổi tên phương thức
+    private void updateSkillSet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        String skillSetIdStr = request.getParameter("skillSetId"); // Corrected parameter name
+        String skillSetIdStr = request.getParameter("skillSetId");
         String skillName = request.getParameter("skillName");
         String skillDescription = request.getParameter("skillDescription");
-        String statusSkillStr = request.getParameter("statusSkill");
-        String expertIdStr = request.getParameter("expertId");
+        // SỬA LẠI: Tên tham số là 'isActive'
+        String isActiveStr = request.getParameter("isActive");
+        String expertiseIdStr = request.getParameter("expertiseId");
         String redirectURL = request.getContextPath() + "/admin?action=skills";
-
 
         if (skillSetIdStr == null || skillName == null || skillName.trim().isEmpty()) {
             session.setAttribute("error", "Skill ID and Skill Name are required for update.");
-            // Optionally redirect back to edit page with error
-            // redirectURL = request.getContextPath() + "/admin?action=editSkill&id=" + skillSetIdStr;
             response.sendRedirect(redirectURL);
             return;
         }
 
         try {
             int skillSetId = Integer.parseInt(skillSetIdStr);
-            
-            int statusSkill = 1;
-            if (statusSkillStr != null && !statusSkillStr.trim().isEmpty()) {
-                statusSkill = Integer.parseInt(statusSkillStr);
+
+            // SỬA LẠI: Chuyển đổi sang boolean
+            boolean isActive = "1".equals(isActiveStr) || "true".equalsIgnoreCase(isActiveStr);
+
+            int expertiseId = 0;
+            if (expertiseIdStr != null && !expertiseIdStr.trim().isEmpty()) {
+                expertiseId = Integer.parseInt(expertiseIdStr);
             }
 
-            int expertId = 0;
-            if (expertIdStr != null && !expertIdStr.trim().isEmpty()) {
-                expertId = Integer.parseInt(expertIdStr);
-            }
-            
             SkillSet skillToUpdate = new SkillSet();
             skillToUpdate.setSkillSetId(skillSetId);
             skillToUpdate.setSkillSetName(skillName.trim());
             skillToUpdate.setDescription(skillDescription != null ? skillDescription.trim() : "");
-            skillToUpdate.setStatusSkill(statusSkill);
-            skillToUpdate.setExpertId(expertId);
+            // SỬA LẠI: Dùng đúng setter của model SkillSet
+            skillToUpdate.setActive(isActive);
+            skillToUpdate.setExpertiseId(expertiseId);
 
-            boolean success = skillDAO.updateSkill(skillToUpdate);
+            // SỬA LẠI: Dùng đúng tên phương thức mới từ SkillDAO
+            boolean success = skillDAO.updateSkillSet(skillToUpdate);
             if (success) {
                 session.setAttribute("message", "Skill '" + skillToUpdate.getSkillSetName() + "' updated successfully!");
             } else {
                 session.setAttribute("error", "Failed to update skill. Skill not found or database error.");
-                 // Optionally redirect back to edit page if update fails
-                // redirectURL = request.getContextPath() + "/admin?action=editSkill&id=" + skillSetId;
             }
         } catch (NumberFormatException e) {
-            session.setAttribute("error", "Invalid format for Skill ID, Status, or Expert ID.");
-            // redirectURL = request.getContextPath() + "/admin?action=editSkill&id=" + skillSetIdStr;
+            session.setAttribute("error", "Invalid format for Skill ID or Expert ID.");
         } catch (Exception e) {
             e.printStackTrace();
             session.setAttribute("error", "Error updating skill: " + e.getMessage());
-            // redirectURL = request.getContextPath() + "/admin?action=editSkill&id=" + skillSetIdStr;
         }
         response.sendRedirect(redirectURL);
     }
 
-    private void deleteSkill(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    // SỬA LẠI: Đổi tên phương thức
+    private void deleteSkillSet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         String skillIdStr = request.getParameter("id");
 
         if (skillIdStr != null) {
             try {
                 int skillId = Integer.parseInt(skillIdStr);
-                // Consider fetching skill name before delete for a more informative message
-                // SkillSet skillToDelete = skillDAO.getSkillById(skillId);
-                // String skillName = (skillToDelete != null) ? skillToDelete.getSkillSetName() : "ID " + skillId;
-                
-                boolean success = skillDAO.deleteSkill(skillId);
+
+                // SỬA LẠI: Dùng đúng tên phương thức mới từ SkillDAO
+                boolean success = skillDAO.deleteSkillSet(skillId);
                 if (success) {
                     session.setAttribute("message", "Skill (ID: " + skillId + ") deleted successfully!");
                 } else {
@@ -654,7 +872,7 @@ public class AdminController extends HttpServlet {
             } catch (Exception e) {
                 e.printStackTrace();
                 if (e.getMessage() != null && (e.getMessage().toLowerCase().contains("constraint") || e.getMessage().toLowerCase().contains("foreign key"))) {
-                     session.setAttribute("error", "Cannot delete skill (ID: " + skillIdStr + "): It is currently in use by other records.");
+                    session.setAttribute("error", "Cannot delete skill (ID: " + skillIdStr + "): It is currently in use by other records.");
                 } else {
                     session.setAttribute("error", "Error deleting skill (ID: " + skillIdStr + "): " + e.getMessage());
                 }
@@ -666,7 +884,6 @@ public class AdminController extends HttpServlet {
     }
 
     // --- End of Skill Management Methods ---
-
     // --- Jobseeker and Recruiter methods with PRG ---
     private void changeJobseekerStatus(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
@@ -682,7 +899,7 @@ public class AdminController extends HttpServlet {
                 session.setAttribute("error", "Error updating jobseeker status: " + e.getMessage());
             }
         } else {
-             session.setAttribute("error", "Missing ID or status for jobseeker update.");
+            session.setAttribute("error", "Missing ID or status for jobseeker update.");
         }
         response.sendRedirect(request.getContextPath() + "/admin?action=jobseekers");
     }
@@ -710,32 +927,33 @@ public class AdminController extends HttpServlet {
         }
         response.sendRedirect(request.getContextPath() + "/admin?action=jobseekers");
     }
+
     private void viewRecruiter(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getParameter("id");
         if (id == null || id.isEmpty()) {
             response.sendRedirect("AdminController?action=recruiter");
             return;
         }
-        
+
         try {
             int recruiterId = Integer.parseInt(id);
             Recruiter recruiter = recruiterDAO.getRecruiterById(recruiterId);
             if (recruiter != null) {
                 RecruiterDAO reDAO = new RecruiterDAO();
                 RecruiterTransactionDAO rtDAO = new RecruiterTransactionDAO();
-                
+
                 List<RecruiterTransaction> transactions = rtDAO.getTransactionsByRecruiter(recruiterId);
                 Double totalSpent = rtDAO.getTotalSpent(recruiterId);
-                
+
                 // Lấy thông tin gói đăng ký
                 AccountTierDAO atDAO = new AccountTierDAO();
                 String tierName = reDAO.getTierName(recruiterId);
                 String description = reDAO.getTierNameDescription(recruiterId);
-                
+
                 // Lấy thông tin công ty
                 CompanyDAO companyDAO = new CompanyDAO();
                 Company company = companyDAO.getCompanyByRecruiterId(recruiterId);
-                
+
                 // Đặt thuộc tính để hiển thị trong JSP
                 request.setAttribute("recruiter", recruiter);
                 request.setAttribute("transactions", transactions);
@@ -743,7 +961,7 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("tierName", tierName);
                 request.setAttribute("description", description);
                 request.setAttribute("company", company);
-                
+
                 request.getRequestDispatcher("admin_recruiterdetails.jsp").forward(request, response);
             } else {
                 request.setAttribute("error", "Recruiter not found");
@@ -758,31 +976,30 @@ public class AdminController extends HttpServlet {
             response.sendRedirect("AdminController?action=recruiter");
         }
     }
-    
-    
-     private void viewJobseeker(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    private void viewJobseeker(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getParameter("id");
         if (id == null || id.isEmpty()) {
             response.sendRedirect("admin?action=jobseekers");
             return;
         }
-        
+
         try {
             int freelancerId = Integer.parseInt(id);
             Jobseeker jobseeker = jobseekerDAO.getJobseekerById(freelancerId);
-            
+
             if (jobseeker != null) {
                 // Lấy dữ liệu từ các DAO
                 List<Education> educations = educationDAO.getEducationByFreelancerID(freelancerId);
                 List<Experience> experiences = experienceDAO.getExperienceByFreelancerID(freelancerId);
                 List<Skill> skills = jobseekerSkillDAO.getSkillsByFreelancerID(freelancerId);
-                
+
                 // Đặt các thuộc tính vào request
                 request.setAttribute("jobseeker", jobseeker);
                 request.setAttribute("educations", educations);
                 request.setAttribute("experiences", experiences);
                 request.setAttribute("skills", skills);
-                
+
                 // Forward đến trang chi tiết
                 request.getRequestDispatcher("admin_jobseekerdetails.jsp").forward(request, response);
             } else {
@@ -841,7 +1058,6 @@ public class AdminController extends HttpServlet {
         }
         response.sendRedirect(request.getContextPath() + "/admin?action=recruiters");
     }
-
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

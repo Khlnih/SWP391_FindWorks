@@ -1,22 +1,31 @@
 package Model;
 
+/**
+ * Lớp này đại diện cho một bộ kỹ năng (Skill Set) trong hệ thống.
+ * Nó ánh xạ tới bảng 'Skill_Set' trong cơ sở dữ liệu.
+ */
 public class SkillSet {
+
     private int skillSetId;
     private String skillSetName;
     private String description;
-    private int statusSkill;
-    private int expertId;
+    private boolean isActive;
+    private int expertiseId; // Khóa ngoại tới bảng Expertise
 
-    public SkillSet() {}
+    // Constructor không tham số
+    public SkillSet() {
+    }
 
-    public SkillSet(int skillSetId, String skillSetName, String description, int statusSkill, int expertId) {
+    // Constructor đầy đủ tham số
+    public SkillSet(int skillSetId, String skillSetName, String description, boolean isActive, int expertiseId) {
         this.skillSetId = skillSetId;
         this.skillSetName = skillSetName;
         this.description = description;
-        this.statusSkill = statusSkill;
-        this.expertId = expertId;
+        this.isActive = isActive;
+        this.expertiseId = expertiseId;
     }
 
+    // Getters and Setters
     public int getSkillSetId() {
         return skillSetId;
     }
@@ -41,19 +50,31 @@ public class SkillSet {
         this.description = description;
     }
 
-    public int getStatusSkill() {
-        return statusSkill;
+    public boolean isActive() {
+        return isActive;
     }
 
-    public void setStatusSkill(int statusSkill) {
-        this.statusSkill = statusSkill;
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
-    public int getExpertId() {
-        return expertId;
+    public int getExpertiseId() {
+        return expertiseId;
     }
 
-    public void setExpertId(int expertId) {
-        this.expertId = expertId;
+    public void setExpertiseId(int expertiseId) {
+        this.expertiseId = expertiseId;
+    }
+
+    // Phương thức toString() để dễ dàng debug
+    @Override
+    public String toString() {
+        return "SkillSet{" +
+                "skillSetId=" + skillSetId +
+                ", skillSetName='" + skillSetName + '\'' +
+                ", description='" + description + '\'' +
+                ", isActive=" + isActive +
+                ", expertiseId=" + expertiseId +
+                '}';
     }
 }

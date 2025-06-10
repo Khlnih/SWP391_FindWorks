@@ -62,7 +62,13 @@
             <li class="nav-item">
                 <a href="admin?action=skills" class="nav-link ${param.action == 'skills' ? 'active' : ''}">
 <!--                    <i class="fa fa-cogs"></i>-->
-                    <span class="link-text">Skills</span>
+                    <span class="link-text">Manage Skills</span>
+                </a>
+            </li>
+              <li class="nav-item">
+                <a href="admin?action=categories" class="nav-link ${param.action == 'categories' || param.action == 'addCategory' || param.action == 'editCategory' ? 'active' : ''}">
+                    
+                    <span class="link-text">Manage Categories</span>
                 </a>
             </li>
             <li class="nav-item">
