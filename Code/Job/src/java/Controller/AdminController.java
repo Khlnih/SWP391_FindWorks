@@ -80,21 +80,18 @@ public class AdminController extends HttpServlet {
                 showAccountRegistration(request, response);
                 break;
             case "skills":
-
                 showSkillSets(request, response);
                 break;
             case "addSkill":
-
-                break;
-            case "editSkill":
-
-                showEditSkillSetForm(request, response);
+                addSkillSet(request, response);
                 break;
             case "updateSkill":
-
+                updateSkillSet(request, response);
+                break;
+            case "editSkill":
+                showEditSkillSetForm(request, response);
                 break;
             case "deleteSkill":
-
                 deleteSkillSet(request, response);
                 break;
             case "settings":
@@ -130,7 +127,7 @@ public class AdminController extends HttpServlet {
             case "viewJobseeker":
                 viewJobseeker(request, response);
                 break;
-           case "categories":
+            case "categories":
                 showCategories(request, response);
                 break;
             case "addCategory":
@@ -148,7 +145,7 @@ public class AdminController extends HttpServlet {
             case "deleteCategory":
                 deleteCategory(request, response);
                 break;
-                
+
             default:
                 request.getRequestDispatcher("admin.jsp").forward(request, response);
                 break;
@@ -461,7 +458,6 @@ public class AdminController extends HttpServlet {
     }
 
     // --- Category Management Methods ---
-
     /**
      * Hiển thị danh sách tất cả các danh mục.
      */
@@ -477,7 +473,7 @@ public class AdminController extends HttpServlet {
             request.setAttribute("categories", new ArrayList<Category>());
         }
         request.getRequestDispatcher("admin_categories.jsp").forward(request, response);
-        
+
     }
 
     /**
@@ -597,7 +593,6 @@ public class AdminController extends HttpServlet {
     }
 
     // Thay thế phương thức deleteCategory cũ bằng phương thức này trong AdminController.java
-
     /**
      * Xóa vĩnh viễn một danh mục.
      */
@@ -614,7 +609,7 @@ public class AdminController extends HttpServlet {
 
         try {
             int categoryId = Integer.parseInt(categoryIdStr);
-            
+
             // Gọi phương thức xóa vĩnh viễn mới trong DAO
             boolean success = categoryDAO.hardDeleteCategory(categoryId);
 
@@ -631,29 +626,30 @@ public class AdminController extends HttpServlet {
             // Bắt lỗi được ném từ DAO (thường là do ràng buộc khóa ngoại)
             e.printStackTrace(); // In stack trace ra console để debug
             if (e.getCause() instanceof java.sql.SQLException) {
-                 // Kiểm tra thông điệp lỗi để cung cấp thông tin hữu ích hơn
-                 String dbErrorMessage = e.getCause().getMessage().toLowerCase();
-                 if (dbErrorMessage.contains("foreign key") || dbErrorMessage.contains("constraint")) {
-                     session.setAttribute("error", "Không thể xóa danh mục này vì nó đang được sử dụng bởi các công việc hoặc bản ghi khác.");
-                 } else {
-                     session.setAttribute("error", "Lỗi cơ sở dữ liệu khi xóa danh mục: " + e.getCause().getMessage());
-                 }
+                // Kiểm tra thông điệp lỗi để cung cấp thông tin hữu ích hơn
+                String dbErrorMessage = e.getCause().getMessage().toLowerCase();
+                if (dbErrorMessage.contains("foreign key") || dbErrorMessage.contains("constraint")) {
+                    session.setAttribute("error", "Không thể xóa danh mục này vì nó đang được sử dụng bởi các công việc hoặc bản ghi khác.");
+                } else {
+                    session.setAttribute("error", "Lỗi cơ sở dữ liệu khi xóa danh mục: " + e.getCause().getMessage());
+                }
             } else {
                 session.setAttribute("error", "Lỗi hệ thống khi xóa danh mục: " + e.getMessage());
             }
         }
-        
+
         response.sendRedirect("admin?action=categories");
     }
 
     // --- End of Category Management Methods ---
-    // --- Skill Management Methods ---
-    
     private void showSkillSets(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         transferSessionMessagesToRequest(request);
 
         try {
             String keyword = request.getParameter("keyword");
+            if (keyword != null) {
+                keyword = keyword.trim().replaceAll("\\s+", " ");
+            }
             int defaultPageSize = 10;
             int pageSize = defaultPageSize;
             String pageSizeParam = request.getParameter("pageSize");
@@ -682,7 +678,6 @@ public class AdminController extends HttpServlet {
             int totalSkills;
             List<SkillSet> skillList;
 
-            // SỬA LẠI: Dùng đúng tên phương thức mới từ SkillDAO
             if (keyword != null && !keyword.trim().isEmpty()) {
                 totalSkills = skillDAO.countSearchedSkillSets(keyword);
                 skillList = skillDAO.searchSkillSets(keyword, currentPage, pageSize);
@@ -719,41 +714,41 @@ public class AdminController extends HttpServlet {
             request.setAttribute("totalSkills", 0);
             request.setAttribute("pageSize", 10);
         }
+
         request.getRequestDispatcher("admin_skill.jsp").forward(request, response);
     }
 
-    // SỬA LẠI: Đổi tên phương thức để rõ nghĩa hơn
-    private void addSkillSet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    /**
+     * Xử lý việc thêm một bộ kỹ năng mới. Được gọi từ doPost với
+     * action="addSkill".
+     */
+    private void addSkillSet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
         String skillName = request.getParameter("skillName");
         String skillDescription = request.getParameter("skillDescription");
-        // SỬA LẠI: Tên tham số là 'isActive' để khớp với model
         String isActiveStr = request.getParameter("isActive");
         String expertiseIdStr = request.getParameter("expertiseId");
 
-        if (skillName == null || skillName.trim().isEmpty()) {
-            session.setAttribute("error", "Skill name cannot be empty.");
+        if (skillName == null || skillName.trim().isEmpty()
+                || skillDescription == null || skillDescription.trim().isEmpty()) {
+            session.setAttribute("error", "Skill name and description cannot be empty.");
             response.sendRedirect(request.getContextPath() + "/admin?action=skills");
             return;
         }
 
         try {
-            // SỬA LẠI: Chuyển đổi sang kiểu boolean
             boolean isActive = "1".equals(isActiveStr) || "true".equalsIgnoreCase(isActiveStr);
-
-            int expertiseId = 0;
+            int expertiseId = 0; // Giá trị mặc định
             if (expertiseIdStr != null && !expertiseIdStr.trim().isEmpty()) {
                 expertiseId = Integer.parseInt(expertiseIdStr);
             }
 
             SkillSet newSkillSet = new SkillSet();
             newSkillSet.setSkillSetName(skillName.trim());
-            newSkillSet.setDescription(skillDescription != null ? skillDescription.trim() : "");
-            // SỬA LẠI: Dùng đúng setter của model SkillSet
+            newSkillSet.setDescription(skillDescription.trim());
             newSkillSet.setActive(isActive);
             newSkillSet.setExpertiseId(expertiseId);
 
-            // SỬA LẠI: Dùng đúng tên phương thức mới từ SkillDAO
             boolean success = skillDAO.addSkillSet(newSkillSet);
             if (success) {
                 session.setAttribute("message", "Skill '" + newSkillSet.getSkillSetName() + "' added successfully!");
@@ -769,43 +764,48 @@ public class AdminController extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/admin?action=skills");
     }
 
-    // SỬA LẠI: Đổi tên phương thức
+    /**
+     * Hiển thị form để chỉnh sửa thông tin một bộ kỹ năng. Được gọi từ doGet
+     * với action="editSkill".
+     */
     private void showEditSkillSetForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         transferSessionMessagesToRequest(request);
         String skillIdStr = request.getParameter("id");
         if (skillIdStr != null) {
             try {
                 int skillId = Integer.parseInt(skillIdStr);
-                // SỬA LẠI: Dùng đúng tên phương thức mới từ SkillDAO
                 SkillSet skill = skillDAO.getSkillSetById(skillId);
                 if (skill != null) {
                     request.setAttribute("skillToEdit", skill);
                     request.getRequestDispatcher("admin_skill_edit.jsp").forward(request, response);
                 } else {
-                    request.setAttribute("error", "Skill not found for editing (ID: " + skillId + ").");
-                    showSkillSets(request, response);
+                    // Dùng session để lưu lỗi vì sẽ redirect
+                    request.getSession().setAttribute("error", "Skill not found for editing (ID: " + skillId + ").");
+                    response.sendRedirect(request.getContextPath() + "/admin?action=skills");
                 }
             } catch (NumberFormatException e) {
-                request.setAttribute("error", "Invalid skill ID format for editing.");
-                showSkillSets(request, response);
+                request.getSession().setAttribute("error", "Invalid skill ID format for editing.");
+                response.sendRedirect(request.getContextPath() + "/admin?action=skills");
             } catch (Exception e) {
                 e.printStackTrace();
-                request.setAttribute("error", "Error retrieving skill for editing: " + e.getMessage());
-                showSkillSets(request, response);
+                request.getSession().setAttribute("error", "Error retrieving skill for editing: " + e.getMessage());
+                response.sendRedirect(request.getContextPath() + "/admin?action=skills");
             }
         } else {
-            request.setAttribute("error", "No skill ID provided for editing.");
-            showSkillSets(request, response);
+            request.getSession().setAttribute("error", "No skill ID provided for editing.");
+            response.sendRedirect(request.getContextPath() + "/admin?action=skills");
         }
     }
 
-    // SỬA LẠI: Đổi tên phương thức
-    private void updateSkillSet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    /**
+     * Xử lý việc cập nhật thông tin một bộ kỹ năng. Được gọi từ doPost với
+     * action="updateSkill".
+     */
+    private void updateSkillSet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
         String skillSetIdStr = request.getParameter("skillSetId");
         String skillName = request.getParameter("skillName");
         String skillDescription = request.getParameter("skillDescription");
-        // SỬA LẠI: Tên tham số là 'isActive'
         String isActiveStr = request.getParameter("isActive");
         String expertiseIdStr = request.getParameter("expertiseId");
         String redirectURL = request.getContextPath() + "/admin?action=skills";
@@ -818,11 +818,8 @@ public class AdminController extends HttpServlet {
 
         try {
             int skillSetId = Integer.parseInt(skillSetIdStr);
-
-            // SỬA LẠI: Chuyển đổi sang boolean
             boolean isActive = "1".equals(isActiveStr) || "true".equalsIgnoreCase(isActiveStr);
-
-            int expertiseId = 0;
+            int expertiseId = 0; // Giá trị mặc định
             if (expertiseIdStr != null && !expertiseIdStr.trim().isEmpty()) {
                 expertiseId = Integer.parseInt(expertiseIdStr);
             }
@@ -831,11 +828,9 @@ public class AdminController extends HttpServlet {
             skillToUpdate.setSkillSetId(skillSetId);
             skillToUpdate.setSkillSetName(skillName.trim());
             skillToUpdate.setDescription(skillDescription != null ? skillDescription.trim() : "");
-            // SỬA LẠI: Dùng đúng setter của model SkillSet
             skillToUpdate.setActive(isActive);
             skillToUpdate.setExpertiseId(expertiseId);
 
-            // SỬA LẠI: Dùng đúng tên phương thức mới từ SkillDAO
             boolean success = skillDAO.updateSkillSet(skillToUpdate);
             if (success) {
                 session.setAttribute("message", "Skill '" + skillToUpdate.getSkillSetName() + "' updated successfully!");
@@ -851,16 +846,17 @@ public class AdminController extends HttpServlet {
         response.sendRedirect(redirectURL);
     }
 
-    // SỬA LẠI: Đổi tên phương thức
-    private void deleteSkillSet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    /**
+     * Xử lý việc xóa một bộ kỹ năng. Được gọi từ doGet với
+     * action="deleteSkill".
+     */
+    private void deleteSkillSet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
         String skillIdStr = request.getParameter("id");
 
         if (skillIdStr != null) {
             try {
                 int skillId = Integer.parseInt(skillIdStr);
-
-                // SỬA LẠI: Dùng đúng tên phương thức mới từ SkillDAO
                 boolean success = skillDAO.deleteSkillSet(skillId);
                 if (success) {
                     session.setAttribute("message", "Skill (ID: " + skillId + ") deleted successfully!");
