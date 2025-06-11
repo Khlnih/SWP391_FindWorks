@@ -29,23 +29,33 @@ public class LoginJobseekerServlet extends HttpServlet {
         String userIdentifier = request.getParameter("usernameOrEmail");
         String passwordInput = request.getParameter("password");
 
-        if (userIdentifier == null || passwordInput == null) {
-            request.setAttribute("error", "Username/email and password are required!");
+        // SỬA Ở ĐÂY: Kiểm tra đầu vào mạnh mẽ hơn, kiểm tra cả chuỗi rỗng
+        if (userIdentifier == null || userIdentifier.trim().isEmpty() ||
+            passwordInput == null || passwordInput.trim().isEmpty()) {
+            // SỬA Ở ĐÂY: Thông báo lỗi bằng tiếng Việt và rõ ràng hơn
+            request.setAttribute("error", "Tên đăng nhập/Email và mật khẩu không được để trống!");
             request.getRequestDispatcher("loginjobseeker.jsp").forward(request, response);
             return;
         }
 
         loginjobseekerDAO dao = new loginjobseekerDAO();
         UserLoginInfo user = dao.getUserLoginInfo(userIdentifier);
-PrintWriter out = response.getWriter();
+        
+        // Dòng này dùng để debug, có thể giữ lại hoặc xóa đi
+        PrintWriter out = response.getWriter();
         out.print(user);
+
         if (user != null && user.getPassword().equals(passwordInput)) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user); 
 
+            // Jobseeker sau khi đăng nhập thành công sẽ được chuyển đến trang index.jsp
             response.sendRedirect("index.jsp"); 
         } else {
-            request.setAttribute("error", "Invalid username/email or password!");
+            // SỬA Ở ĐÂY: Thêm log ở server để dễ dàng debug
+            System.out.println("Login failed for identifier: " + userIdentifier); 
+            // SỬA Ở ĐÂY: Thông báo lỗi bằng tiếng Việt và rõ ràng hơn
+            request.setAttribute("error", "Tên đăng nhập/Email hoặc mật khẩu không chính xác!");
             request.getRequestDispatcher("loginjobseeker.jsp").forward(request, response);
         }
     }
@@ -56,5 +66,3 @@ PrintWriter out = response.getWriter();
         request.getRequestDispatcher("loginjobseeker.jsp").forward(request, response);
     }
 }
-
-
