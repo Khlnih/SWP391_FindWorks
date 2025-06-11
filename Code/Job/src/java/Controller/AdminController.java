@@ -461,21 +461,60 @@ public class AdminController extends HttpServlet {
     /**
      * Hiển thị danh sách tất cả các danh mục.
      */
+    /**
+     * Hiển thị danh sách tất cả các danh mục với tìm kiếm và phân trang. (PHIÊN
+     * BẢN ĐÃ SỬA LẠI)
+     */
     private void showCategories(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         transferSessionMessagesToRequest(request); // Lấy message từ session sau khi redirect
+
         try {
-            List<Category> categories = categoryDAO.getAllCategories();
-            request.setAttribute("categories", categories);
+            // 1. Lấy các tham số cho phân trang và tìm kiếm (Phần này bạn đã làm đúng)
+            String keyword = request.getParameter("keyword");
+            if (keyword == null) {
+                keyword = ""; // Mặc định là chuỗi rỗng để không bị lỗi null
+            }
+
+            String pageStr = request.getParameter("page");
+            int currentPage = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
+
+            String pageSizeStr = request.getParameter("pageSize");
+            int pageSize = (pageSizeStr == null || pageSizeStr.isEmpty()) ? 5 : Integer.parseInt(pageSizeStr);
+
+            // 2. Lấy tổng số danh mục khớp với từ khóa từ DAO (Đã đúng)
+            int totalCategories = categoryDAO.countCategories(keyword);
+
+            // 3. Tính toán các giá trị phân trang (Đã đúng)
+            int totalPages = (int) Math.ceil((double) totalCategories / pageSize);
+            int offset = (currentPage - 1) * pageSize;
+
+            // 4. GỌI ĐÚNG PHƯƠNG THỨC DAO để lấy danh sách đã phân trang và tìm kiếm
+            List<Category> categories = categoryDAO.searchAndPaginateCategories(keyword, offset, pageSize);
+
+            // 5. GỬI TẤT CẢ DỮ LIỆU CẦN THIẾT SANG JSP
+            request.setAttribute("categories", categories); // Danh sách danh mục cho trang hiện tại
+            request.setAttribute("currentPage", currentPage);   // Trang hiện tại
+            request.setAttribute("totalPages", totalPages);     // Tổng số trang
+            request.setAttribute("pageSize", pageSize);         // Kích thước trang
+            request.setAttribute("currentKeyword", keyword);    // Từ khóa tìm kiếm hiện tại
+            request.setAttribute("totalCategories", totalCategories); // Tổng số danh mục tìm thấy
+
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Tham số trang hoặc kích thước trang không hợp lệ.");
+            request.setAttribute("categories", new ArrayList<Category>());
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi khi tải danh sách danh mục: " + e.getMessage());
             request.setAttribute("categories", new ArrayList<Category>());
         }
-        request.getRequestDispatcher("admin_categories.jsp").forward(request, response);
 
+        request.getRequestDispatcher("admin_categories.jsp").forward(request, response);
     }
 
+    // --- Các phương thức còn lại của bạn giữ nguyên ---
+    // showAddCategoryForm, createCategory, updateCategory,...
     /**
      * Hiển thị form để tạo một danh mục mới.
      */
@@ -501,6 +540,11 @@ public class AdminController extends HttpServlet {
             if (categoryName == null || categoryName.trim().isEmpty()) {
                 session.setAttribute("error", "Tên danh mục không được để trống.");
                 response.sendRedirect("admin?action=addCategory"); // Gửi lại form
+                return;
+            }
+            if (description == null || description.trim().isEmpty()) {
+                session.setAttribute("error", "Tên danh mục không được để trống.");
+                response.sendRedirect("admin?action=addCategory");
                 return;
             }
 
@@ -568,6 +612,11 @@ public class AdminController extends HttpServlet {
                 response.sendRedirect("admin?action=editCategory&id=" + categoryId);
                 return;
             }
+            if (description == null || description.trim().isEmpty()) {
+                session.setAttribute("error", "Tên danh mục không được để trống.");
+                response.sendRedirect("admin?action=editCategory&id=" + categoryId);
+                return;
+            }
 
             Category categoryToUpdate = new Category();
             categoryToUpdate.setCategoryID(categoryId);
@@ -592,10 +641,6 @@ public class AdminController extends HttpServlet {
         response.sendRedirect("admin?action=categories");
     }
 
-    // Thay thế phương thức deleteCategory cũ bằng phương thức này trong AdminController.java
-    /**
-     * Xóa vĩnh viễn một danh mục.
-     */
     private void deleteCategory(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
