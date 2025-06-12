@@ -156,9 +156,9 @@
                                         <li><a href="jobs.jsp">Browse Job</a></li>
                                         <li><a href="#">pages <i class="ti-angle-down"></i></a>
                                             <ul class="submenu">
-                                                <li><a href="candidate.jsp">Candidates </a></li>
-                                                <li><a href="job_details.jsp">job details </a></li>
-                                                <li><a href="elements.jsp">elements</a></li>
+                                                <li><a href="freelancer_list">Jobseekers</a></li>
+                                                <li><a href="job_details.jsp">Job details </a></li>
+                                                <li><a href="elements.jsp">Elements</a></li>
                                             </ul>
                                         </li>
                                         <li><a href="#">blog <i class="ti-angle-down"></i></a>
