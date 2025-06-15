@@ -318,7 +318,7 @@
                     <span>Basic Information</span>
                 </div>
                 
-                <form action="admin" method="POST" id="tierForm" class="needs-validation" novalidate>
+            <form action="admin" method="POST" id="tierForm" class="needs-validation" novalidate>
                 <input type="hidden" name="action" value="addTier">
                 <input type="hidden" name="status" id="statusValue" value="1">
                 
@@ -436,7 +436,7 @@
                                 </span>
                                 <select class="form-select" id="typeScope" name="typeScope" required>
                                     <option value="Recruiter" selected>Recruiter</option>
-                                    <option value="Jobseeker">Jobseeker</option>
+                                    <option value="Jobseeker" >Jobseeker</option>
                                 </select>
                             </div>
                             <div class="form-text text-muted small">

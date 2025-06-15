@@ -759,23 +759,33 @@
             const keyword = document.getElementById('searchKeyword').value.trim();
             const searchBy = document.getElementById('searchBy').value;
             
-            // Lấy các tham số hiện tại từ URL
+            // Get current URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             
-            // Cập nhật các tham số tìm kiếm
+            // Update search parameters
             if (keyword) {
-                urlParams.set('keyword', keyword);
+                // For name search, clean up the input (trim and replace multiple spaces with single space)
+                const cleanKeyword = keyword.replace(/\s+/g, ' ').trim();
+                urlParams.set('keyword', cleanKeyword);
                 urlParams.set('searchBy', searchBy);
+                
+                // Show loading indicator
+                const searchBtn = document.querySelector('button[onclick="searchJobseekers()"]');
+                const originalBtnText = searchBtn.innerHTML;
+                searchBtn.disabled = true;
+                searchBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Searching...';
+                
+                // Small delay to show loading state
+                setTimeout(() => {
+                    window.location.href = window.location.pathname + '?' + urlParams.toString();
+                }, 100);
             } else {
+                // If no keyword, reset the search
                 urlParams.delete('keyword');
                 urlParams.delete('searchBy');
+                urlParams.set('page', '1');
+                window.location.href = window.location.pathname + '?' + urlParams.toString();
             }
-            
-            // Reset về trang đầu tiên khi tìm kiếm
-            urlParams.set('page', '1');
-            
-            // Chuyển hướng với các tham số mới
-            window.location.href = window.location.pathname + '?' + urlParams.toString();
         }
         
         // Reset search function

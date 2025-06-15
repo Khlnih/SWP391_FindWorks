@@ -103,6 +103,9 @@ public class JobseekerDAO extends DBContext {
     }
     
     public int countSearchResults(String keyword, String searchBy) {
+        // Normalize the keyword by trimming and replacing multiple spaces with a single space
+        String normalizedKeyword = keyword.trim().replaceAll("\\s+", " ");
+        
         String sql = "SELECT COUNT(*) as total FROM Freelancer WHERE status != 'inactive' AND ";
         
         switch(searchBy.toLowerCase()) {
@@ -115,20 +118,42 @@ public class JobseekerDAO extends DBContext {
             case "phone":
                 sql += "phone_contact LIKE ?";
                 break;
+            case "name":
+                // Split normalized keywords by space and create conditions for each word
+                String[] keywords = normalizedKeyword.split(" ");
+                StringBuilder nameCondition = new StringBuilder();
+                
+                for (int i = 0; i < keywords.length; i++) {
+                    if (i > 0) {
+                        nameCondition.append(" AND ");
+                    }
+                    nameCondition.append("(LOWER(first_name) LIKE LOWER(?) OR LOWER(last_name) LIKE LOWER(?))");
+                }
+                sql += "(" + nameCondition.toString() + ")";
+                break;
             default: // search all
                 sql += "(username LIKE ? OR email_contact LIKE ? OR phone_contact LIKE ? OR first_name LIKE ? OR last_name LIKE ?)";
                 break;
         }
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            String searchTerm = "%" + keyword + "%";
+            int paramIndex = 1;
             
             if (searchBy.equalsIgnoreCase("all")) {
-                for (int i = 1; i <= 5; i++) {
-                    stm.setString(i, searchTerm);
+                String searchTerm = "%" + keyword + "%";
+                for (int i = 0; i < 5; i++) {
+                    stm.setString(paramIndex++, searchTerm);
+                }
+            } else if (searchBy.equalsIgnoreCase("name")) {
+                String[] keywords = keyword.trim().split("\\s+");
+                for (String kw : keywords) {
+                    String searchTerm = "%" + kw + "%";
+                    stm.setString(paramIndex++, searchTerm); // first_name
+                    stm.setString(paramIndex++, searchTerm); // last_name
                 }
             } else {
-                stm.setString(1, searchTerm);
+                String searchTerm = "%" + keyword + "%";
+                stm.setString(paramIndex++, searchTerm);
             }
             
             try (ResultSet rs = stm.executeQuery()) {
@@ -146,6 +171,9 @@ public class JobseekerDAO extends DBContext {
         ArrayList<Jobseeker> list = new ArrayList<>();
         if (connection == null) return list;
         
+        // Normalize the keyword by trimming and replacing multiple spaces with a single space
+        String normalizedKeyword = keyword.trim().replaceAll("\\s+", " ");
+        
         String sql = "SELECT * FROM Freelancer WHERE status != 'inactive' AND ";
         
         switch(searchBy.toLowerCase()) {
@@ -158,6 +186,19 @@ public class JobseekerDAO extends DBContext {
             case "phone":
                 sql += "phone_contact LIKE ? ";
                 break;
+            case "name":
+                // Split normalized keywords by space and create conditions for each word
+                String[] keywords = normalizedKeyword.split(" ");
+                StringBuilder nameCondition = new StringBuilder();
+                
+                for (int i = 0; i < keywords.length; i++) {
+                    if (i > 0) {
+                        nameCondition.append(" AND ");
+                    }
+                    nameCondition.append("(LOWER(first_name) LIKE LOWER(?) OR LOWER(last_name) LIKE LOWER(?))");
+                }
+                sql += "(" + nameCondition.toString() + ") ";
+                break;
             default: // search all
                 sql += "(username LIKE ? OR email_contact LIKE ? OR phone_contact LIKE ? OR first_name LIKE ? OR last_name LIKE ?) ";
                 break;
@@ -167,19 +208,27 @@ public class JobseekerDAO extends DBContext {
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             int offset = (page - 1) * pageSize;
-            String searchTerm = "%" + keyword + "%";
+            int paramIndex = 1;
             
             if (searchBy.equalsIgnoreCase("all")) {
-                for (int i = 1; i <= 5; i++) {
-                    stm.setString(i, searchTerm);
+                String searchTerm = "%" + keyword + "%";
+                for (int i = 0; i < 5; i++) {
+                    stm.setString(paramIndex++, searchTerm);
                 }
-                stm.setInt(6, offset);
-                stm.setInt(7, pageSize);
+            } else if (searchBy.equalsIgnoreCase("name")) {
+                String[] keywords = keyword.trim().split("\\s+");
+                for (String kw : keywords) {
+                    String searchTerm = "%" + kw + "%";
+                    stm.setString(paramIndex++, searchTerm); // first_name
+                    stm.setString(paramIndex++, searchTerm); // last_name
+                }
             } else {
-                stm.setString(1, searchTerm);
-                stm.setInt(2, offset);
-                stm.setInt(3, pageSize);
+                String searchTerm = "%" + keyword + "%";
+                stm.setString(paramIndex++, searchTerm);
             }
+            
+            stm.setInt(paramIndex++, offset);
+            stm.setInt(paramIndex, pageSize);
             
             try (ResultSet rs = stm.executeQuery()) {
                 while (rs.next()) {

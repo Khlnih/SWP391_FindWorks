@@ -128,63 +128,75 @@ public class RecruiterDAO extends DBContext {
     public ArrayList<Recruiter> searchRecruiters(String keyword, String searchBy, int page, int pageSize) {
         ArrayList<Recruiter> list = new ArrayList<>();
         
-        if (connection == null) {
-            System.err.println("Database connection is null");
+        if (connection == null || keyword == null || keyword.trim().isEmpty()) {
             return list;
         }
         
-        int offset = (page - 1) * pageSize;
-        StringBuilder sql = new StringBuilder("SELECT * FROM Recruiter WHERE status != 'inactive' ");
+        // Normalize the keyword by trimming and replacing multiple spaces with a single space
+        String normalizedKeyword = keyword.trim().replaceAll("\\s+", " ");
+        String[] searchKeywords = null;
+        
+        StringBuilder sql = new StringBuilder("SELECT * FROM Recruiter WHERE status != 'inactive' AND ");
         
         // Add search conditions based on searchBy parameter
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            switch (searchBy) {
-                case "name":
-                    sql.append("AND (LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ?) ");
-                    break;
-                case "email":
-                    sql.append("AND LOWER(email_contact) LIKE ? ");
-                    break;
-                case "phone":
-                    sql.append("AND phone_contact LIKE ? ");
-                    break;
-                default: // all
-                    sql.append("AND (LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR " +
-                           "LOWER(email_contact) LIKE ? OR phone_contact LIKE ?) ");
-                    break;
-            }
+        switch (searchBy.toLowerCase()) {
+            case "username":
+                sql.append("LOWER(username) LIKE LOWER(?)");
+                break;
+            case "email":
+                sql.append("LOWER(email_contact) LIKE LOWER(?)");
+                break;
+            case "phone":
+                sql.append("phone_contact LIKE ?");
+                break;
+            case "name":
+                // Split normalized keywords by space
+                searchKeywords = normalizedKeyword.split(" ");
+                StringBuilder nameCondition = new StringBuilder();
+                
+                for (int i = 0; i < searchKeywords.length; i++) {
+                    if (i > 0) {
+                        nameCondition.append(" OR ");
+                    }
+                    nameCondition.append("(LOWER(first_name) LIKE LOWER(?) OR LOWER(last_name) LIKE LOWER(?))");
+                }
+                sql.append("(").append(nameCondition).append(")");
+                break;
+            default: // all
+                sql.append("(LOWER(username) LIKE LOWER(?) " +
+                         "OR LOWER(email_contact) LIKE LOWER(?) " +
+                         "OR phone_contact LIKE ? " +
+                         "OR LOWER(first_name) LIKE LOWER(?) " +
+                         "OR LOWER(last_name) LIKE LOWER(?))");
+                break;
         }
         
-        sql.append("ORDER BY recruiterID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        sql.append(" ORDER BY recruiterID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
         
         try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
             
             // Set search parameters based on searchBy
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                String searchTerm = "%" + keyword.toLowerCase() + "%";
-                switch (searchBy) {
-                    case "name":
-                        stm.setString(paramIndex++, searchTerm);
-                        stm.setString(paramIndex++, searchTerm);
-                        break;
-                    case "email":
-                        stm.setString(paramIndex++, searchTerm);
-                        break;
-                    case "phone":
-                        stm.setString(paramIndex++, "%" + keyword + "%");
-                        break;
-                    default: // all
-                        stm.setString(paramIndex++, searchTerm);
-                        stm.setString(paramIndex++, searchTerm);
-                        stm.setString(paramIndex++, searchTerm);
-                        stm.setString(paramIndex++, "%" + keyword + "%");
-                        break;
+            if (searchBy.equalsIgnoreCase("all")) {
+                String searchTerm = "%" + normalizedKeyword + "%";
+                stm.setString(paramIndex++, searchTerm); // username
+                stm.setString(paramIndex++, searchTerm); // email_contact
+                stm.setString(paramIndex++, "%" + normalizedKeyword + "%"); // phone_contact
+                stm.setString(paramIndex++, searchTerm); // first_name
+                stm.setString(paramIndex++, searchTerm); // last_name
+            } else if (searchBy.equalsIgnoreCase("name") && searchKeywords != null) {
+                for (String kw : searchKeywords) {
+                    String searchTerm = "%" + kw + "%";
+                    stm.setString(paramIndex++, searchTerm); // first_name
+                    stm.setString(paramIndex++, searchTerm); // last_name
                 }
+            } else {
+                String searchTerm = "%" + normalizedKeyword + "%";
+                stm.setString(paramIndex++, searchTerm);
             }
             
             // Set pagination parameters
-            stm.setInt(paramIndex++, offset);
+            stm.setInt(paramIndex++, (page - 1) * pageSize);
             stm.setInt(paramIndex, pageSize);
             
             ResultSet rs = stm.executeQuery();
@@ -216,54 +228,69 @@ public class RecruiterDAO extends DBContext {
     public int countSearchResults(String keyword, String searchBy) {
         int count = 0;
         
-        if (connection == null) {
-            System.err.println("Database connection is null");
+        if (connection == null || keyword == null || keyword.trim().isEmpty()) {
             return count;
         }
         
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) as total FROM Recruiter WHERE status != 'inactive' ");
+        // Normalize the keyword by trimming and replacing multiple spaces with a single space
+        String normalizedKeyword = keyword.trim().replaceAll("\\s+", " ");
+        String[] searchKeywords = null;
+        
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) as total FROM Recruiter WHERE status != 'inactive' AND ");
         
         // Add search conditions based on searchBy parameter
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            switch (searchBy) {
-                case "name":
-                    sql.append("AND (LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ?) ");
-                    break;
-                case "email":
-                    sql.append("AND LOWER(email_contact) LIKE ? ");
-                    break;
-                case "phone":
-                    sql.append("AND phone_contact LIKE ? ");
-                    break;
-                default: // all
-                    sql.append("AND (LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR " +
-                           "LOWER(email_contact) LIKE ? OR phone_contact LIKE ?) ");
-                    break;
-            }
+        switch (searchBy.toLowerCase()) {
+            case "username":
+                sql.append("LOWER(username) LIKE LOWER(?)");
+                break;
+            case "email":
+                sql.append("LOWER(email_contact) LIKE LOWER(?)");
+                break;
+            case "phone":
+                sql.append("phone_contact LIKE ?");
+                break;
+            case "name":
+                // Split normalized keywords by space
+                searchKeywords = normalizedKeyword.split(" ");
+                StringBuilder nameCondition = new StringBuilder();
+                
+                for (int i = 0; i < searchKeywords.length; i++) {
+                    if (i > 0) {
+                        nameCondition.append(" OR ");
+                    }
+                    nameCondition.append("(LOWER(first_name) LIKE LOWER(?) OR LOWER(last_name) LIKE LOWER(?))");
+                }
+                sql.append("(").append(nameCondition).append(")");
+                break;
+            default: // all
+                sql.append("(LOWER(username) LIKE LOWER(?) " +
+                         "OR LOWER(email_contact) LIKE LOWER(?) " +
+                         "OR phone_contact LIKE ? " +
+                         "OR LOWER(first_name) LIKE LOWER(?) " +
+                         "OR LOWER(last_name) LIKE LOWER(?))");
+                break;
         }
         
         try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            
             // Set search parameters based on searchBy
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                String searchTerm = "%" + keyword.toLowerCase() + "%";
-                switch (searchBy) {
-                    case "name":
-                        stm.setString(1, searchTerm);
-                        stm.setString(2, searchTerm);
-                        break;
-                    case "email":
-                        stm.setString(1, searchTerm);
-                        break;
-                    case "phone":
-                        stm.setString(1, "%" + keyword + "%");
-                        break;
-                    default: // all
-                        stm.setString(1, searchTerm);
-                        stm.setString(2, searchTerm);
-                        stm.setString(3, searchTerm);
-                        stm.setString(4, "%" + keyword + "%");
-                        break;
+            if (searchBy.equalsIgnoreCase("all")) {
+                String searchTerm = "%" + normalizedKeyword + "%";
+                stm.setString(paramIndex++, searchTerm); // username
+                stm.setString(paramIndex++, searchTerm); // email_contact
+                stm.setString(paramIndex++, "%" + normalizedKeyword + "%"); // phone_contact
+                stm.setString(paramIndex++, searchTerm); // first_name
+                stm.setString(paramIndex, searchTerm); // last_name
+            } else if (searchBy.equalsIgnoreCase("name") && searchKeywords != null) {
+                for (String kw : searchKeywords) {
+                    String searchTerm = "%" + kw + "%";
+                    stm.setString(paramIndex++, searchTerm); // first_name
+                    stm.setString(paramIndex++, searchTerm); // last_name
                 }
+            } else {
+                String searchTerm = "%" + normalizedKeyword + "%";
+                stm.setString(paramIndex++, searchTerm);
             }
             
             ResultSet rs = stm.executeQuery();

@@ -964,8 +964,8 @@
                                         <c:forEach items="${userTypes}" var="type">
                                             <option value="${type}" ${param.userTypeScope eq type ? 'selected' : ''}>
                                                 <c:choose>
-                                                    <c:when test="${type == 'RECRUITER'}">Employer</c:when>
-                                                    <c:when test="${type == 'JOBSEEKER'}">Job Seeker</c:when>
+                                                    <c:when test="${type == 'Recruiter'}">Recruiter</c:when>
+                                                    <c:when test="${type == 'Jobseeker'}">Jobseeker</c:when>
                                                     <c:otherwise>Both</c:otherwise>
                                                 </c:choose>
                                             </option>
@@ -1067,7 +1067,7 @@
                                         </div>
                                         <div class="d-flex align-items-center mb-2">
                                             <i class="fas fa-user-tag text-primary me-2"></i>
-                                            <span>For: ${account.userTypeScope eq 'BOTH' ? 'All User Types' : account.userTypeScope eq 'Recruiter' ? 'Recruiter' : 'Job Seekers'}</span>
+                                            <span>For: ${account.userTypeScope eq 'BOTH' ? 'All User Types' : account.userTypeScope eq 'Recruiter' ? 'Recruiter' : 'JobSeekers'}</span>
                                         </div>
                                         <div class="d-flex align-items-center">
                                             <i class="fas fa-bullhorn text-primary me-2"></i>

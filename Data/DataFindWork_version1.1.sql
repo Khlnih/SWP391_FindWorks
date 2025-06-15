@@ -318,15 +318,16 @@ CREATE TABLE [AccountTiers] (
     [tierID] [int] IDENTITY(1,1) NOT NULL,
     [tierName] [nvarchar](100) NOT NULL,
     [description] [nvarchar](max) NULL,
-    [userTypeScope] [nvarchar](20) NOT NULL, -- 'Recruiter' hoặc 'Freelancer'
+    [userTypeScope] [nvarchar](20) NOT NULL,
     [price] [decimal](18, 2) NOT NULL DEFAULT 0.00,
-    [durationDays] [int] NULL, -- Số ngày hiệu lực. NULL nếu vĩnh viễn hoặc không áp dụng.
-    [features] [nvarchar](max) NULL, -- Ví dụ: JSON: {"max_posts": 10, "featured_profile": true, "support_level": "premium"}
+    [durationDays] [int] NULL, 
+    [features] [nvarchar](max) NULL,
     [isActive] [bit] NOT NULL DEFAULT 1,
-    [adminID_managed_by] [int] NOT NULL,
+    [adminID_managed_by] [int] NULL,
+	[postlimit] [int] NULL,
     CONSTRAINT [PK_AccountTiers] PRIMARY KEY CLUSTERED ([tierID] ASC),
     CONSTRAINT [FK_AccountTiers_Admin] FOREIGN KEY ([adminID_managed_by]) REFERENCES [Admin]([adminID]),
-    CONSTRAINT [CK_AccountTiers_UserTypeScope] CHECK ([userTypeScope] IN ('Recruiter', 'Freelancer', 'Any'))
+    CONSTRAINT [CK_AccountTiers_UserTypeScope] CHECK ([userTypeScope] IN ('Recruiter', 'Jobseeker', 'Any'))
 );
 GO
 
@@ -339,7 +340,7 @@ CREATE TABLE [UserTierSubscriptions] (
     [startDate] [datetime] NOT NULL DEFAULT GETDATE(),
     [endDate] [datetime] NULL,
     [transactionID] [int] NULL, -- Liên kết với giao dịch thanh toán
-    [isActiveSubscription] [bit] NOT NULL DEFAULT 1, -- Trạng thái của gói đăng ký này (có thể hết hạn nhưng vẫn active trong quá khứ)
+    [isActiveSubscription] [int] NOT NULL DEFAULT 1, -- Trạng thái của gói đăng ký này (có thể hết hạn nhưng vẫn active trong quá khứ)
     CONSTRAINT [PK_UserTierSubscriptions] PRIMARY KEY CLUSTERED ([subscriptionID] ASC),
     CONSTRAINT [FK_UserTierSubscriptions_AccountTiers] FOREIGN KEY ([tierID]) REFERENCES [AccountTiers]([tierID]),
     CONSTRAINT [FK_UserTierSubscriptions_Recruiter] FOREIGN KEY ([recruiterID]) REFERENCES [Recruiter]([recruiterID]),

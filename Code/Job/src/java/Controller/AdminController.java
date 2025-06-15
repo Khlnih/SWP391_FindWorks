@@ -9,6 +9,8 @@ import DAO.JobseekerSkillDAO;
 import DAO.RecruiterTransactionDAO;
 import DAO.AccountTierDAO;
 import DAO.CompanyDAO;
+import DAO.FreelancerSubscriptionDAO;
+import DAO.RecruiterSubscriptionDAO;
 import Model.Jobseeker;
 import Model.Recruiter;
 import Model.SkillSet;
@@ -18,20 +20,22 @@ import Model.Skill;
 import Model.RecruiterTransaction;
 import Model.AccountTier;
 import Model.Company;
-import java.math.BigDecimal;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List; // Import List
-import java.util.Arrays;
+import Model.FreelancerSubscription;
+import Model.RecruiterSubscription;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
 import java.io.PrintWriter;
 import DAO.CategoryDAO;
 import Model.Category;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Servlet implementation class AdminController
@@ -45,8 +49,12 @@ public class AdminController extends HttpServlet {
     private EducationDAO educationDAO = new EducationDAO();
     private ExperienceDAO experienceDAO = new ExperienceDAO();
     private JobseekerSkillDAO jobseekerSkillDAO = new JobseekerSkillDAO();
+    private RecruiterTransactionDAO recruiterTransactionDAO = new RecruiterTransactionDAO();
     private AccountTierDAO accountTierDAO = new AccountTierDAO();
     private CategoryDAO categoryDAO = new CategoryDAO();
+    private CompanyDAO companyDAO = new CompanyDAO();
+    private FreelancerSubscriptionDAO freelancerSubscriptionDAO = new FreelancerSubscriptionDAO();
+    private RecruiterSubscriptionDAO recruiterSubscriptionDAO = new RecruiterSubscriptionDAO();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -146,6 +154,9 @@ public class AdminController extends HttpServlet {
                 deleteCategory(request, response);
                 break;
 
+            case "updateStatus":
+                updateStatus(request, response);
+                break;
             default:
                 request.getRequestDispatcher("admin.jsp").forward(request, response);
                 break;
@@ -153,12 +164,27 @@ public class AdminController extends HttpServlet {
     }
 
     private void clearSessionMessages(HttpSession session, String currentAction) {
-        // Example: If current action is related to skills, clear any old jobseeker/recruiter messages
-        // This needs to be tailored to your specific message usage.
-        // A simpler approach is to always clear message/error before setting new ones for PRG.
-        // For now, we'll handle message transfer in each 'showX' method.
+       
     }
-
+    private void updateStatus(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            int subscriptionID = Integer.parseInt(request.getParameter("subscriptionID"));
+            int status = Integer.parseInt(request.getParameter("statusInt"));
+            
+            boolean success = freelancerSubscriptionDAO.updateStatus(subscriptionID, status);
+            PrintWriter out= response.getWriter(); out.print(status);
+            
+            
+            response.sendRedirect("admin?action=registration");
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("errorMessage", "ID đăng ký không hợp lệ");
+            response.sendRedirect("admin?action=registration");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.getSession().setAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
+            response.sendRedirect("admin?action=registration");
+        }
+    }
     private void transferSessionMessagesToRequest(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
@@ -174,16 +200,29 @@ public class AdminController extends HttpServlet {
     }
 
     private void showJobseekers(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        transferSessionMessagesToRequest(request); // For PRG
         try {
-            // Get search parameters
             String keyword = request.getParameter("keyword");
             String searchBy = request.getParameter("searchBy");
             if (searchBy == null || searchBy.isEmpty()) {
                 searchBy = "all";
             }
+            
+            // Validate search input
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String validationError = validateSearchInput(keyword, searchBy);
+                if (validationError != null) {
+                    // Set error message as JavaScript to show alert and reset page
+                    String script = String.format(
+                        "<script>alert('%s'); window.location.href='%s';</script>",
+                        validationError.replace("'", "\\'"), // Escape single quotes
+                        request.getContextPath() + "/AdminController?action=jobseekers"
+                    );
+                    response.setContentType("text/html;charset=UTF-8");
+                    response.getWriter().write(script);
+                    return;
+                }
+            }
 
-            // Pagination
             int defaultPageSize = 5;
             int pageSize = defaultPageSize;
             String pageSizeParam = request.getParameter("pageSize");
@@ -209,7 +248,6 @@ public class AdminController extends HttpServlet {
                     /* use default */ }
             }
 
-            // Get total count
             int totalJobseekers;
             if (keyword != null && !keyword.trim().isEmpty()) {
                 totalJobseekers = jobseekerDAO.countSearchResults(keyword, searchBy);
@@ -224,7 +262,6 @@ public class AdminController extends HttpServlet {
                 currentPage = 1;
             }
 
-            // Get paginated data
             List<Jobseeker> jobseekers;
             if (keyword != null && !keyword.trim().isEmpty()) {
                 jobseekers = jobseekerDAO.searchJobseekers(keyword, searchBy, currentPage, pageSize);
@@ -232,7 +269,6 @@ public class AdminController extends HttpServlet {
                 jobseekers = jobseekerDAO.getJobseekersByPage(currentPage, pageSize);
             }
 
-            // Set attributes for JSP
             request.setAttribute("jobseekers", jobseekers);
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPages", totalPages);
@@ -253,21 +289,148 @@ public class AdminController extends HttpServlet {
         request.getRequestDispatcher("admin_jobseeker.jsp").forward(request, response);
     }
 
+    /**
+     * Validates search input based on the search type
+     * @param input The input string to validate
+     * @param searchType The type of search (email, phone, name, all)
+     * @return Error message if validation fails, null if validation passes
+     */
+    private String validateSearchInput(String input, String searchType) {
+        if (input == null || input.trim().isEmpty()) {
+            return null;
+        }
+
+        switch (searchType.toLowerCase()) {
+            case "email":
+                // Email validation: no spaces, must contain @ and valid domain
+                if (input.contains(" ")) {
+                    return "Email không được chứa khoảng trắng.";
+                }
+                if (!input.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                    return "Email không đúng định dạng. Vui lòng nhập email hợp lệ (ví dụ: example@domain.com).";
+                }
+                break;
+                
+            case "phone":
+                // Phone validation: digits only, no spaces
+                if (input.contains(" ")) {
+                    return "Số điện thoại không được chứa khoảng trắng.";
+                }
+                if (!input.matches("^\\d+$")) {
+                    return "Số điện thoại chỉ được chứa chữ số.";
+                }
+                break;
+                
+            case "name":
+                // Name validation: allow only letters and single spaces between words
+                // Trim and replace multiple spaces with single space
+                String normalizedInput = input.trim().replaceAll("\\s+", " ");
+                
+                // Check if input contains only letters and spaces
+                if (!normalizedInput.matches("^[\\p{L}\\s]+$")) {
+                    return "Tên chỉ được chứa chữ cái và khoảng trắng.";
+                }
+                
+                // Check each keyword length (at least 1 character)
+                String[] keywords = normalizedInput.split("\\s+");
+                for (String keyword : keywords) {
+                    if (keyword.length() < 1) {
+                        return "Mỗi từ khóa tìm kiếm phải có ít nhất 1 ký tự.";
+                    }
+                }
+                break;
+                
+            case "all":
+                // No specific validation for 'all' search type
+                break;
+                
+            default:
+                return "Loại tìm kiếm không hợp lệ.";
+        }
+        
+        return null; // No validation errors
+    }
+
     private void showRecruiters(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         transferSessionMessagesToRequest(request);
         try {
-            ArrayList<Recruiter> recruiters = recruiterDAO.getAllRecruiters();
+            String keyword = request.getParameter("keyword");
+            String searchBy = request.getParameter("searchBy");
+            if (searchBy == null || searchBy.isEmpty()) {
+                searchBy = "all";
+            }
+            
+            // Validate search input
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String validationError = validateSearchInput(keyword, searchBy);
+                if (validationError != null) {
+                    // Set error message as JavaScript to show alert and reset page
+                    String script = String.format(
+                        "<script>alert('%s'); window.location.href='%s';</script>",
+                        validationError.replace("'", "\\'"), // Escape single quotes
+                        request.getContextPath() + "/admin?action=recruiters"
+                    );
+                    response.setContentType("text/html;charset=UTF-8");
+                    response.getWriter().write(script);
+                    return;
+                }
+            }
+
+            int defaultPageSize = 5;
+            int pageSize = defaultPageSize;
+            String pageSizeParam = request.getParameter("pageSize");
+            if (pageSizeParam != null && !pageSizeParam.isEmpty()) {
+                try {
+                    int customPageSize = Integer.parseInt(pageSizeParam);
+                    if (customPageSize > 0) pageSize = customPageSize;
+                } catch (NumberFormatException e) { /* use default */ }
+            }
+
+            int currentPage = 1;
+            String pageParam = request.getParameter("page");
+            if (pageParam != null && !pageParam.isEmpty()) {
+                try {
+                    currentPage = Integer.parseInt(pageParam);
+                    if (currentPage < 1) currentPage = 1;
+                } catch (NumberFormatException e) { /* use default */ }
+            }
+
+            ArrayList<Recruiter> recruiters;
+            int totalRecruiters;
+            
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                recruiters = recruiterDAO.searchRecruiters(keyword, searchBy, currentPage, pageSize);
+                totalRecruiters = recruiterDAO.countSearchResults(keyword, searchBy);
+            } else {
+                recruiters = recruiterDAO.getRecruitersByPage(currentPage, pageSize);
+                totalRecruiters = recruiterDAO.countTotalRecruiters();
+            }
+
+            int totalPages = (int) Math.ceil((double) totalRecruiters / pageSize);
+            if (totalPages == 0) totalPages = 1; // At least one page
+            if (currentPage > totalPages) currentPage = totalPages; // Adjust if current page exceeds total pages
+
             request.setAttribute("recruiters", recruiters);
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalRecruiters", totalRecruiters);
+            request.setAttribute("keyword", keyword);
+            request.setAttribute("searchBy", searchBy);
+            request.setAttribute("pageSize", pageSize);
+
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Error loading recruiters: " + e.getMessage());
-            request.setAttribute("recruiters", new ArrayList<Recruiter>()); // Ensure not null for JSP
+            request.setAttribute("recruiters", new ArrayList<Recruiter>());
+            request.setAttribute("currentPage", 1);
+            request.setAttribute("totalPages", 0);
+            request.setAttribute("totalRecruiters", 0);
+            request.setAttribute("pageSize", 5);
         }
         request.getRequestDispatcher("admin_recruiter.jsp").forward(request, response);
     }
 
     private void showAccountTier(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Get search parameters
         String minPriceStr = request.getParameter("minPrice");
         String maxPriceStr = request.getParameter("maxPrice");
         String isActiveStr = request.getParameter("isActive");
@@ -276,6 +439,8 @@ public class AdminController extends HttpServlet {
         String userTypeScope = request.getParameter("userTypeScope");
 
         // Parse parameters
+
+        
         BigDecimal minPrice = null;
         BigDecimal maxPrice = null;
         Boolean isActive = null;
@@ -309,7 +474,7 @@ public class AdminController extends HttpServlet {
         // Get all user types for dropdown
         List<String> userTypes = Arrays.asList("RECRUITER", "JOBSEEKER", "BOTH");
 
-        // Set attributes for JSP
+        
         request.setAttribute("accountTiers", accountTiers);
         request.setAttribute("userTypes", userTypes);
 
@@ -325,6 +490,22 @@ public class AdminController extends HttpServlet {
     }
 
     private void showAccountRegistration(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            // Lấy dữ liệu Freelancer
+            List<FreelancerSubscription> freelancerSubscriptions = freelancerSubscriptionDAO.getActiveFreelancerSubscriptions();
+            request.setAttribute("freelancerSubscriptions", freelancerSubscriptions);
+
+//             Lấy ữ liệu Recruiter
+            List<RecruiterSubscription> recruiterSubscriptions = recruiterSubscriptionDAO.getAllRecruiterSubscriptions();
+            request.setAttribute("recruiterSubscriptions", recruiterSubscriptions);
+            PrintWriter out = response.getWriter();
+            out.print(recruiterSubscriptions);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi khi tải dữ liệu đăng ký: " + e.getMessage());
+        }
+        
+        // Forward đến JSP
         request.getRequestDispatcher("admin_tier_registrations.jsp").forward(request, response);
     }
 
@@ -416,7 +597,7 @@ public class AdminController extends HttpServlet {
 
     private void addTier(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            // Get form parameters
+            // Get all parameters for debugging
             String tierName = request.getParameter("tierName");
             String priceStr = request.getParameter("price").replaceAll("[^0-9]", "");
             BigDecimal price = new BigDecimal(priceStr);
@@ -424,8 +605,28 @@ public class AdminController extends HttpServlet {
             String description = request.getParameter("description");
             String typeScope = request.getParameter("typeScope");
             int jobPostLimit = Integer.parseInt(request.getParameter("jobPostLimit"));
-            boolean status = request.getParameter("status").equals("1");
+//            boolean status = request.getParameter("status").equals("1");
 
+
+            boolean status = request.getParameter("status") != null && request.getParameter("status").equals("1");
+            
+            // Debug log the received parameters
+            System.out.println("Adding new tier with parameters:");
+            System.out.println("tierName: " + tierName);
+            System.out.println("price: " + price);
+            System.out.println("durationDays: " + durationDays);
+            System.out.println("description: " + description);
+            System.out.println("typeScope: " + typeScope);
+            System.out.println("jobPostLimit: " + jobPostLimit);
+            System.out.println("status: " + status);
+            
+            // Validate typeScope
+            if (typeScope == null || (!typeScope.equalsIgnoreCase("Recruiter") && !typeScope.equalsIgnoreCase("Jobseeker"))) {
+                request.getSession().setAttribute("errorMessage", "Loại tài khoản không hợp lệ. Vui lòng chọn Recruiter hoặc Jobseeker.");
+                response.sendRedirect("admin?action=accounttier");
+                return;
+            }
+            
             // Create new AccountTier object
             AccountTier tier = new AccountTier();
             tier.setTierName(tierName);
@@ -433,16 +634,16 @@ public class AdminController extends HttpServlet {
             tier.setDurationDays(durationDays);
             tier.setDescription(description);
             tier.setStatus(status);
-            tier.setJobPostLimit(jobPostLimit); // Default value
+            tier.setJobPostLimit(jobPostLimit);
             tier.setUserTypeScope(typeScope);
 
             // Add to database
             boolean success = accountTierDAO.addAccountTier(tier);
 
             if (success) {
-                request.getSession().setAttribute("successMessage", "Thêm gói tài khoản thành công!");
+                request.getSession().setAttribute("successMessage", "Thêm gói tài khoản " + tierName + " cho " + typeScope + " thành công!");
             } else {
-                request.getSession().setAttribute("errorMessage", "Có lỗi xảy ra khi thêm gói tài khoản. Vui lòng thử lại.");
+                request.getSession().setAttribute("errorMessage", "Có lỗi xảy ra khi thêm gói tài khoản. Vui lòng kiểm tra lại thông tin.");
             }
 
         } catch (NumberFormatException e) {
@@ -1106,7 +1307,8 @@ public class AdminController extends HttpServlet {
         processRequest(request, response);
     }
 
-    @Override
+  
+    
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);

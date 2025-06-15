@@ -41,7 +41,7 @@ public class LoginServlet extends HttpServlet {
             } else if ("freelancer".equals(userType)) {
                 response.sendRedirect(request.getContextPath() + "/index.jsp");
             } else if ("admin".equals(userType)) {
-                response.sendRedirect(request.getContextPath() + "/admin_dashboard.jsp");
+                response.sendRedirect(request.getContextPath() + "/admin.jsp");
             } else {
                 response.sendRedirect(request.getContextPath() + "/index.jsp");
             }
