@@ -28,9 +28,6 @@ public class LoginServlet extends HttpServlet {
 
         loginDAO dao = new loginDAO();
         UserLoginInfo user = dao.getUserLoginInfo(userIdentifier);
-        PrintWriter out = response.getWriter();
-        out.print(user);
-        // So sánh mật khẩu dạng thuần
         if (user != null && user.getPassword().equals(passwordInput)) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user); // lưu thông tin user vào session

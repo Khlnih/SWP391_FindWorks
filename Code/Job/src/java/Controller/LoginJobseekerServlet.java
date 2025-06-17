@@ -40,21 +40,23 @@ public class LoginJobseekerServlet extends HttpServlet {
 
         loginjobseekerDAO dao = new loginjobseekerDAO();
         UserLoginInfo user = dao.getUserLoginInfo(userIdentifier);
-        
-        // Dòng này dùng để debug, có thể giữ lại hoặc xóa đi
-        PrintWriter out = response.getWriter();
-        out.print(user);
-
+        PrintWriter out = response.getWriter(); out.print(user);
         if (user != null && user.getPassword().equals(passwordInput)) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user); 
-
-            // Jobseeker sau khi đăng nhập thành công sẽ được chuyển đến trang index.jsp
-            response.sendRedirect("index.jsp"); 
+            
+            String userType = user.getUserType();
+            if ("recruiter".equals(userType)) {
+                response.sendRedirect(request.getContextPath() + "/index_recruiter.jsp");
+            } else if ("freelancer".equals(userType)) {
+                response.sendRedirect(request.getContextPath() + "/index.jsp");
+            } else if ("admin".equals(userType)) {
+                response.sendRedirect(request.getContextPath() + "/admin.jsp");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/index.jsp");
+            } 
         } else {
-            // SỬA Ở ĐÂY: Thêm log ở server để dễ dàng debug
             System.out.println("Login failed for identifier: " + userIdentifier); 
-            // SỬA Ở ĐÂY: Thông báo lỗi bằng tiếng Việt và rõ ràng hơn
             request.setAttribute("error", "Tên đăng nhập/Email hoặc mật khẩu không chính xác!");
             request.getRequestDispatcher("loginjobseeker.jsp").forward(request, response);
         }

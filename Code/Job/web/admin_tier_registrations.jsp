@@ -1165,18 +1165,28 @@
 
         
         // Function to export table to Excel
-        function exportToExcel(tableID, filename = '') {
-            const table = document.getElementById(tableID);
-            const wb = XLSX.utils.table_to_book(table, {sheet: 'Sheet1'});
-            
-            // Generate current date for filename
-            const today = new Date();
-            const date = today.getFullYear() + '-' + 
-                        String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                        String(today.getDate()).padStart(2, '0');
-            
-            // Generate Excel file
-            XLSX.writeFile(wb, `${filename}_${date}.xlsx`);
+        function exportToExcel(tableID, defaultFilename = '11111') {
+            try {
+                
+                const table = document.getElementById(tableID);
+                if (!table) {
+                    alert('Không tìm thấy bảng dữ liệu');
+                    return;
+                }
+
+                const wb = XLSX.utils.table_to_book(table, {sheet: 'Sheet1'});
+
+                const today = new Date();
+                const date = today.getFullYear() +
+                            String(today.getMonth() + 1).padStart(2, '0') +
+                            String(today.getDate()).padStart(2, '0');
+
+                XLSX.writeFile(wb, `Add_.xlsx`);
+
+            } catch (error) {
+                console.error('Lỗi khi xuất Excel:', error);
+                alert('Có lỗi xảy ra khi xuất file Excel');
+            }
         }
     </script>
 </body>
