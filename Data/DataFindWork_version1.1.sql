@@ -362,3 +362,42 @@ GO
 -- Thêm các bảng được đề xuất khác (Reviews, Notifications) nếu bạn muốn
 -- CREATE TABLE [Reviews] ( ... );
 -- CREATE TABLE [Notifications] ( ... );
+CREATE TABLE [Notifications] (
+    [notificationID] [int] IDENTITY(1,1) NOT NULL,
+
+    -- Recipient: Who is this notification for?
+    -- One of the following should be populated.
+    [recipient_freelancerID] [int] NULL,
+    [recipient_recruiterID] [int] NULL,
+
+    -- Notification Content
+    [message] [nvarchar](max) NOT NULL,         -- The main content/text of the notification
+    [notificationType] [nvarchar](50) NULL,     -- Optional: Helps categorize notifications (e.g., 'ApplicationUpdate', 'PostStatus', 'AdminMessage')
+
+    -- Status
+    [isRead] [bit] NOT NULL DEFAULT 0,          -- Flag indicating if the recipient has read the notification
+    [readDate] [datetime] NULL,                 -- Timestamp of when the notification was marked as read (can be NULL if not read)
+
+    -- Source of Notification / Admin Link
+    [createdBy_adminID] [int] NULL,             -- FK to Admin. Indicates if an Admin created or was involved in this notification.
+                                                -- This fulfills the "khóa ngoại với Admin" requirement.
+
+    CONSTRAINT [PK_Notifications] PRIMARY KEY CLUSTERED ([notificationID] ASC),
+
+    -- Foreign Keys for Recipients
+    CONSTRAINT [FK_Notifications_RecipientFreelancer_Simplified] FOREIGN KEY ([recipient_freelancerID]) REFERENCES [Freelancer]([freelancerID]) ON DELETE CASCADE,
+    CONSTRAINT [FK_Notifications_RecipientRecruiter_Simplified] FOREIGN KEY ([recipient_recruiterID]) REFERENCES [Recruiter]([recruiterID]) ON DELETE CASCADE,
+
+    -- Foreign Key for the Admin involved with the notification
+    CONSTRAINT [FK_Notifications_CreatedByAdmin_Simplified] FOREIGN KEY ([createdBy_adminID]) REFERENCES [Admin]([adminID]) ON DELETE SET NULL,
+
+    -- Constraint to ensure the notification is targeted to a specific user type.
+    CONSTRAINT [CK_Notification_TargetUser_Simplified] CHECK (
+        ([recipient_freelancerID] IS NOT NULL AND [recipient_recruiterID] IS NULL) OR
+        ([recipient_freelancerID] IS NULL AND [recipient_recruiterID] IS NOT NULL)
+    )
+);
+GO
+
+PRINT 'Highly Simplified Notifications table created successfully.';
+GO

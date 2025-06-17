@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import DAO.CategoryDAO;
 import Model.Category;
+import DAO.NotificationDAO;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +56,8 @@ public class AdminController extends HttpServlet {
     private CompanyDAO companyDAO = new CompanyDAO();
     private FreelancerSubscriptionDAO freelancerSubscriptionDAO = new FreelancerSubscriptionDAO();
     private RecruiterSubscriptionDAO recruiterSubscriptionDAO = new RecruiterSubscriptionDAO();
-
+    private NotificationDAO notificationDAO = new NotificationDAO();
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -170,11 +172,19 @@ public class AdminController extends HttpServlet {
         try {
             int subscriptionID = Integer.parseInt(request.getParameter("subscriptionID"));
             int status = Integer.parseInt(request.getParameter("statusInt"));
-            
+            String user = request.getParameter("user");
             boolean success = freelancerSubscriptionDAO.updateStatus(subscriptionID, status);
-            PrintWriter out= response.getWriter(); out.print(status);
             
-            
+            String userID = request.getParameter("userID");
+            int id = Integer.parseInt(userID);
+            String mess = "Thank you for subscribing";
+            String type = "ApplicationUpdate";
+            if(user.equals("freelancer")){
+                notificationDAO.addFreelancerNotification(id, mess, type);
+            }else{
+                notificationDAO.addRecruiterNotification(id, mess, type);
+            }
+            PrintWriter out= response.getWriter(); out.print(id);
             response.sendRedirect("admin?action=registration");
         } catch (NumberFormatException e) {
             request.getSession().setAttribute("errorMessage", "ID đăng ký không hợp lệ");
@@ -499,7 +509,7 @@ public class AdminController extends HttpServlet {
             List<RecruiterSubscription> recruiterSubscriptions = recruiterSubscriptionDAO.getAllRecruiterSubscriptions();
             request.setAttribute("recruiterSubscriptions", recruiterSubscriptions);
             PrintWriter out = response.getWriter();
-            out.print(recruiterSubscriptions);
+            out.print(freelancerSubscriptions);
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi khi tải dữ liệu đăng ký: " + e.getMessage());

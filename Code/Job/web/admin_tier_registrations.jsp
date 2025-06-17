@@ -714,16 +714,29 @@
                     }
                 </style>
 
-                
+                <div class="tab-content" id="dashboardTabsContent">
+                    <!-- Overview Tab -->
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                        <!-- Overview content goes here -->
+                        <div class="row">
+                            <div class="col-12 text-center py-5">
+                                <h4>Welcome to Subscription Management</h4>
+                                <p class="text-muted">Select a tab to view subscription details</p>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <!-- Freelancer Tab - Only display Freelancer table -->
+                    <!-- Freelancer Tab -->
                     <div class="tab-pane fade" id="freelancer" role="tabpanel" aria-labelledby="freelancer-tab">
                         <div class="card">
-                            <div class="card-header bg-white">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">
                                     <i class="fas fa-user-graduate text-primary me-2"></i>
                                     Freelancer Subscriptions List
                                 </h5>
+                                <button class="btn btn-success btn-sm" onclick="exportToExcel('freelancerTable', 'Freelancer_Subscriptions')">
+                                    <i class="fas fa-file-excel me-1"></i> Export to Excel
+                                </button>
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
@@ -780,8 +793,10 @@
                                                             <!-- Approve Button -->
                                                             <form method="post" action="admin" style="display: inline;">
                                                                 <input type="hidden" name="action" value="updateStatus">
+                                                                <input type="hidden" name="userID" value="${subscription.freelancerID}">
                                                                 <input type="hidden" name="subscriptionID" value="${subscription.subscriptionID}">
                                                                 <input type="hidden" name="statusInt" value="0">
+                                                                <input type="hidden" name="user" value="freelancer">
                                                                 <button type="submit" 
                                                                         class="btn btn-sm btn-success" 
                                                                         data-bs-toggle="tooltip" 
@@ -794,8 +809,10 @@
                                                             
                                                             <form method="post" action="admin" style="display: inline;">
                                                                 <input type="hidden" name="action" value="updateStatus">
+                                                                <input type="hidden" name="userID" value="${subscription.freelancerID}">
                                                                 <input type="hidden" name="subscriptionID" value="${subscription.subscriptionID}">
                                                                 <input type="hidden" name="statusInt" value="2">
+                                                                <input type="hidden" name="user" value="freelancer">
                                                                 <button type="submit" 
                                                                         class="btn btn-sm btn-danger" 
                                                                         data-bs-toggle="tooltip" 
@@ -825,14 +842,17 @@
                         </div>
                     </div>
 
-                    <!-- Recruiter Tab - Only display Recruiter table -->
+                    <!-- Recruiter Tab -->
                     <div class="tab-pane fade" id="recruiter" role="tabpanel" aria-labelledby="recruiter-tab">
                         <div class="card">
-                            <div class="card-header bg-white">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">
                                     <i class="fas fa-briefcase text-info me-2"></i>
                                     Recruiter Subscriptions List
                                 </h5>
+                                <button class="btn btn-success btn-sm" onclick="exportToExcel('recruiterTable', 'Recruiter_Subscriptions')">
+                                    <i class="fas fa-file-excel me-1"></i> Export to Excel
+                                </button>
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
@@ -904,8 +924,10 @@
                                                                 <div class="d-flex flex-wrap justify-content-center gap-2">
                                                                     <form method="post" action="admin" style="display: inline;">
                                                                         <input type="hidden" name="action" value="updateStatus">
+                                                                        <input type="hidden" name="id" value="${sub.recruiterID}">
                                                                         <input type="hidden" name="subscriptionID" value="${sub.subscriptionID}">
                                                                         <input type="hidden" name="statusInt" value="0">
+                                                                        <input type="hidden" name="user" value="recruiter">
                                                                         <button type="submit" 
                                                                                 class="btn btn-sm btn-success" 
                                                                                 data-bs-toggle="tooltip" 
@@ -915,11 +937,12 @@
                                                                             <i class="fas fa-check me-1"></i> Duyệt
                                                                         </button>
                                                                     </form>
-
                                                                     <form method="post" action="admin" style="display: inline;">
                                                                         <input type="hidden" name="action" value="updateStatus">
+                                                                        <input type="hidden" name="id" value="${sub.recruiterID}">
                                                                         <input type="hidden" name="subscriptionID" value="${sub.subscriptionID}">
                                                                         <input type="hidden" name="statusInt" value="2">
+                                                                        <input type="hidden" name="user" value="recruiter">
                                                                         <button type="submit" 
                                                                                 class="btn btn-sm btn-danger" 
                                                                                 data-bs-toggle="tooltip" 
@@ -950,16 +973,21 @@
                             </div>
                         </div>
                     </div>
-                                           
-                 
+                </div> <!-- End of tab-content -->
+            </div> <!-- End of page-header -->
+        </div> <!-- End of container-fluid -->
+    </div> <!-- End of main-content -->
 
-    
-
+    <!-- Load jQuery first -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Then DataTables -->
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Other scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     
     <!-- Toast Notification -->
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
@@ -1033,19 +1061,86 @@
             alert('Showing details for subscription: ' + subscriptionId);
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabLinks = document.querySelectorAll('.nav-tabs-custom .nav-link');
+        // Hàm khởi tạo DataTable
+        function initializeDataTables() {
+            // Hủy DataTable cũ nếu đã tồn tại
+            if ($.fn.DataTable.isDataTable('table')) {
+                $('table').DataTable().destroy();
+            }
             
-            tabLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-bs-target');
-                    
-                    // Update URL to maintain tab state
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', tabId.substring(1)); // Loại bỏ dấu #
-                    history.pushState({}, '', url);
+            // Khởi tạo DataTable mới
+            $('table').each(function() {
+                $(this).DataTable({
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, 'Tất cả']],
+                    language: {
+                        search: 'Tìm kiếm:',
+                        lengthMenu: 'Hiển thị _MENU_ mục mỗi trang',
+                        zeroRecords: 'Không tìm thấy dữ liệu',
+                        info: 'Hiển thị _START_ đến _END_ của _TOTAL_ mục',
+                        infoEmpty: 'Không có dữ liệu',
+                        infoFiltered: '(đã lọc từ _MAX_ mục)',
+                        paginate: {
+                            first: 'Đầu',
+                            last: 'Cuối',
+                            next: 'Sau',
+                            previous: 'Trước'
+                        },
+                        infoPostFix: '',
+                        thousands: ',',
+                        loadingRecords: 'Đang tải...',
+                        processing: 'Đang xử lý...',
+                        searchPlaceholder: 'Nhập từ khóa...',
+                        emptyTable: 'Không có dữ liệu',
+                        infoEmpty: 'Hiển thị 0 đến 0 của 0 mục',
+                        infoFiltered: ''
+                    },
+                    responsive: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    processing: true,
+                    serverSide: false
                 });
             });
+        }
+
+        // Khởi tạo khi trang đã tải xong
+        $(document).ready(function() {
+            // Khởi tạo DataTables lần đầu
+            initializeDataTables();
+
+            // Xử lý sự kiện khi chuyển tab
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                // Cập nhật URL
+                const tabId = $(e.target).attr('data-bs-target');
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', tabId.substring(1));
+                history.pushState({}, '', url);
+                
+                // Khởi tạo lại DataTables cho tab mới
+                setTimeout(initializeDataTables, 100);
+            });
+
+            // Xử lý sự kiện khi quay lại/tiến tới trang
+            window.addEventListener('popstate', function() {
+                setTimeout(initializeDataTables, 100);
+            });
+        });
+
+        // Xử lý khi load lại trang với tab đã chọn
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeTab = urlParams.get('tab') || 'overview';
+            
+            if (activeTab) {
+                const tabLink = document.querySelector(`.nav-tabs-custom [data-bs-target='#${activeTab}']`);
+                if (tabLink) {
+                    const tab = new bootstrap.Tab(tabLink);
+                    tab.show();
+                    // Khởi tạo lại DataTables sau khi chuyển tab
+                    setTimeout(initializeDataTables, 100);
+                }
+            }
         });
         window.addEventListener('load', function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -1069,6 +1164,20 @@
         });
 
         
+        // Function to export table to Excel
+        function exportToExcel(tableID, filename = '') {
+            const table = document.getElementById(tableID);
+            const wb = XLSX.utils.table_to_book(table, {sheet: 'Sheet1'});
+            
+            // Generate current date for filename
+            const today = new Date();
+            const date = today.getFullYear() + '-' + 
+                        String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(today.getDate()).padStart(2, '0');
+            
+            // Generate Excel file
+            XLSX.writeFile(wb, `${filename}_${date}.xlsx`);
+        }
     </script>
 </body>
 </html>

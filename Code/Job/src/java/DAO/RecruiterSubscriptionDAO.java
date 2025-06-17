@@ -51,7 +51,7 @@ public class RecruiterSubscriptionDAO extends DBContext {
                     "FROM UserTierSubscriptions u\n" +
                     "JOIN Recruiter r ON u.recruiterID = r.recruiterID\n" +
                     "JOIN Company c ON c.recruiterID = r.recruiterID\n" +
-                    "JOIN AccountTiers a ON u.tierID = a.tierID";
+                    "JOIN AccountTiers a ON u.tierID = a.tierID WHERE u.isActiveSubscription = 1";
 
                 try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
