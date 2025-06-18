@@ -397,7 +397,27 @@ public class RecruiterDAO extends DBContext {
         }
         return null;
     }
+// Thêm phương thức này vào lớp DAO/RecruiterDAO.java
 
+public boolean isEmailInUseByAnotherRecruiter(String email, int currentRecruiterId) {
+    if (connection == null) {
+        // Giả định là có lỗi, không cho phép cập nhật để đảm bảo an toàn
+        return true;
+    }
+    String sql = "SELECT COUNT(*) FROM Recruiter WHERE email_contact = ? AND recruiterID != ?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setString(1, email);
+        ps.setInt(2, currentRecruiterId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) > 0; // Trả về true nếu email đã tồn tại ở recruiter khác
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    // Mặc định trả về true nếu có lỗi để ngăn chặn trùng lặp
+    return true;
+}
      public boolean isUsernameOrEmailExists(String username, String email) {
         String sql = "SELECT * FROM Recruiter WHERE username = ? OR email_contact = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -431,4 +451,32 @@ public class RecruiterDAO extends DBContext {
         }
         return false;
     }
+    // Thêm phương thức này vào cuối lớp RecruiterDAO.java
+
+public boolean updateRecruiterProfile(Recruiter r) {
+    if (connection == null) {
+        System.err.println("Database connection is null");
+        return false;
+    }
+    
+    // Lưu ý: Không cho phép cập nhật username, password, status, money... từ trang này
+    String sql = "UPDATE Recruiter SET first_name = ?, last_name = ?, gender = ?, dob = ?, email_contact = ?, phone_contact = ? WHERE recruiterID = ?";
+    
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setString(1, r.getFirstName());
+        stm.setString(2, r.getLastName());
+        stm.setBoolean(3, r.isGender());
+        stm.setString(4, r.getDob());
+        stm.setString(5, r.getEmailContact());
+        stm.setString(6, r.getPhoneContact());
+        stm.setInt(7, r.getRecruiterID());
+        
+        int rowsAffected = stm.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.err.println("Error updating recruiter profile: " + e.getMessage());
+        return false;
+    }
+}
 }
