@@ -11,40 +11,7 @@ import Model.UserLoginInfo;
  */
 public class loginjobseekerDAO {
 
-    /**
-     * SỬA Ở ĐÂY: Hàm này giờ chỉ tìm kiếm trong bảng Freelancer.
-     * Nó trả về đầy đủ thông tin người dùng bao gồm ID và loại người dùng ("freelancer").
-     * @param userIdentifier Tên đăng nhập hoặc email của freelancer.
-     * @return Đối tượng UserLoginInfo nếu tìm thấy, ngược lại trả về null.
-     */
-//    public UserLoginInfo getUserLoginInfo(String userIdentifier) {
-//        String freelancerSQL = "SELECT freelancerID, username, email_contact, password FROM Freelancer WHERE username = ? OR email_contact = ?";
-//        
-//        try (DBContext db = new DBContext()) {
-//            Connection conn = db.connection;
-//            try (PreparedStatement ps = conn.prepareStatement(freelancerSQL)) {
-//                ps.setString(1, userIdentifier);
-//                ps.setString(2, userIdentifier);
-//
-//                try (ResultSet rs = ps.executeQuery()) {
-//                    if (rs.next()) {
-//                        // SỬA Ở ĐÂY: Sử dụng constructor đầy đủ để lưu ID và userType
-//                        return new UserLoginInfo(
-//                                rs.getInt("freelancerID"),
-//                                rs.getString("username"),
-//                                rs.getString("email_contact"),
-//                                rs.getString("password"),
-//                                "freelancer" // Hardcode a "freelancer"
-//                        );
-//                    }
-//                }
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        
-//        return null; // Trả về null nếu không tìm thấy Freelancer
-//    }
+   
     
     public UserLoginInfo getUserLoginInfo(String userIdentifier) {
         // Thử tìm trong bảng Recruiter trước

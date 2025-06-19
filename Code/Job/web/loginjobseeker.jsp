@@ -89,7 +89,7 @@
 
 <div class="login-container">
     <h2>Login to Your Account</h2>
-    <form action="loginjobseeker" method="post">
+    <form action="login" method="post">
         <input type="text" id="usernameOrEmail" name="usernameOrEmail" placeholder="Username or Email" required>
 
         <input type="password" id="password" name="password" placeholder="Password" required>

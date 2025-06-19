@@ -18,15 +18,15 @@
         </div>
     </div>
     
-<!--    <div class="sidebar-profile">
+    <div class="sidebar-profile">
         <div class="profile-avatar">
             <i class="fa fa-user-circle"></i>
         </div>
         <div class="profile-info">
-            <div class="profile-name">${sessionScope.admin.name}</div>
-            <div class="profile-role">Administrator</div>
+           <div class="profile-name">${sessionScope.admin.firstName}</div>
+
         </div>
-    </div>-->
+    </div>
     
     <nav class="sidebar-nav">
         <ul class="nav-menu">
