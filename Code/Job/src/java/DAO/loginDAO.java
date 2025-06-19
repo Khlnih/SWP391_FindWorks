@@ -47,7 +47,7 @@ public class loginDAO extends DBContext{
     }
     
     public Recruiter loginUserByRecruiter(String username, String password) {
-        String sql = "SELECT * FROM Recruiter WHERE (username = ? OR emailContact = ?) AND [password] = ?";
+        String sql = "SELECT * FROM Recruiter WHERE (username = ? OR email_contact = ?) AND [password] = ?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, username);

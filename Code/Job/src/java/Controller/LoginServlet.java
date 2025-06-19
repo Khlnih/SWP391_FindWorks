@@ -38,17 +38,29 @@ public class LoginServlet extends HttpServlet {
         HttpSession session = request.getSession();
         if (jobseeker != null) {
             session.setAttribute("jobseeker", jobseeker);
-            response.sendRedirect("jobseeker_profile.jsp");
+            response.sendRedirect(request.getContextPath() + "/jobseeker_profile.jsp");
         } else if (recruiter != null) {
             session.setAttribute("recruiter", recruiter);
-            response.sendRedirect("profile");
-        } else if( admin != null){
+            response.sendRedirect(request.getContextPath() + "/index_recruiter.jsp");
+        } else if (admin != null) {
             session.setAttribute("admin", admin);
-            response.sendRedirect("admin.jsp");
+            response.sendRedirect(request.getContextPath() + "/admin.jsp");
         }
-        
-//        
-//        
+//          String userIdentifier = request.getParameter("usernameOrEmail");
+//        String passwordInput = request.getParameter("password");
+//
+//        if (userIdentifier == null || userIdentifier.trim().isEmpty() ||
+//            passwordInput == null || passwordInput.trim().isEmpty()) { // SỬA Ở ĐÂY
+//            request.setAttribute("error", "Tên đăng nhập/Email và mật khẩu không được để trống!"); // SỬA Ở ĐÂY
+//            request.getRequestDispatcher("login.jsp").forward(request, response);
+//            return;
+//        }
+//
+//        loginDAO dao = new loginDAO();
+//        UserLoginInfo user = dao.getUserLoginInfo(userIdentifier);
+//        PrintWriter out = response.getWriter();
+//        out.print(user);
+//        // So sánh mật khẩu dạng thuần
 //        if (user != null && user.getPassword().equals(passwordInput)) {
 //            HttpSession session = request.getSession();
 //            session.setAttribute("user", user); // lưu thông tin user vào session
@@ -59,7 +71,7 @@ public class LoginServlet extends HttpServlet {
 //            } else if ("freelancer".equals(userType)) {
 //                response.sendRedirect(request.getContextPath() + "/index.jsp");
 //            } else if ("admin".equals(userType)) {
-//                response.sendRedirect(request.getContextPath() + "/admin.jsp");
+//                response.sendRedirect(request.getContextPath() + "/admin_dashboard.jsp");
 //            } else {
 //                response.sendRedirect(request.getContextPath() + "/index.jsp");
 //            }
@@ -68,6 +80,7 @@ public class LoginServlet extends HttpServlet {
 //            request.setAttribute("error", "Tên đăng nhập/Email hoặc mật khẩu không chính xác!"); // SỬA Ở ĐÂY
 //            request.getRequestDispatcher("login.jsp").forward(request, response);
 //        }
+//    
     }
 
     @Override

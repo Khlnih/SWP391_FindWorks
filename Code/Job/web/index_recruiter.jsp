@@ -1,26 +1,27 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="Model.UserLoginInfo, DAO.RecruiterDAO, Model.Recruiter"%>
+<%@page import="DAO.RecruiterDAO, Model.Recruiter"%>
+<%@page session="true" %>
 
 <%
-    // Kiểm tra session và phân quyền
-    UserLoginInfo user = (UserLoginInfo) session.getAttribute("user");
-    if (user == null || !"recruiter".equals(user.getUserType())) {
-        response.sendRedirect("login.jsp");
+    // Kiểm tra session
+    Recruiter recruiter = (Recruiter) session.getAttribute("recruiter");
+    if (recruiter == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
     
-    // Lấy thông tin recruiter để hiển thị avatar
-    RecruiterDAO recruiterDAO = new RecruiterDAO();
-    Recruiter currentRecruiter = recruiterDAO.getRecruiterById(user.getUserID());
-    
     String avatarPath = "img/candiateds/1.png"; // Default avatar
-    String userName = "User";
+    String userName = recruiter.getFirstName() != null ? recruiter.getFirstName() : "User";
     
-    if (currentRecruiter != null) {
-        if (currentRecruiter.getImage() != null && !currentRecruiter.getImage().isEmpty()) {
-            avatarPath = currentRecruiter.getImage();
-        }
-        userName = currentRecruiter.getFirstName();
+    if (recruiter.getImage() != null && !recruiter.getImage().isEmpty()) {
+        avatarPath = recruiter.getImage();
+    }
+    
+    // Add context path to avatar path if it's a relative path
+    if (!avatarPath.startsWith("http") && !avatarPath.startsWith("/")) {
+        avatarPath = request.getContextPath() + "/" + avatarPath;
+    } else if (!avatarPath.startsWith("http")) {
+        avatarPath = request.getContextPath() + avatarPath;
     }
 %>
 
@@ -33,20 +34,22 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="${pageContext.request.contextPath}/img/favicon.png">
 
-    <!-- CSS here - Same as original index.jsp -->
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/owl.carousel.min.css">
-    <link rel="stylesheet" href="css/magnific-popup.css">
-    <link rel="stylesheet" href="css/font-awesome.min.css">
-    <link rel="stylesheet" href="css/themify-icons.css">
-    <link rel="stylesheet" href="css/nice-select.css">
-    <link rel="stylesheet" href="css/flaticon.css">
-    <link rel="stylesheet" href="css/gijgo.css">
-    <link rel="stylesheet" href="css/animate.min.css">
-    <link rel="stylesheet" href="css/slicknav.css">
-    <link rel="stylesheet" href="css/style.css">
+    <!-- CSS here - Using CDN for better performance -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/magnific-popup.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/themify-icons.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/nice-select.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/flaticon.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/gijgo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/animate.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/slicknav.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
     <style>
         /* Custom styles for recruiter dashboard */
@@ -257,7 +260,7 @@
                                 <div class="Appointment">
                                     <!-- Profile Button with Avatar -->
                                     <div class="phone_num d-none d-xl-block">
-                                        <a href="recruiter_profile.jsp" class="profile-btn">
+                                        <a href="${pageContext.request.contextPath}/recruiter_profile.jsp" class="profile-btn">
                                             <img src="<%= avatarPath %>" alt="Avatar" class="profile-avatar">
                                             <span class="profile-text"><%= userName %></span>
                                         </a>
