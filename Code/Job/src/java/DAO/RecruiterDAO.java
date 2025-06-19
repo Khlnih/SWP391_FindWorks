@@ -479,4 +479,30 @@ public boolean updateRecruiterProfile(Recruiter r) {
         return false;
     }
 }
+public boolean checkPassword(int recruiterID, String currentPassword) {
+    String sql = "SELECT password FROM Recruiter WHERE recruiterID = ?";
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, recruiterID);
+        ResultSet rs = stm.executeQuery();
+        if (rs.next()) {
+            return rs.getString("password").equals(currentPassword);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
+public boolean updatePassword(int recruiterID, String newPassword) {
+    String sql = "UPDATE Recruiter SET password = ? WHERE recruiterID = ?";
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setString(1, newPassword);
+        stm.setInt(2, recruiterID);
+        return stm.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
 }
