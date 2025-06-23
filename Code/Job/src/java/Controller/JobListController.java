@@ -70,7 +70,7 @@ public class JobListController extends HttpServlet {
             }
             
             // Chuyển hướng đến trang JSP
-            request.getRequestDispatcher("/jobs.jsp").forward(request, response);
+            request.getRequestDispatcher("/jobs_list.jsp").forward(request, response);
             
         } catch (Exception e) {
             System.err.println("JobListController - Error: " + e.getMessage());

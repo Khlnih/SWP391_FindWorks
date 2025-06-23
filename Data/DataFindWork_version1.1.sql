@@ -260,7 +260,7 @@ CREATE TABLE [JobApply] (
     [dateApply] [datetime] NOT NULL DEFAULT GETDATE(),
     [coverLetter] [nvarchar](max) NULL, -- Thêm cover letter
     [resumePath] [nvarchar](500) NULL, -- Đổi tên Resume thành resumePath
-    [expectedBudget] [decimal](18,2) NULL, -- Freelancer có thể đề xuất budget
+    [CV]  [nvarchar](100) NULL, 
     CONSTRAINT [PK_JobApply] PRIMARY KEY CLUSTERED ([applyID] ASC),
     CONSTRAINT [UQ_JobApply_FreelancerID_PostID] UNIQUE NONCLUSTERED ([freelancerID] ASC, [postID] ASC), -- Mỗi freelancer chỉ apply 1 lần/post
     CONSTRAINT [FK_JobApply_Freelancer] FOREIGN KEY ([freelancerID]) REFERENCES [Freelancer]([freelancerID]),
@@ -400,4 +400,26 @@ CREATE TABLE [Notifications] (
 GO
 
 PRINT 'Highly Simplified Notifications table created successfully.';
+GO
+
+CREATE TABLE [FreelancerLocation] (
+    [freelancerLocationID] [int] IDENTITY(1,1) NOT NULL,
+    [freelancerID] [int] NOT NULL,
+    [city] [nvarchar](100) NULL,                      
+    [country] [nvarchar](100) NOT NULL,                
+    [work_preference] [nvarchar](50) NOT NULL DEFAULT 'Negotiable',
+    [location_notes] [nvarchar](500) NULL,           
+    CONSTRAINT [PK_FreelancerLocation] PRIMARY KEY CLUSTERED ([freelancerLocationID] ASC),
+    CONSTRAINT [FK_FreelancerLocation_Freelancer] FOREIGN KEY ([freelancerID]) REFERENCES [Freelancer]([freelancerID]) ON DELETE CASCADE,
+    CONSTRAINT [UQ_FreelancerLocation_FreelancerID] UNIQUE NONCLUSTERED ([freelancerID] ASC) -- Đảm bảo mỗi freelancer chỉ có một mục vị trí
+);
+GO
+
+-- Thêm CHECK constraint để giới hạn các giá trị cho trường work_preference
+ALTER TABLE [FreelancerLocation]
+ADD CONSTRAINT [CK_FreelancerLocation_WorkPreference]
+CHECK ([work_preference] IN ('Remote', 'On-site', 'Hybrid', 'Negotiable'));
+GO
+
+PRINT 'Bang FreelancerLocation (phien ban chi tiet hon mot chut) da duoc tao thanh cong.';
 GO

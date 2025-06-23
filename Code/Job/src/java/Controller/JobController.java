@@ -48,6 +48,9 @@ public class JobController extends HttpServlet {
         }
         
         switch (action) {
+            case "add":
+                addFavorite(request, response);
+                break;
             case "list":
                 showJobList(request, response);
                 break;
@@ -66,7 +69,51 @@ public class JobController extends HttpServlet {
         doGet(request, response);
     }
     
-   
+    private void addFavorite(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
+        String redirectUrl = request.getHeader("referer");
+        if (redirectUrl == null || redirectUrl.isEmpty()) {
+            redirectUrl = "jobs";
+        }
+        
+        try {
+            int jobseekerID = Integer.parseInt(request.getParameter("jobseekerID"));
+            int postID = Integer.parseInt(request.getParameter("postID"));
+            
+            // Kiểm tra xem đã favorite chưa
+            if (favoriteDAO.isFavorite(jobseekerID, postID)) {
+                session.setAttribute("message", "Bài viết đã có trong danh sách yêu thích");
+                session.setAttribute("messageType", "warning");
+                response.sendRedirect("jobs?action=list");
+                return;
+            }
+            
+            boolean success = favoriteDAO.addFavorite(jobseekerID, postID);
+            
+            if (success) {
+                session.setAttribute("message", "Đã thêm vào danh sách yêu thích thành công");
+                session.setAttribute("messageType", "success");
+            } else {
+                session.setAttribute("message", "Không thể thêm vào danh sách yêu thích");
+                session.setAttribute("messageType", "danger");
+            }
+            
+            response.sendRedirect("jobs?action=list");
+            
+        } catch (NumberFormatException e) {
+            session.setAttribute("message", "ID bài viết không hợp lệ");
+            session.setAttribute("messageType", "danger");
+            response.sendRedirect("jobs?action=list");
+        } catch (Exception e) {
+            System.err.println("Error adding favorite: " + e.getMessage());
+            e.printStackTrace();
+            session.setAttribute("message", "Đã xảy ra lỗi khi xử lý yêu cầu");
+            session.setAttribute("messageType", "danger");
+            response.sendRedirect("jobs?action=list");
+        }
+    }
     private void showJobList(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         

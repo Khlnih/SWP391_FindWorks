@@ -147,7 +147,13 @@ public class Jobseeker {
     public void setStatusChangedByAdminID(Integer statusChangedByAdminID) {
         this.statusChangedByAdminID = statusChangedByAdminID;
     }
-
     
+    // Alias methods for avatar functionality
+    public String getAvatar() {
+        return this.image;
+    }
     
+    public void setAvatar(String avatar) {
+        this.image = avatar;
+    }
 }

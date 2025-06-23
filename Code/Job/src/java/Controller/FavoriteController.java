@@ -69,9 +69,6 @@ public class FavoriteController extends HttpServlet {
         }
         
         switch (action) {
-            case "add":
-                addFavorite(request, response);
-                break;
             case "remove":
                 removeFavorite(request, response);
                 break;
@@ -88,15 +85,10 @@ public class FavoriteController extends HttpServlet {
             throws ServletException, IOException {
         
         HttpSession session = request.getSession();
-        UserLoginInfo user = (UserLoginInfo) session.getAttribute("user");
-        
-        if (user == null || !"freelancer".equals(user.getUserType())) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
+        int id = Integer.parseInt(request.getParameter("id"));
         
         try {
-            List<FreelancerFavorite> favorites = favoriteDAO.getFavoritesByFreelancer(user.getUserID());
+            List<FreelancerFavorite> favorites = favoriteDAO.getFavoritesByFreelancer(id);
             
             List<Category> categories = categoryDAO.getAllCategories();
             List<JobType> jobTypes = jobTypeDAO.getAllJobTypes();
@@ -119,47 +111,7 @@ public class FavoriteController extends HttpServlet {
     }
     
     
-    private void addFavorite(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        
-        HttpSession session = request.getSession();
-        UserLoginInfo user = (UserLoginInfo) session.getAttribute("user");
-        
-        if (user == null || !"freelancer".equals(user.getUserType())) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"success\": false, \"message\": \"Please login as freelancer\"}");
-            return;
-        }
-        
-        try {
-            int postID = Integer.parseInt(request.getParameter("postId"));
-            
-            // Kiểm tra xem đã favorite chưa
-            if (favoriteDAO.isFavorite(user.getUserID(), postID)) {
-                response.setContentType("application/json");
-                response.getWriter().write("{\"success\": false, \"message\": \"Already in favorites\"}");
-                return;
-            }
-            
-            boolean success = favoriteDAO.addFavorite(user.getUserID(), postID);
-            
-            response.setContentType("application/json");
-            if (success) {
-                response.getWriter().write("{\"success\": true, \"message\": \"Added to favorites\"}");
-            } else {
-                response.getWriter().write("{\"success\": false, \"message\": \"Failed to add to favorites\"}");
-            }
-            
-        } catch (NumberFormatException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"success\": false, \"message\": \"Invalid post ID\"}");
-        } catch (Exception e) {
-            System.err.println("Error adding favorite: " + e.getMessage());
-            e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"success\": false, \"message\": \"Server error\"}");
-        }
-    }
+    
     
     
     private void removeFavorite(HttpServletRequest request, HttpServletResponse response)

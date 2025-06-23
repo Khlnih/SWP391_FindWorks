@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List, Model.Post, Model.Category, Model.JobType, Model.Duration, Model.UserLoginInfo, java.text.SimpleDateFormat, DAO.RecruiterDAO, Model.Recruiter" %>
 <%
@@ -154,9 +155,17 @@
                                 <div class="main-menu d-none d-lg-block">
                                     <nav>
                                         <ul id="navigation">
-                                            <li><a href="index_recruiter.jsp">Home</a></li>
+                                            <c:if test="${sessionScope.recruiter != null}">
+                                                <li><a href="index_recruiter.jsp">Home</a></li>
+                                            </c:if>
+                                            <c:if test="${sessionScope.jobseeker != null}">
+                                                <li><a href="index.jsp">Home</a></li>
+                                            </c:if>
                                             <li><a href="jobs" class="active">Browse Jobs</a></li>
-                                            <li><a href="post?action=list">My Jobs</a></li>
+                                            <c:if test="${sessionScope.recruiter != null}">
+                                                  <li><a href="post?action=list">My Jobs</a></li>
+                                            </c:if>
+                                            
                                             <li><a href="#">Pages <i class="ti-angle-down"></i></a>
                                                 <ul class="submenu">
                                                     <li><a href="freelancer_list.jsp">Candidates</a></li>
@@ -170,11 +179,11 @@
                             </div>
                             <div class="col-xl-3 col-lg-3 d-none d-lg-block">
                                 <div class="Appointment">
-                                    <% if (user != null && "recruiter".equals(user.getUserType())) { %>
+                                    <c:if test="${sessionScope.recruiter != null}">
                                         <div class="phone_num d-none d-xl-block">
                                             <a href="recruiter_profile.jsp" class="profile-btn">
-                                                <img src="<%= avatarPath %>" alt="Avatar" class="profile-avatar">
-                                                <span><%= userName %></span>
+                                                <img src="${avatarPath}" alt="Avatar" class="profile-avatar">
+                                                <span>${userName}</span>
                                             </a>
                                         </div>
                                         <div class="phone_num d-none d-xl-block">
@@ -183,15 +192,18 @@
                                         <div class="d-none d-lg-block">
                                             <a class="boxed-btn3" href="post?action=create">Post a Job</a>
                                         </div>
-                                    <% } else { %>
-                                        <%-- Fallback cho freelancer hoặc guest --%>
-                                        <div class="phone_num d-none d-xl-block">
-                                            <a href="login.jsp">Log in</a>
-                                        </div>
+                                    </c:if>
+
+                                    <c:if test="${sessionScope.jobseeker != null}">
+                                        <div class="col-xl-3 col-lg-3 d-none d-lg-block">
                                         <div class="d-none d-lg-block">
-                                            <a class="boxed-btn3" href="register.jsp">Sign Up</a>
+                                            <a href="jobseeker_profile.jsp">
+                                                <img src="${sessionScope.jobseeker.image}" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
+                                            </a>
                                         </div>
-                                    <% } %>
+                                    </div>
+                                    </c:if>
+
                                 </div>
                             </div>
                             <div class="col-12"><div class="mobile_menu d-block d-lg-none"></div></div>
@@ -201,11 +213,7 @@
             </div>
         </div>
     </header>
-    <!-- header-end -->
-
-    <!-- PHẦN THÂN TRANG (TỪ ĐÂY TRỞ XUỐNG) ĐƯỢC GIỮ NGUYÊN -->
     
-    <!-- bradcam_area -->
     <div class="bradcam_area bradcam_bg_1">
         <div class="container">
             <div class="row">
@@ -217,9 +225,27 @@
             </div>
         </div>
     </div>
-    <!--/ bradcam_area -->
-
-    <!-- job_listing_area_start -->
+    
+    <!-- Message Display Section -->
+    <div class="container mt-3">
+        <% String message = (String) session.getAttribute("message"); 
+           String messageType = (String) session.getAttribute("messageType");
+           if (message != null && !message.isEmpty()) { 
+        %>
+            <div class="alert alert-<%= messageType != null ? messageType : "info" %> alert-dismissible fade show" role="alert">
+                <%= message %>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <% 
+            // Remove the message from session after displaying
+            session.removeAttribute("message");
+            session.removeAttribute("messageType");
+           } 
+        %>
+    </div>
+    
     <div class="job_listing_area plus_padding">
         <div class="container">
             <div class="row">
@@ -288,11 +314,9 @@
                                 <% } %>
                                 <span class="text-muted">(<%= totalJobs != null ? totalJobs : 0 %> jobs found)</span>
                             </h4>
-                            <% if (user != null && "freelancer".equals(user.getUserType())) { %>
-                                <a href="favorite?action=list" class="btn btn-outline-danger">
-                                    <i class="fa fa-heart"></i> My Favorites
-                                </a>
-                            <% } %>
+                            
+                            
+                          
                         </div>
                     </div>
 
@@ -357,14 +381,24 @@
                                             <div class="meta-item"><i class="fa fa-users"></i><span><%= job.getQuantity() %> position<%= job.getQuantity() > 1 ? "s" : "" %></span></div>
                                         <% } %>
                                         
-                                        <div class="action-buttons">
+                                                <div class="action-buttons">
                                             <a href="post?action=view&id=<%= job.getPostId() %>" class="btn-action btn-primary"><i class="fa fa-eye"></i> View Details</a>
-                                            <% if (user != null && "freelancer".equals(user.getUserType())) { %>
-                                                <a href="apply_job.jsp?id=<%= job.getPostId() %>" class="btn-action btn-warning"><i class="fa fa-paper-plane"></i> Apply</a>
-                                            <% } else if (user == null) { %>
-                                                <a href="login.jsp" class="btn-action btn-warning"><i class="fa fa-sign-in"></i> Login to Apply</a>
-                                            <% } %>
+                                            <c:if test="${sessionScope.recruiter == null}">
+                                                <c:if test="${sessionScope.jobseeker != null}">
+                                                    <a href="apply_job.jsp?id=${job.postId}" class="btn-action btn-warning">
+                                                        <i class="fa fa-paper-plane"></i> Apply
+                                                    </a>
+                                                </c:if>
+
+                                                <c:if test="${sessionScope.jobseeker == null}">
+                                                    <a href="login.jsp" class="btn-action btn-warning">
+                                                        <i class="fa fa-sign-in"></i> Login to Apply
+                                                    </a>
+                                                </c:if>
+                                            </c:if> 
                                         </div>
+                                        
+                                        
                                     </div>
                                 </div>
                             <% } %>
@@ -389,68 +423,97 @@
             </div>
         </div>
     </div>
-    <!-- job_listing_area_end -->
-
-    <!-- JS here (GIỮ NGUYÊN) -->
     <script src="js/vendor/jquery-1.12.4.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/nice-select.min.js"></script>
     <script src="js/main.js"></script>
     
-    <% if (user != null && "freelancer".equals(user.getUserType())) { %>
     <script>
-        // JavaScript của bạn cho chức năng favorite (GIỮ NGUYÊN)
-        function toggleFavorite(postId, button) {
-            button.disabled = true;
-            const icon = button.querySelector('i');
-            const originalClass = icon.className;
-            icon.className = 'fa fa-spinner fa-spin';
-            
-            fetch('favorite', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
-                body: 'action=toggle&postId=' + postId
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    if (data.isFavorite) {
-                        button.classList.add('favorited');
-                        icon.className = 'fa fa-heart';
-                        button.title = 'Remove from favorites';
-                    } else {
-                        button.classList.remove('favorited');
-                        icon.className = 'fa fa-heart-o';
-                        button.title = 'Add to favorites';
-                    }
-                    showMessage(data.message, 'success');
-                } else {
-                    icon.className = originalClass;
-                    showMessage(data.message || 'Failed to update favorites', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                icon.className = originalClass;
-                showMessage('An error occurred. Please try again.', 'error');
-            })
-            .finally(() => { button.disabled = false; });
+    // Function to handle favorite button click
+    function toggleFavorite(postId, button) {
+        // Show loading state
+        const icon = button.querySelector('i');
+        const originalIcon = icon.className;
+        icon.className = 'fa fa-spinner fa-spin';
+        
+        // Get jobseeker ID from JSP variable
+        const jobseekerId = '<%= user != null && "freelancer".equals(user.getUserType()) ? user.getUserID() : "" %>';
+        
+        if (!jobseekerId) {
+            // If user is not logged in, redirect to login page
+            window.location.href = 'login.jsp?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+            return;
         }
-        function showMessage(message, type) {
-            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
-            const alertHtml = `<div class="alert ${alertClass}" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;"><i class="fa ${icon}"></i> ${message}</div>`;
-            document.body.insertAdjacentHTML('beforeend', alertHtml);
-            setTimeout(() => {
-                const alert = document.querySelector('.alert');
-                if (alert) {
-                    alert.style.transition = 'opacity 0.3s ease';
-                    alert.style.opacity = '0';
-                    setTimeout(() => alert.remove(), 300);
-                }
-            }, 3000);
-        }
+        
+        // Send AJAX request to add/remove favorite
+        fetch('favorite?action=add&jobseekerID=' + jobseekerId + '&postID=' + postId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Toggle favorite state
+                button.classList.toggle('favorited');
+                icon.className = button.classList.contains('favorited') ? 'fa fa-heart' : 'fa fa-heart-o';
+                
+                // Show success toast
+                showToast(data.message, 'success');
+            } else {
+                // Show error message
+                showToast(data.message, 'danger');
+                icon.className = originalIcon;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('An error occurred. Please try again.', 'danger');
+            icon.className = originalIcon;
+        });
+    }
+    
+    // Function to show toast notification
+    function showToast(message, type) {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.style.zIndex = '1100';
+        
+        // Add toast content
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+        
+        // Add to body
+        document.body.appendChild(toast);
+        
+        // Initialize and show toast
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // Remove toast after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+            document.body.removeChild(toast);
+        });
+    }
+    
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
     </script>
-    <% } %>
 </body>
 </html>

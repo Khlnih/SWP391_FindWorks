@@ -1,5 +1,8 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="Model.UserLoginInfo" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <%
     UserLoginInfo user = (UserLoginInfo) session.getAttribute("user");
 %>
@@ -156,7 +159,7 @@
                                         <nav>
                                             <ul id="navigation">
                                                 <li><a href="index.jsp">home</a></li>
-                                                <li><a href="jobs">Browse Jobs</a></li>
+                                                <li><a href="jobs.jsp">Browse Jobs</a></li>
                                                     <% if (user != null && "freelancer".equals(user.getUserType())) { %>
                                                 <li><a href="favorite?action=list">My Favorites</a></li>
                                                     <% } %>
@@ -175,45 +178,56 @@
                                         </nav>
                                     </div>
                                 </div>
-                                <div class="col-xl-3 col-lg-3 d-none d-lg-block">
-                                    <div class="Appointment">
-                                        <div class="phone_num d-none d-xl-block">
-                                            <!--                                            <a href="register.jsp">Register</a>-->
-                                            <!-- Nút mở popup -->
-                                            <a href="#" onclick="openPopup()">Register</a>
-
-                                            <!-- Popup overlay -->
-                                            <div id="popupOverlay" class="overlay">
-                                                <div class="popup">
-                                                    <h2>Register an Account</h2>
-                                                    <button onclick="location.href = 'register.jsp'">I am an employer</button>
-                                                    <button onclick="location.href = 'registerjobseeker.jsp'">I am a job seeker</button>
-                                                    <br><br>
-                                                    <button class="close-btn" onclick="closePopup()">Close</button>
+                                
+                               
+                                <c:if test="${sessionScope.jobseeker == null}">
+                                    <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                                        <div class="Appointment">
+                                            <div class="phone_num d-none d-xl-block">
+                                                <a href="#" onclick="openPopup()">Register</a>
+                                                <!-- Popup overlay -->
+                                                <div id="popupOverlay" class="overlay">
+                                                    <div class="popup">
+                                                        <h2>Register an Account</h2>
+                                                        <button onclick="location.href = 'register.jsp'">I am an employer</button>
+                                                        <button onclick="location.href = 'registerjobseeker.jsp'">I am a job seeker</button>
+                                                        <br><br>
+                                                        <button class="close-btn" onclick="closePopup()">Close</button>
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                        </div>
-                                        <div class="phone_num d-none d-xl-block">
-                                            <!--                                            <a href="#">Log in</a>-->
-                                            <a href="#" id="loginLink">Log in</a>
-
-                                            <!-- Popup -->
-                                            <div class="overlaylog" id="loginPopup">
-                                                <div class="popuplog">
-                                                    <span class="close-btnlog" onclick="closePopuplog()">&times;</span>
-                                                    <h3>Login</h3>
-                                                    <a href="login.jsp">I am Recruiter</a>
-                                                    <a href="loginjobseeker.jsp">I am  Jobseekers</a>
-
+                                            <div class="phone_num d-none d-xl-block">
+                                                <a href="#" id="loginLink">Log in</a>
+                                                <div class="overlaylog" id="loginPopup">
+                                                    <div class="popuplog">
+                                                        <span class="close-btnlog" onclick="closePopuplog()">&times;</span>
+                                                        <h3>Login</h3>
+                                                        <a href="login.jsp">I am Recruiter</a>
+                                                        <a href="loginjobseeker.jsp">I am Jobseekers</a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="d-none d-lg-block">
-                                            <a class="boxed-btn3" href="#">Post a Job</a>
+
+                                            <div class="d-none d-lg-block">
+                                                <a class="boxed-btn3" href="#">Post a Job</a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </c:if>
+
+                                <c:if test="${sessionScope.jobseeker != null}">
+                                    <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                                        <div class="d-none d-lg-block">
+                                            <a href="jobseeker_profile.jsp">
+                                                <img src="${sessionScope.jobseeker.image}" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
+                                            </a>
+                                        </div>
+                                    </div>
+                                </c:if>
+
+                                
+                                                
                                 <div class="col-12">
                                     <div class="mobile_menu d-block d-lg-none"></div>
                                 </div>

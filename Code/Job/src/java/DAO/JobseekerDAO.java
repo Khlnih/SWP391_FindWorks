@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import Model.FreelancerLocation;
 
 public class JobseekerDAO extends DBContext {
     
@@ -84,6 +85,48 @@ public class JobseekerDAO extends DBContext {
         } catch (SQLException e) {
             e.printStackTrace();
             System.err.println("Error updating jobseeker status: " + e.getMessage());
+            return false;
+        }
+    }
+    public boolean updateDes(String id, String describe) {
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return false;
+        }
+        
+        String sql = "UPDATE Freelancer SET describe = ? WHERE freelancerID = ?";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, describe);
+            stm.setString(2, id);
+            
+            int rowsAffected = stm.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error updating jobseeker describe: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    public boolean updateContact(String id, String email, String phone ) {
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return false;
+        }
+        
+        String sql = "Update Freelancer SET email_contact = ? , phone_contact = ? WHERE freelancerID = ?";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, email);
+            stm.setString(2, phone);
+            stm.setString(3, id);
+            
+            int rowsAffected = stm.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error updating jobseeker describe: " + e.getMessage());
             return false;
         }
     }
@@ -328,4 +371,77 @@ public class JobseekerDAO extends DBContext {
         
         return null;
     }
+     public FreelancerLocation getFreelancerLocationById(int id) {
+        FreelancerLocation location = null;
+        String sql = "SELECT * " +
+                     "FROM FreelancerLocation WHERE freelancerID  = ?";
+
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    location = new FreelancerLocation();
+                    location.setFreelancerLocationID(rs.getInt("freelancerLocationID"));
+                    location.setFreelancerID(rs.getInt("freelancerID"));
+                    location.setCity(rs.getString("city"));
+                    location.setCountry(rs.getString("country"));
+                    location.setWorkPreference(rs.getString("work_preference")); 
+                    location.setLocationNotes(rs.getString("location_notes"));
+                    return location;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching FreelancerLocation by ID: " + id);
+            e.printStackTrace();
+        }
+        return null; // Trả về null nếu không tìm thấy
+    }
+    public boolean updateLocation(String id, String city, String country, String pre, String note ) {
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return false;
+        }
+        
+        String sql = "Update FreelancerLocation SET city = ?, country = ?, work_preference = ?, location_notes = ? WHERE freelancerID = ?";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, city);
+            stm.setString(2, country);
+            stm.setString(3, pre);
+            stm.setString(4, note);
+            
+            stm.setString(5, id);
+            
+            int rowsAffected = stm.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error updating jobseeker describe: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    public boolean updateAvatar(int freelancerId, String avatarPath) {
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return false;
+        }
+        
+        String sql = "UPDATE Freelancer SET image = ? WHERE freelancerID = ?";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, avatarPath);
+            stm.setInt(2, freelancerId);
+            
+            int rowsAffected = stm.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error updating avatar: " + e.getMessage());
+            return false;
+        }
+    }
+     
 }

@@ -183,13 +183,13 @@ GO
 
 PRINT 'Inserting data into JobApply...';
 -- Đảm bảo freelancerID và postID tồn tại
-INSERT INTO [JobApply] ([freelancerID], [postID], [statusApply], [dateApply], [coverLetter], [resumePath], [expectedBudget]) VALUES
-(1, 1, N'Shortlisted', '2024-07-11 11:00:00', N'Dear Recruiter, I am very interested in the ReactJS Developer position...', N'/resumes/lan_ho_react.pdf', 22000000),
-(5, 1, N'Viewed', '2024-07-12 09:30:00', N'Xin chào, tôi thấy tin tuyển dụng ReactJS Developer và muốn ứng tuyển...', N'/resumes/vy_tran_fullstack.pdf', 20000000),
-(2, 2, N'Interviewing', '2024-07-07 10:00:00', N'To Company Y, I have extensive experience with Spring Boot...', N'/resumes/son_dang_java.pdf', 700000),
-(3, 3, N'Pending', '2024-07-13 14:00:00', N'Kính gửi Anh/Chị, Em xin ứng tuyển vị trí UI/UX Designer...', N'/resumes/mai_nguyen_uiux.pdf', 15000000),
-(1, 4, N'Offered', '2024-06-25 10:00:00', N'I would like to apply for the SEO Content Writer role...', N'/resumes/lan_ho_writer.pdf', 400000),
-(5, 6, N'Rejected', '2024-01-05 10:00:00', N'Ứng tuyển vào post đã hết hạn.', N'/resumes/vy_tran_old.pdf', 6000000);
+INSERT INTO [JobApply] ([freelancerID], [postID], [statusApply], [dateApply], [coverLetter], [resumePath], [CV]) VALUES
+(1, 1, N'Shortlisted', '2024-07-11 11:00:00', N'Dear Recruiter, I am very interested in the ReactJS Developer position...', N'/resumes/lan_ho_react.pdf', '123'),
+(5, 1, N'Viewed', '2024-07-12 09:30:00', N'Xin chào, tôi thấy tin tuyển dụng ReactJS Developer và muốn ứng tuyển...', N'/resumes/vy_tran_fullstack.pdf', '123'),
+(2, 2, N'Interviewing', '2024-07-07 10:00:00', N'To Company Y, I have extensive experience with Spring Boot...', N'/resumes/son_dang_java.pdf', '123'),
+(3, 3, N'Pending', '2024-07-13 14:00:00', N'Kính gửi Anh/Chị, Em xin ứng tuyển vị trí UI/UX Designer...', N'/resumes/mai_nguyen_uiux.pdf', '123'),
+(1, 4, N'Offered', '2024-06-25 10:00:00', N'I would like to apply for the SEO Content Writer role...', N'/resumes/lan_ho_writer.pdf', '123'),
+(5, 6, N'Rejected', '2024-01-05 10:00:00', N'Ứng tuyển vào post đã hết hạn.', N'/resumes/vy_tran_old.pdf', '123');
 GO
 
 PRINT 'Inserting data into FreelancerFavorites...';
@@ -261,4 +261,55 @@ EXEC sp_MSforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL";
 GO
 
 PRINT 'All data has been inserted and constraints re-enabled.';
+GO
+
+PRINT 'Inserting data into FreelancerLocation...';
+GO
+
+-- Giả sử các freelancerID tương ứng với thứ tự insert trong bảng Freelancer:
+-- 1: Lan Hồ Thị
+-- 2: Sơn Đặng Văn
+-- 3: Mai Nguyễn Thị
+-- 4: Khánh Lý Hoàng
+-- 5: Vy Trần Thảo
+
+INSERT INTO [FreelancerLocation] ([freelancerID], [city], [country], [work_preference], [location_notes]) VALUES
+(
+    1, -- Lan Hồ Thị
+    N'TP. Hồ Chí Minh',
+    N'Việt Nam',
+    N'Hybrid',
+    N'Ưu tiên làm việc tại các quận trung tâm TP.HCM hoặc làm việc từ xa. Sẵn sàng onsite 2-3 ngày/tuần.'
+),
+(
+    2, -- Sơn Đặng Văn
+    N'Hà Nội',
+    N'Việt Nam',
+    N'On-site',
+    N'Mong muốn làm việc tại văn phòng ở Hà Nội để dễ dàng trao đổi với team.'
+),
+(
+    3, -- Mai Nguyễn Thị
+    N'Đà Nẵng',
+    N'Việt Nam',
+    N'Remote',
+    N'Chủ yếu làm việc từ xa. Có thể đến văn phòng tại Đà Nẵng nếu dự án yêu cầu (không thường xuyên).'
+),
+(
+    4, -- Khánh Lý Hoàng (Có thể không có thông tin vị trí cụ thể hoặc chỉ làm remote)
+    NULL, -- Không có thành phố cụ thể
+    N'Việt Nam', -- Vẫn là người Việt Nam
+    N'Remote',
+    N'Chỉ nhận các dự án làm việc từ xa hoàn toàn.'
+),
+(
+    5, -- Vy Trần Thảo
+    N'TP. Hồ Chí Minh',
+    N'Việt Nam',
+    N'Negotiable',
+    N'Linh hoạt giữa làm việc từ xa và tại chỗ tại TP.HCM, tùy thuộc vào yêu cầu dự án.'
+);
+GO
+
+PRINT 'Data inserted into FreelancerLocation successfully.';
 GO

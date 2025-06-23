@@ -149,6 +149,7 @@ public class EducationDAO extends DBContext {
         }
     }
     
+    
     /**
      * Get a single education record by its ID
      * 
@@ -163,7 +164,7 @@ public class EducationDAO extends DBContext {
         
         String sql = "SELECT e.*, d.degree_name " +
                      "FROM Education e " +
-                     "JOIN Degree d ON e.degreeID = d.dregeeID " +
+                     "JOIN Degree d ON e.degreeID = d.degreeID " +
                      "WHERE e.educationID = ?";
         
         try (PreparedStatement stm = connection.prepareStatement(sql)) {

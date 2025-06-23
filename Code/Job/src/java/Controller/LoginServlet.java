@@ -1,5 +1,9 @@
 package Controller;
 
+import DAO.EducationDAO;
+import DAO.ExperienceDAO;
+import DAO.JobseekerDAO;
+import DAO.SkillDAO;
 import DAO.loginDAO;
 import Model.UserLoginInfo;
 
@@ -11,6 +15,13 @@ import java.io.PrintWriter;
 import Model.Jobseeker;
 import Model.Recruiter;
 import Model.Admin;
+import Model.SkillSet;
+import Model.FreelancerLocation;
+import Model.Education;
+import Model.Experience;
+import Model.Skill;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
@@ -34,11 +45,25 @@ public class LoginServlet extends HttpServlet {
         Recruiter recruiter = dao.loginUserByRecruiter(userIdentifier, passwordInput);
         Admin admin = dao.loginUserByAdmin(userIdentifier, passwordInput);
         
-        PrintWriter out = response.getWriter(); out.print(recruiter);
         HttpSession session = request.getSession();
         if (jobseeker != null) {
             session.setAttribute("jobseeker", jobseeker);
-            response.sendRedirect(request.getContextPath() + "/jobseeker_profile.jsp");
+            JobseekerDAO jobseekerDAO = new JobseekerDAO();
+            EducationDAO educationDAO = new EducationDAO();
+            ExperienceDAO experienceDAO = new ExperienceDAO();
+            SkillDAO skillDAO = new SkillDAO();
+            ArrayList<Education> education = educationDAO.getEducationByFreelancerID(jobseeker.getFreelancerID());
+            ArrayList<Experience> experience = experienceDAO.getExperienceByFreelancerID(jobseeker.getFreelancerID());
+            FreelancerLocation location = jobseekerDAO.getFreelancerLocationById(jobseeker.getFreelancerID());
+            ArrayList<Skill> listSkill = skillDAO.getSkillByFreelancerID(jobseeker.getFreelancerID());
+            ArrayList<SkillSet> skillSet = skillDAO.getAllSkillSets();
+            session.setAttribute("education", education);
+            session.setAttribute("experience", experience);
+            session.setAttribute("location", location);
+             session.setAttribute("listSkill", listSkill);
+             session.setAttribute("skillSet", skillSet);
+            PrintWriter out = response.getWriter(); out.print(skillSet);
+            response.sendRedirect(request.getContextPath() + "/index.jsp");
         } else if (recruiter != null) {
             session.setAttribute("recruiter", recruiter);
             response.sendRedirect(request.getContextPath() + "/index_recruiter.jsp");
@@ -46,6 +71,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("admin", admin);
             response.sendRedirect(request.getContextPath() + "/admin.jsp");
         }
+//        response.sendRedirect(request.getContextPath() + "/index.jsp");
 //          String userIdentifier = request.getParameter("usernameOrEmail");
 //        String passwordInput = request.getParameter("password");
 //

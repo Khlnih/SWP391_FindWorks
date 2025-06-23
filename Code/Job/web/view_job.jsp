@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="Model.Post" %>
 <%@ page import="Model.Category" %>
@@ -369,12 +370,11 @@
 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
-                    <% if (user != null && "recruiter".equals(user.getUserType()) && post.getRecruiterId() == user.getUserID()) { %>
-                        <!-- Owner actions -->
-                        <a href="post?action=edit&id=<%= post.getPostId() %>" class="btn-action btn-warning">
+                    <c:if test="${sessionScope.recruiter != null}">
+                        <a href="post?action=edit&id=${post.postId}" class="btn-action btn-warning">
                             <i class="fa fa-edit"></i> Edit Job
                         </a>
-                        <a href="post?action=delete&id=<%= post.getPostId() %>" 
+                        <a href="post?action=delete&id=${post.postId}" 
                            class="btn-action btn-danger"
                            onclick="return confirm('Are you sure you want to delete this job post?')">
                             <i class="fa fa-trash"></i> Delete Job
@@ -382,31 +382,36 @@
                         <a href="post?action=list" class="btn-action btn-secondary">
                             <i class="fa fa-arrow-left"></i> Back to My Jobs
                         </a>
-                    <% } else if (user != null && "freelancer".equals(user.getUserType())) { %>
-                        <!-- Freelancer actions -->
-                        <button type="button" id="favoriteBtn" class="btn-action btn-warning"
-                                onclick="toggleFavorite(<%= post.getPostId() %>)">
-                            <i class="fa fa-heart-o" id="favoriteIcon"></i> <span id="favoriteText">Add to Favorites</span>
-                        </button>
-                        <a href="apply_job.jsp?id=<%= post.getPostId() %>" class="btn-action btn-primary">
+                    </c:if>
+                           
+                    <c:if test="${sessionScope.jobseeker != null}">
+                        <form action="jobs" method="GET">
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="jobseekerID" value="${jobseeker.getFreelancerID()}">
+                            <input type="hidden" name="postID" value="${postIdStr}">
+                            <button type="submit" id="favoriteBtn" class="btn-action btn-warning"">
+                                <i class="fa fa-heart-o" id="favoriteIcon"></i><span id="favoriteText">Add to Favorites</span>
+                            </button>
+                        </form>
+                        <a href="apply_job.jsp?id=${post.postId}" class="btn-action btn-primary">
                             <i class="fa fa-paper-plane"></i> Apply Now
                         </a>
-                        <a href="favorite?action=list" class="btn-action btn-secondary">
-                            <i class="fa fa-heart"></i> My Favorites
-                        </a>
+
                         <a href="jobs" class="btn-action btn-secondary">
                             <i class="fa fa-arrow-left"></i> Back to Jobs
                         </a>
-                    <% } else { %>
-                        <!-- Guest actions -->
+                    </c:if>
+
+                   <c:if test="${sessionScope.jobseeker == null and sessionScope.recruiter == null}">
                         <a href="login.jsp" class="btn-action btn-primary">
                             <i class="fa fa-sign-in"></i> Login to Apply
                         </a>
                         <a href="jobs.jsp" class="btn-action btn-secondary">
                             <i class="fa fa-arrow-left"></i> Back to Jobs
                         </a>
-                    <% } %>
+                    </c:if>
                 </div>
+
             </div>
         </div>
     </div>
@@ -436,43 +441,7 @@
                 });
         }
 
-        // Function to toggle favorite status
-        function toggleFavorite(postId) {
-            const btn = document.getElementById('favoriteBtn');
-            const icon = document.getElementById('favoriteIcon');
-            const text = document.getElementById('favoriteText');
-
-            // Disable button during request
-            btn.disabled = true;
-            icon.className = 'fa fa-spinner fa-spin';
-            text.textContent = 'Processing...';
-
-            fetch('favorite', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'action=toggle&postId=' + postId
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateFavoriteButton(data.isFavorite);
-                    showMessage(data.message, 'success');
-                } else {
-                    showMessage(data.message || 'Failed to update favorites', 'error');
-                    // Reset button state
-                    btn.disabled = false;
-                    checkFavoriteStatus(postId);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showMessage('An error occurred. Please try again.', 'error');
-                btn.disabled = false;
-                checkFavoriteStatus(postId);
-            });
-        }
+       
 
         // Function to update favorite button appearance
         function updateFavoriteButton(isFavorite) {

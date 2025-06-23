@@ -219,6 +219,7 @@ public class PostController extends HttpServlet {
 
             request.setAttribute("post", post);
             request.setAttribute("category", category);
+            request.setAttribute("postIdStr", postIdStr);
             request.setAttribute("jobType", jobType);
             request.setAttribute("duration", duration);
             request.getRequestDispatcher("/view_job.jsp").forward(request, response);

@@ -19,4 +19,14 @@
         <servlet-name>AdminController</servlet-name>
         <url-pattern>/AdminController</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>JobseekerDetailController</servlet-name>
+        <servlet-class>Controller.JobseekerDetailController</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>JobseekerDetailController</servlet-name>
+        <url-pattern>/JobseekerDetailController</url-pattern>
+    </servlet-mapping>
 </web-app>
