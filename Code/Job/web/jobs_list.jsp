@@ -384,11 +384,7 @@
                                                 <div class="action-buttons">
                                             <a href="post?action=view&id=<%= job.getPostId() %>" class="btn-action btn-primary"><i class="fa fa-eye"></i> View Details</a>
                                             <c:if test="${sessionScope.recruiter == null}">
-                                                <c:if test="${sessionScope.jobseeker != null}">
-                                                    <a href="apply_job.jsp?id=${job.postId}" class="btn-action btn-warning">
-                                                        <i class="fa fa-paper-plane"></i> Apply
-                                                    </a>
-                                                </c:if>
+                                                
 
                                                 <c:if test="${sessionScope.jobseeker == null}">
                                                     <a href="login.jsp" class="btn-action btn-warning">

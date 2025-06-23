@@ -55,16 +55,21 @@
                 <a href="#" class="nav-link ${param.active == 'applications' ? 'active' : ''}">
                     <i class="fas fa-file-alt"></i>
                     <span class="link-text">Notificationn</span>
-                    <span class="badge bg-danger rounded-pill">3</span>
+                    <span class="badge bg-danger rounded-pill">${sessionScope.number}</span>
                 </a>
             </li>
             
             <li class="nav-item">
-                <a href="#" class="nav-link ${param.active == 'saved' ? 'active' : ''}">
-                    <i class="fas fa-bookmark"></i>
-                    <span class="link-text"></span>
-                    <span class="badge bg-warning rounded-pill">5</span>
-                </a>
+                <form method="get" action="ffavoriteController">
+                    <input type="hidden" name="action" value="list">
+                    <input type="hidden" name="userID" value="${sessionScope.jobseeker.freelancerID}">
+                    <button type="submit" class="nav-link ${param.active == 'saved' ? 'active' : ''}">
+                        <i class="fas fa-bookmark"></i>
+                        <span class="link-text">My favorite</span>
+                        <span class="badge bg-warning rounded-pill">${sessionScope.count}</span>
+                    </button>
+                </form>
+               
             </li>
             
             

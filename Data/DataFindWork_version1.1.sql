@@ -260,7 +260,6 @@ CREATE TABLE [JobApply] (
     [dateApply] [datetime] NOT NULL DEFAULT GETDATE(),
     [coverLetter] [nvarchar](max) NULL, -- Thêm cover letter
     [resumePath] [nvarchar](500) NULL, -- Đổi tên Resume thành resumePath
-    [CV]  [nvarchar](100) NULL, 
     CONSTRAINT [PK_JobApply] PRIMARY KEY CLUSTERED ([applyID] ASC),
     CONSTRAINT [UQ_JobApply_FreelancerID_PostID] UNIQUE NONCLUSTERED ([freelancerID] ASC, [postID] ASC), -- Mỗi freelancer chỉ apply 1 lần/post
     CONSTRAINT [FK_JobApply_Freelancer] FOREIGN KEY ([freelancerID]) REFERENCES [Freelancer]([freelancerID]),

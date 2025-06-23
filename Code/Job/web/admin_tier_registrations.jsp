@@ -793,6 +793,7 @@
                                                             <!-- Approve Button -->
                                                             <form method="post" action="admin" style="display: inline;">
                                                                 <input type="hidden" name="action" value="updateStatus">
+                                                                <input type="hidden" name="mess" value="Cảm ơn bạn đã đăng ký">
                                                                 <input type="hidden" name="userID" value="${subscription.freelancerID}">
                                                                 <input type="hidden" name="subscriptionID" value="${subscription.subscriptionID}">
                                                                 <input type="hidden" name="statusInt" value="0">
@@ -809,6 +810,7 @@
                                                             
                                                             <form method="post" action="admin" style="display: inline;">
                                                                 <input type="hidden" name="action" value="updateStatus">
+                                                                <input type="hidden" name="mess" value="Phần đăng ký của bạn chúng tôi không đồng ý">
                                                                 <input type="hidden" name="userID" value="${subscription.freelancerID}">
                                                                 <input type="hidden" name="subscriptionID" value="${subscription.subscriptionID}">
                                                                 <input type="hidden" name="statusInt" value="2">
@@ -861,8 +863,8 @@
                                             <tr>
                                                 <th style="width: 25%;">Recruiter</th>
                                                 <th style="width: 20%;">Company</th>
-                                                <th style="width: 15%;">Tier</th>
-                                                <th style="width: 15%;">Price</th>
+                                                <th style="width: 10%;">Tier</th>
+                                                <th style="width: 10%;">Price</th>
                                                 <th style="width: 10%;">Start Date</th>
                                                 <th style="width: 10%;">End Date</th>
                                                 <th style="width: 10%;">Status</th>
@@ -924,7 +926,8 @@
                                                                 <div class="d-flex flex-wrap justify-content-center gap-2">
                                                                     <form method="post" action="admin" style="display: inline;">
                                                                         <input type="hidden" name="action" value="updateStatus">
-                                                                        <input type="hidden" name="id" value="${sub.recruiterID}">
+                                                                        <input type="hidden" name="mess" value="Cảm ơn bạn đã đăng ký">
+                                                                        <input type="hidden" name="userID" value="${sub.recruiterID}">
                                                                         <input type="hidden" name="subscriptionID" value="${sub.subscriptionID}">
                                                                         <input type="hidden" name="statusInt" value="0">
                                                                         <input type="hidden" name="user" value="recruiter">
@@ -939,7 +942,8 @@
                                                                     </form>
                                                                     <form method="post" action="admin" style="display: inline;">
                                                                         <input type="hidden" name="action" value="updateStatus">
-                                                                        <input type="hidden" name="id" value="${sub.recruiterID}">
+                                                                        <input type="hidden" name="mess" value="Phần đăng ký của bạn chúng tôi không đồng ý">
+                                                                        <input type="hidden" name="userID" value="${sub.recruiterID}">
                                                                         <input type="hidden" name="subscriptionID" value="${sub.subscriptionID}">
                                                                         <input type="hidden" name="statusInt" value="2">
                                                                         <input type="hidden" name="user" value="recruiter">

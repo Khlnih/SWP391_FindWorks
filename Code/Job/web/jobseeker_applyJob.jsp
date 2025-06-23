@@ -122,7 +122,9 @@
                             }
                         %>
                         <form action="applyJob" method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="jobId" value="${job.id}">
+                            <input type="hidden" name="action" value="apply_Job">
+                            <input type="hidden" name="jobId" value="${jobseekerID}">
+                            <input type="hidden" name="postID" value="${postID}">
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="input_field">

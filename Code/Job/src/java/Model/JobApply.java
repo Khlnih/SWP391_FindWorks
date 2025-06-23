@@ -18,12 +18,11 @@ public class JobApply {
     private Date dateApply;
     private String coverLetter;
     private String resumePath;
-    private String CV;
 
     public JobApply() {
     }
 
-    public JobApply(int applyID, int freelancerID, int postID, String statusApply, Date dateApply, String coverLetter, String resumePath, String CV) {
+    public JobApply(int applyID, int freelancerID, int postID, String statusApply, Date dateApply, String coverLetter, String resumePath) {
         this.applyID = applyID;
         this.freelancerID = freelancerID;
         this.postID = postID;
@@ -31,7 +30,6 @@ public class JobApply {
         this.dateApply = dateApply;
         this.coverLetter = coverLetter;
         this.resumePath = resumePath;
-        this.CV = CV;
     }
 
     public int getApplyID() {
@@ -90,13 +88,6 @@ public class JobApply {
         this.resumePath = resumePath;
     }
 
-    public String getCV() {
-        return CV;
-    }
-
-    public void setCV(String CV) {
-        this.CV = CV;
-    }
     
     
     

@@ -393,9 +393,15 @@
                                 <i class="fa fa-heart-o" id="favoriteIcon"></i><span id="favoriteText">Add to Favorites</span>
                             </button>
                         </form>
-                        <a href="apply_job.jsp?id=${post.postId}" class="btn-action btn-primary">
-                            <i class="fa fa-paper-plane"></i> Apply Now
-                        </a>
+                        
+                        <form action="applyJob" method="GET">
+                            <input type="hidden" name="action" value="apply">
+                            <input type="hidden" name="jobseekerID" value="${jobseeker.getFreelancerID()}">
+                            <input type="hidden" name="postID" value="${postIdStr}">
+                            <button type="submit" id="favoriteBtn" class="btn-action btn-primary">
+                                 <i class="fa fa-paper-plane"></i> Apply Now
+                            </button>
+                        </form>
 
                         <a href="jobs" class="btn-action btn-secondary">
                             <i class="fa fa-arrow-left"></i> Back to Jobs

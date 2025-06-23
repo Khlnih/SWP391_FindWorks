@@ -183,13 +183,13 @@ GO
 
 PRINT 'Inserting data into JobApply...';
 -- Đảm bảo freelancerID và postID tồn tại
-INSERT INTO [JobApply] ([freelancerID], [postID], [statusApply], [dateApply], [coverLetter], [resumePath], [CV]) VALUES
-(1, 1, N'Shortlisted', '2024-07-11 11:00:00', N'Dear Recruiter, I am very interested in the ReactJS Developer position...', N'/resumes/lan_ho_react.pdf', '123'),
-(5, 1, N'Viewed', '2024-07-12 09:30:00', N'Xin chào, tôi thấy tin tuyển dụng ReactJS Developer và muốn ứng tuyển...', N'/resumes/vy_tran_fullstack.pdf', '123'),
-(2, 2, N'Interviewing', '2024-07-07 10:00:00', N'To Company Y, I have extensive experience with Spring Boot...', N'/resumes/son_dang_java.pdf', '123'),
-(3, 3, N'Pending', '2024-07-13 14:00:00', N'Kính gửi Anh/Chị, Em xin ứng tuyển vị trí UI/UX Designer...', N'/resumes/mai_nguyen_uiux.pdf', '123'),
-(1, 4, N'Offered', '2024-06-25 10:00:00', N'I would like to apply for the SEO Content Writer role...', N'/resumes/lan_ho_writer.pdf', '123'),
-(5, 6, N'Rejected', '2024-01-05 10:00:00', N'Ứng tuyển vào post đã hết hạn.', N'/resumes/vy_tran_old.pdf', '123');
+INSERT INTO [JobApply] ([freelancerID], [postID], [statusApply], [dateApply], [coverLetter], [resumePath]) VALUES
+(1, 1, N'Shortlisted', '2024-07-11 11:00:00', N'Dear Recruiter, I am very interested in the ReactJS Developer position...', N'/resumes/lan_ho_react.pdf'),
+(5, 1, N'Viewed', '2024-07-12 09:30:00', N'Xin chào, tôi thấy tin tuyển dụng ReactJS Developer và muốn ứng tuyển...', N'/resumes/vy_tran_fullstack.pdf'),
+(2, 2, N'Interviewing', '2024-07-07 10:00:00', N'To Company Y, I have extensive experience with Spring Boot...', N'/resumes/son_dang_java.pdf'),
+(3, 3, N'Pending', '2024-07-13 14:00:00', N'Kính gửi Anh/Chị, Em xin ứng tuyển vị trí UI/UX Designer...', N'/resumes/mai_nguyen_uiux.pdf'),
+(1, 4, N'Offered', '2024-06-25 10:00:00', N'I would like to apply for the SEO Content Writer role...', N'/resumes/lan_ho_writer.pdf'),
+(5, 6, N'Rejected', '2024-01-05 10:00:00', N'Ứng tuyển vào post đã hết hạn.', N'/resumes/vy_tran_old.pdf');
 GO
 
 PRINT 'Inserting data into FreelancerFavorites...';

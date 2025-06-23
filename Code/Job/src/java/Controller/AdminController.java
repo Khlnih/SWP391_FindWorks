@@ -177,11 +177,12 @@ public class AdminController extends HttpServlet {
             
             String userID = request.getParameter("userID");
             int id = Integer.parseInt(userID);
-            String mess = "Thank you for subscribing";
+            String mess = request.getParameter("mess");
             String type = "ApplicationUpdate";
             if(user.equals("freelancer")){
                 notificationDAO.addFreelancerNotification(id, mess, type);
-            }else{
+            }
+            if(user.equals("recruiter")){
                 notificationDAO.addRecruiterNotification(id, mess, type);
             }
             PrintWriter out= response.getWriter(); out.print(id);

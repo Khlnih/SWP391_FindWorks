@@ -8,11 +8,7 @@
 <%@ page import="Model.UserLoginInfo" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%
-    UserLoginInfo user = (UserLoginInfo) session.getAttribute("user");
-    if (user == null || !"freelancer".equals(user.getUserType())) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
+    
     
     List<FreelancerFavorite> favorites = (List<FreelancerFavorite>) request.getAttribute("favorites");
     List<Category> categories = (List<Category>) request.getAttribute("categories");
@@ -466,10 +462,15 @@
                                     <a href="post?action=view&id=<%= post.getPostId() %>" class="btn-action btn-primary">
                                         <i class="fa fa-eye"></i> View Details
                                     </a>
-                                    <button type="button" class="btn-action btn-danger" 
-                                            onclick="removeFavorite(<%= post.getPostId() %>, this)">
-                                        <i class="fa fa-heart-o"></i> Remove
-                                    </button>
+                                    <form method="get" action="ffavoriteController">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="userID" value="${sessionScope.jobseeker.freelancerID}">
+                                        <input type="hidden" name="postID" value="<%= post.getPostId() %>">
+                                        <button type="submit" class="btn-action btn-danger" >
+                                            <i class="fa fa-heart-o"></i> Remove
+                                        </button>
+                                    </form>    
+                                    
                                 </div>
                             </div>
                         </div>

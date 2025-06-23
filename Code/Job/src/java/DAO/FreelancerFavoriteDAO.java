@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FreelancerFavoriteDAO {
+public class FreelancerFavoriteDAO extends DBContext{
     
    
     public boolean addFavorite(int freelancerID, int postID) {
@@ -72,7 +72,23 @@ public class FreelancerFavoriteDAO {
         
         return false;
     }
-    
+    public boolean deleteFavorite(int freelancerID, int postID) {
+        String sql = "DELETE FROM FreelancerFavorites WHERE freelancerID = ? AND postID = ?";
+
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, freelancerID);
+            ps.setInt(2, postID);
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0; // true nếu xóa thành công
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     
     public List<FreelancerFavorite> getFavoritesByFreelancer(int freelancerID) {
         List<FreelancerFavorite> favorites = new ArrayList<>();

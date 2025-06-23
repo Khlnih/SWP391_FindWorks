@@ -3,8 +3,11 @@ package Controller;
 import DAO.JobApplyDAO;
 import Model.JobApply;
 import Model.Jobseeker;
+import Model.Recruiter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.Date;
 import jakarta.servlet.ServletException;
@@ -15,50 +18,87 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+import java.util.ArrayList;
 
 @MultipartConfig
 @WebServlet(name = "JobApplyController", urlPatterns = {"/applyJob"})
 public class JobApplyController extends HttpServlet {
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
-        String jobIdStr = request.getParameter("jobId");
+
+        String action = request.getParameter("action");
+        HttpSession session = request.getSession();
+
+        if (action == null) {
+            action = "dashboard";
+        }
+
+
+        switch (action) {
+            case "dashboard":
+                request.getRequestDispatcher("admin.jsp").forward(request, response);
+                break;
+            case "apply":
+                showApply(request, response);
+                break;
+            case "apply_Job":
+                applyJob(request, response);
+                break;   
+            default:
+                request.getRequestDispatcher("admin.jsp").forward(request, response);
+                break;
+        }
+    }
+    private void showApply(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        int jobseekerID = Integer.parseInt(request.getParameter("jobseekerID"));
+        int postID = Integer.parseInt(request.getParameter("postID"));
+        JobApplyDAO jobApply = new JobApplyDAO();
+        if (jobApply.isFavorite(jobseekerID, postID)) {
+            session.setAttribute("message", "Bài viết đã có trong danh sách apply");
+            session.setAttribute("messageType", "warning");
+            response.sendRedirect("jobs?action=list");
+            return;
+        }
+//        boolean success = jobApply.applyJob(jobseekerID, postID);
+        request.setAttribute("jobseekerID", jobseekerID);
+        request.setAttribute("postID", postID);
+
+        request.getRequestDispatcher("/jobseeker_applyJob.jsp").forward(request, response);
+    }
+    
+    private void applyJob(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
+        
+        HttpSession session = request.getSession();
+        
 
         try {
-            HttpSession session = request.getSession();
-            Jobseeker jobSeeker = (Jobseeker) session.getAttribute("user");
-
-            if (jobSeeker == null) {
-                response.sendRedirect("loginjobseeker.jsp?error=Please login to apply");
-                return;
-            }
-
+            // Lấy thông tin từ form
+            int jobseekerID = Integer.parseInt(request.getParameter("jobId"));
+            int postID = Integer.parseInt(request.getParameter("postID"));
             String coverLetter = request.getParameter("coverLetter");
+            
+            // Kiểm tra xem có file được tải lên không
             Part filePart = request.getPart("cv");
-
-            if (jobIdStr == null || jobIdStr.trim().isEmpty() || filePart == null || filePart.getSize() == 0) {
-                 request.setAttribute("error", "Invalid data. Please fill out the form correctly.");
-                 request.getRequestDispatcher("jobseeker_applyJob.jsp?jobId=" + jobIdStr).forward(request, response);
-                 return;
-            }
-            
-            int jobId = Integer.parseInt(jobIdStr);
-            int freelancerId = jobSeeker.getFreelancerID();
-
-            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-            String fileExtension = fileName.substring(fileName.lastIndexOf("."));
-            
-            if(!fileExtension.equalsIgnoreCase(".pdf")) {
-                request.setAttribute("error", "Invalid file type. Please upload a PDF file.");
-                request.getRequestDispatcher("jobseeker_applyJob.jsp?jobId=" + jobId).forward(request, response);
+            if (filePart == null || filePart.getSize() == 0) {
+                session.setAttribute("error", "Vui lòng tải lên file CV");
+                response.sendRedirect("jobseeker_applyJob.jsp?jobId=" + postID);
                 return;
             }
 
-            String uniqueFileName = "cv_" + freelancerId + "_" + jobId + "_" + System.currentTimeMillis() + fileExtension;
+            // Lấy tên file
+            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+            
+            // Kiểm tra định dạng file
+            if (fileName == null || !fileName.toLowerCase().endsWith(".pdf")) {
+                session.setAttribute("error", "Chỉ chấp nhận file PDF");
+                response.sendRedirect("jobseeker_applyJob.jsp?jobId=" + postID);
+                return;
+            }
 
             String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads" + File.separator + "cvs";
             File uploadDir = new File(uploadPath);
@@ -66,38 +106,46 @@ public class JobApplyController extends HttpServlet {
                 uploadDir.mkdirs();
             }
 
+            String uniqueFileName = "cv_" + jobseekerID + "_" + postID + "_" + System.currentTimeMillis() + ".pdf";
             String filePath = uploadPath + File.separator + uniqueFileName;
+            
             filePart.write(filePath);
             
-            String dbFilePath = "uploads/cvs/" + uniqueFileName;
-
-            JobApplyDAO applyDAO = new JobApplyDAO();
-            JobApply application = new JobApply();
-            application.setPostID(jobId);
-            application.setFreelancerID(freelancerId);
-            application.setCoverLetter(coverLetter);
-            application.setResumePath(dbFilePath);
-            application.setDateApply(new Date());
-            application.setStatusApply("Pending");
-
-            boolean success = applyDAO.addJobApply(application);
+            String relativePath = "uploads/cvs/" + uniqueFileName;
+            JobApplyDAO jobApplyDAO = new JobApplyDAO();
+            boolean success = jobApplyDAO.applyJob(
+                jobseekerID, 
+                postID, 
+                coverLetter, 
+                relativePath
+            );
 
             if (success) {
-                response.sendRedirect("jobs_list.jsp?apply_success=true");
+                session.setAttribute("message", "Nộp đơn thành công!");
+                session.setAttribute("messageType", "success");
+                response.sendRedirect("jobs?action=list");
             } else {
-                request.setAttribute("error", "Failed to submit application. Please try again.");
-                request.getRequestDispatcher("jobseeker_applyJob.jsp?jobId=" + jobId).forward(request, response);
+                new File(filePath).delete();
+                session.setAttribute("message", "Có lỗi xảy ra khi lưu thông tin. Vui lòng thử lại.");
+                response.sendRedirect("jobs?action=list");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "An unexpected error occurred: " + e.getMessage());
-            request.getRequestDispatcher("jobseeker_applyJob.jsp?jobId=" + jobIdStr).forward(request, response);
+            session.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            response.sendRedirect("job-list");
         }
     }
-
     @Override
-    public String getServletInfo() {
-        return "Handles job application submissions, including CV uploads.";
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+  
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
     }
 }

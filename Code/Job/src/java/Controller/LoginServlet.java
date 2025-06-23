@@ -2,11 +2,13 @@ package Controller;
 
 import DAO.EducationDAO;
 import DAO.ExperienceDAO;
+import DAO.FreelancerFavoriteDAO;
 import DAO.JobseekerDAO;
 import DAO.SkillDAO;
 import DAO.loginDAO;
 import Model.UserLoginInfo;
-
+import Model.Notification;
+import DAO.NotificationDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -52,11 +54,19 @@ public class LoginServlet extends HttpServlet {
             EducationDAO educationDAO = new EducationDAO();
             ExperienceDAO experienceDAO = new ExperienceDAO();
             SkillDAO skillDAO = new SkillDAO();
+            NotificationDAO notiDAO = new NotificationDAO();
+            FreelancerFavoriteDAO favoriteDAO = new FreelancerFavoriteDAO();
+            
             ArrayList<Education> education = educationDAO.getEducationByFreelancerID(jobseeker.getFreelancerID());
             ArrayList<Experience> experience = experienceDAO.getExperienceByFreelancerID(jobseeker.getFreelancerID());
             FreelancerLocation location = jobseekerDAO.getFreelancerLocationById(jobseeker.getFreelancerID());
             ArrayList<Skill> listSkill = skillDAO.getSkillByFreelancerID(jobseeker.getFreelancerID());
             ArrayList<SkillSet> skillSet = skillDAO.getAllSkillSets();
+            int number = notiDAO.countNotificationsByFreelancerId(jobseeker.getFreelancerID());
+            int count = favoriteDAO.getFavoriteCount(jobseeker.getFreelancerID());
+            
+            session.setAttribute("count", count);
+            session.setAttribute("number", number);
             session.setAttribute("education", education);
             session.setAttribute("experience", experience);
             session.setAttribute("location", location);

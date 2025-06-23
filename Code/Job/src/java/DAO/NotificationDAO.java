@@ -28,4 +28,27 @@ public class NotificationDAO extends DBContext {
             stmt.executeUpdate();
         }
     }
+    public int countNotificationsByFreelancerId(int freelancerId) {
+        String sql = "SELECT COUNT(*) AS NumberOfNotifications " +
+                     "FROM [Notifications] " +
+                     "WHERE [recipient_freelancerID] = ? AND isRead = 0";
+        int count = 0; 
+
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, freelancerId); 
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt("NumberOfNotifications");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error counting notifications for freelancer ID " + freelancerId + ": " + e.getMessage());
+            e.printStackTrace();
+            return -1; 
+        }
+        return count;
+    }
 }
