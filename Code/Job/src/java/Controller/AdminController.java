@@ -9,6 +9,7 @@ import DAO.JobseekerSkillDAO;
 import DAO.RecruiterTransactionDAO;
 import DAO.AccountTierDAO;
 import DAO.CompanyDAO;
+import DAO.NotificationDAO;
 import DAO.FreelancerSubscriptionDAO;
 import DAO.RecruiterSubscriptionDAO;
 import Model.Jobseeker;
@@ -33,6 +34,7 @@ import java.io.PrintWriter;
 import DAO.CategoryDAO;
 import Model.Category;
 import DAO.NotificationDAO;
+import Model.Notification;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -170,6 +172,7 @@ public class AdminController extends HttpServlet {
     }
     private void updateStatus(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+            HttpSession session = request.getSession();
             int subscriptionID = Integer.parseInt(request.getParameter("subscriptionID"));
             int status = Integer.parseInt(request.getParameter("statusInt"));
             String user = request.getParameter("user");
@@ -185,6 +188,13 @@ public class AdminController extends HttpServlet {
             if(user.equals("recruiter")){
                 notificationDAO.addRecruiterNotification(id, mess, type);
             }
+            NotificationDAO notiDAO = new NotificationDAO();
+            int number = notiDAO.countNotificationsByFreelancerId(Integer.parseInt(userID));
+            ArrayList<Notification> listNoti = notiDAO.getUnreadNotificationsForFreelancer(Integer.parseInt(userID));
+            ArrayList<Notification> allNoti = notiDAO.getNotificationsForFreelancer(Integer.parseInt(userID));
+            session.setAttribute("listNoti", listNoti);
+            session.setAttribute("allNoti", allNoti);
+            session.setAttribute("number", number);
             PrintWriter out= response.getWriter(); out.print(id);
             response.sendRedirect("admin?action=registration");
         } catch (NumberFormatException e) {

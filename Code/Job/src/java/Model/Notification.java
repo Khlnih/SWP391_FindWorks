@@ -18,7 +18,7 @@ public class Notification {
     private String notificationType;
     private int isRead; 
     private Date readDate;
-    private Integer createdByAdminID;   
+    private int createdByAdminID;   
 
     public Notification() {
     }
@@ -90,11 +90,11 @@ public class Notification {
         this.readDate = readDate;
     }
 
-    public Integer getCreatedByAdminID() {
+    public int getCreatedByAdminID() {
         return createdByAdminID;
     }
 
-    public void setCreatedByAdminID(Integer createdByAdminID) {
+    public void setCreatedByAdminID(int createdByAdminID) {
         this.createdByAdminID = createdByAdminID;
     }
     

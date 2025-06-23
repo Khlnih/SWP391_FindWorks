@@ -64,15 +64,18 @@ public class LoginServlet extends HttpServlet {
             ArrayList<SkillSet> skillSet = skillDAO.getAllSkillSets();
             int number = notiDAO.countNotificationsByFreelancerId(jobseeker.getFreelancerID());
             int count = favoriteDAO.getFavoriteCount(jobseeker.getFreelancerID());
-            
+            ArrayList<Notification> listNoti = notiDAO.getUnreadNotificationsForFreelancer(jobseeker.getFreelancerID());
+            ArrayList<Notification> allNoti = notiDAO.getNotificationsForFreelancer(jobseeker.getFreelancerID());
+                    PrintWriter out = response.getWriter();out.print(listNoti);
             session.setAttribute("count", count);
+            session.setAttribute("listNoti", listNoti);
+            session.setAttribute("allNoti", allNoti);
             session.setAttribute("number", number);
             session.setAttribute("education", education);
             session.setAttribute("experience", experience);
             session.setAttribute("location", location);
              session.setAttribute("listSkill", listSkill);
              session.setAttribute("skillSet", skillSet);
-            PrintWriter out = response.getWriter(); out.print(skillSet);
             response.sendRedirect(request.getContextPath() + "/index.jsp");
         } else if (recruiter != null) {
             session.setAttribute("recruiter", recruiter);

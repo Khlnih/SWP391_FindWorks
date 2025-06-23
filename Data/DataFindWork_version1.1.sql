@@ -364,8 +364,6 @@ GO
 CREATE TABLE [Notifications] (
     [notificationID] [int] IDENTITY(1,1) NOT NULL,
 
-    -- Recipient: Who is this notification for?
-    -- One of the following should be populated.
     [recipient_freelancerID] [int] NULL,
     [recipient_recruiterID] [int] NULL,
 
@@ -374,7 +372,7 @@ CREATE TABLE [Notifications] (
     [notificationType] [nvarchar](50) NULL,     -- Optional: Helps categorize notifications (e.g., 'ApplicationUpdate', 'PostStatus', 'AdminMessage')
 
     -- Status
-    [isRead] [bit] NOT NULL DEFAULT 0,          -- Flag indicating if the recipient has read the notification
+    [isRead] [int] NOT NULL DEFAULT 0,          -- Flag indicating if the recipient has read the notification
     [readDate] [datetime] NULL,                 -- Timestamp of when the notification was marked as read (can be NULL if not read)
 
     -- Source of Notification / Admin Link

@@ -98,6 +98,40 @@ public class AccountTierDAO extends DBContext {
         return list;
     }
     
+    
+    public ArrayList<AccountTier> getAllAccountTierForJobseeker() {
+        ArrayList<AccountTier> list = new ArrayList<>();
+
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return list;
+        }
+
+        String sql = "SELECT * FROM AccountTiers WHERE userTypeScope = 'Jobseeker' AND isActive = 1";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                AccountTier tier = new AccountTier();
+                tier.setTierID(rs.getInt("tierID"));
+                tier.setTierName(rs.getString("tierName"));
+                tier.setPrice(rs.getBigDecimal("price"));
+                tier.setDurationDays(rs.getInt("durationDays"));
+                tier.setDescription(rs.getString("description"));
+                tier.setStatus(rs.getBoolean("isActive"));
+                tier.setJobPostLimit(rs.getInt("postlimit"));
+                tier.setUserTypeScope(rs.getString("userTypeScope"));
+                list.add(tier);
+            }
+            System.out.println("Found " + list.size() + " account tiers");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error getting recruiters: " + e.getMessage());
+        }
+
+        return list;
+    }
+    
     public boolean updateTier(AccountTier tier) {
         if (connection == null) {
             System.err.println("Database connection is null");

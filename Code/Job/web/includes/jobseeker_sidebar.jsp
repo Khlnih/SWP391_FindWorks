@@ -52,7 +52,7 @@
             </li>
             
             <li class="nav-item">
-                <a href="#" class="nav-link ${param.active == 'applications' ? 'active' : ''}">
+                <a href="jobseeker_notification.jsp" class="nav-link ${param.active == 'applications' ? 'active' : ''}">
                     <i class="fas fa-file-alt"></i>
                     <span class="link-text">Notificationn</span>
                     <span class="badge bg-danger rounded-pill">${sessionScope.number}</span>
@@ -71,7 +71,12 @@
                 </form>
                
             </li>
-            
+            <li class="nav-item">
+                <a href="jobseeker_accountTier.jsp" class="nav-link ${param.active == 'applications' ? 'active' : ''}">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="link-text">Account tier</span>
+                </a>
+            </li>
             
             
             <li class="nav-divider"></li>
