@@ -402,7 +402,16 @@
                                  <i class="fa fa-paper-plane"></i> Apply Now
                             </button>
                         </form>
-
+                            
+                        <form action="ffavoriteController" method="GET">
+                            <input type="hidden" name="action" value="report">
+                            <input type="hidden" name="jobseekerID" value="${jobseeker.getFreelancerID()}">
+                            <input type="hidden" name="postID" value="${postIdStr}">
+                            <button type="submit" id="favoriteBtn" class="btn-action btn-primary">
+                                 <i class="fa fa-paper-plane"></i> Report
+                            </button>
+                        </form>
+                        
                         <a href="jobs" class="btn-action btn-secondary">
                             <i class="fa fa-arrow-left"></i> Back to Jobs
                         </a>

@@ -82,7 +82,7 @@
             <li class="nav-divider"></li>
             
             <li class="nav-item logout-item">
-                <a href="<%= request.getContextPath() %>/LogoutController" class="nav-link">
+                <a href="${pageContext.request.contextPath}/logout" class="nav-link">
                     <i class="fas fa-sign-out-alt"></i>
                     <span class="link-text">Log out</span>
                 </a>

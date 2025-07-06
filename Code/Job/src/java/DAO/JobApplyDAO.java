@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -75,5 +77,31 @@ public class JobApplyDAO extends DBContext {
             return false;
         }
     }
+    
+    public List<JobApply> getJobAppliesByPostID(int postID) {
+        List<JobApply> applies = new ArrayList<>();
+        String sql = "SELECT * FROM JobApply WHERE postID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, postID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    JobApply ja = new JobApply();
+                    ja.setApplyID(rs.getInt("applyID"));
+                    ja.setFreelancerID(rs.getInt("freelancerID"));
+                    ja.setPostID(rs.getInt("postID"));
+                    ja.setStatusApply(rs.getString("statusApply"));
+                    ja.setDateApply(rs.getTimestamp("dateApply"));
+                    ja.setCoverLetter(rs.getString("coverLetter"));
+                    ja.setResumePath(rs.getString("resumePath"));
+                    applies.add(ja);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return applies;
+    }
+    
+    
 
 }

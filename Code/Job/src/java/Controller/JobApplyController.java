@@ -20,7 +20,11 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.util.ArrayList;
 
-@MultipartConfig
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,      // 1MB
+    maxFileSize = 1024 * 1024 * 5,        // 5MB mỗi file
+    maxRequestSize = 1024 * 1024 * 10     // 10MB tổng request
+)
 @WebServlet(name = "JobApplyController", urlPatterns = {"/applyJob"})
 public class JobApplyController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)

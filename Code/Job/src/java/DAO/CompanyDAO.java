@@ -30,4 +30,35 @@ public class CompanyDAO extends DBContext{
         }
         return null;
     }
+    
+    
+    
+    public boolean updateCompanyBasic(Company company) {
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return false;
+        }
+        
+        String sql = "UPDATE Company SET "
+                   + "company_name = ?, "
+                   + "website = ?, "
+                   + "describe = ?, "
+                   + "location = ? "
+                   + "WHERE companyID = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, company.getCompany_name());
+            ps.setString(2, company.getWebsite());
+            ps.setString(3, company.getDescribe());
+            ps.setString(4, company.getLocation());
+            ps.setInt(5, company.getCompanyID());
+
+            int affected = ps.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating company basic info: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

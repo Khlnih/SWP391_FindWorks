@@ -5,6 +5,9 @@
 package DAO;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import Model.UserTierSubscriptions;
+import java.util.ArrayList;
+import java.sql.ResultSet;
 /**
  *
  * @author ADMIN
@@ -38,5 +41,32 @@ public class UserTierSubscriptionDAO extends DBContext{
             e.printStackTrace();
             return false;
         }
+    }
+    public ArrayList<UserTierSubscriptions> getActiveSubscriptionsByRecruiter(int recruiterID) {
+        ArrayList<UserTierSubscriptions> list = new ArrayList<>();
+        String sql = "SELECT * FROM UserTierSubscriptions WHERE recruiterID = ? AND isActiveSubscription = 0";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    UserTierSubscriptions sub = new UserTierSubscriptions();
+                    sub.setSubscriptionID(rs.getInt("subscriptionID"));
+                    sub.setRecruiterID(rs.getInt("recruiterID"));
+                    sub.setFreelancerID(rs.getInt("freelancerID"));
+                    sub.setTierID(rs.getInt("tierID"));
+                    sub.setStartDate(rs.getDate("startDate"));
+                    sub.setEndDate(rs.getDate("endDate"));
+                    sub.setTransactionID(rs.getInt("transactionID"));
+                    sub.setIsActiveSubscription(rs.getInt("isActiveSubscription"));
+                    list.add(sub);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+
+        return list;
     }
 }

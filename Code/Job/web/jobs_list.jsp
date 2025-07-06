@@ -330,7 +330,8 @@
                     <!-- Jobs List -->
                     <% if (jobs != null && !jobs.isEmpty()) { %>
                         <div class="jobs-list">
-                            <% for (Post job : jobs) { %>
+                            <% for (Post job : jobs) { request.setAttribute("jobRecruiterId", job.getRecruiterId());  %>
+                                
                                 <div class="job-card">
                                     <div class="job-header">
                                         <div class="job-info">
@@ -381,17 +382,22 @@
                                             <div class="meta-item"><i class="fa fa-users"></i><span><%= job.getQuantity() %> position<%= job.getQuantity() > 1 ? "s" : "" %></span></div>
                                         <% } %>
                                         
-                                                <div class="action-buttons">
+                                        <div class="action-buttons">
                                             <a href="post?action=view&id=<%= job.getPostId() %>" class="btn-action btn-primary"><i class="fa fa-eye"></i> View Details</a>
-                                            <c:if test="${sessionScope.recruiter == null}">
-                                                
-
+                                            <c:if test="${sessionScope.recruiter == null}">                                               
                                                 <c:if test="${sessionScope.jobseeker == null}">
                                                     <a href="login.jsp" class="btn-action btn-warning">
                                                         <i class="fa fa-sign-in"></i> Login to Apply
                                                     </a>
                                                 </c:if>
                                             </c:if> 
+                                            
+                                            <c:if test="${sessionScope.recruiter != null and sessionScope.recruiter.recruiterID == jobRecruiterId}">
+                                              
+                                                <a href="login.jsp" class="btn-action btn-warning">
+                                                        <i class="fa fa-sign-in"></i> Edit post 
+                                                </a>
+                                            </c:if>
                                         </div>
                                         
                                         

@@ -10,7 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostDAO {
+public class PostDAO extends DBContext{
 
     // Phương thức ánh xạ ResultSet sang đối tượng Post
     private Post mapResultSetToPost(ResultSet rs) throws SQLException {
@@ -134,32 +134,56 @@ public class PostDAO {
     }
 
     // Tạo bài đăng mới
-    public boolean createPost(Post post) {
-        String sql = "INSERT INTO Post (title, image, jobTypeID, durationID, expired_date, quantity, " +
-                    "description, budget_min, budget_max, budget_type, location, recruiterID, " +
-                    "statusPost, categoryID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+   public boolean createPost(Post post) {
+        String sql = "INSERT INTO Post ("
+                + "title, jobTypeID, durationID, date_post, expired_date, quantity, "
+                + "budget_min, budget_max, location, categoryID, budget_type, description, "
+                + "recruiterID"
+                + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setString(1, post.getTitle());
-            ps.setString(2, post.getImage());
-            ps.setInt(3, post.getJobTypeId());
-            ps.setInt(4, post.getDurationId());
-            ps.setTimestamp(5, post.getExpiredDate() != null ?
-                new java.sql.Timestamp(post.getExpiredDate().getTime()) : null);
-            ps.setInt(6, post.getQuantity());
-            ps.setString(7, post.getDescription());
-            ps.setBigDecimal(8, post.getBudgetMin());
-            ps.setBigDecimal(9, post.getBudgetMax());
-            ps.setString(10, post.getBudgetType());
-            ps.setString(11, post.getLocation());
-            ps.setInt(12, post.getRecruiterId());
-            ps.setString(13, post.getStatusPost());
-            ps.setInt(14, post.getCategoryId());
+            int paramIndex = 1;
+            ps.setString(paramIndex++, post.getTitle());
+            ps.setInt(paramIndex++, post.getJobTypeId());
+            ps.setInt(paramIndex++, post.getDurationId());
+
+            // date_post - set to current time if null
+            if (post.getDatePost() != null) {
+                ps.setTimestamp(paramIndex++, new java.sql.Timestamp(post.getDatePost().getTime()));
+            } else {
+                ps.setTimestamp(paramIndex++, new java.sql.Timestamp(System.currentTimeMillis()));
+            }
+
+            // expired_date
+            if (post.getExpiredDate() != null) {
+                ps.setTimestamp(paramIndex++, new java.sql.Timestamp(post.getExpiredDate().getTime()));
+            } else {
+                throw new SQLException("Expired date is required");
+            }
+
+            ps.setInt(paramIndex++, post.getQuantity());
+            ps.setBigDecimal(paramIndex++, post.getBudgetMin());
+            ps.setBigDecimal(paramIndex++, post.getBudgetMax());
+            ps.setString(paramIndex++, post.getLocation());
+            ps.setInt(paramIndex++, post.getCategoryId());
+            ps.setString(paramIndex++, post.getBudgetType());
+            ps.setString(paramIndex++, post.getDescription());
+            ps.setInt(paramIndex++, post.getRecruiterId());
 
             int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
+
+            // Get the generated post ID
+            if (rowsAffected > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        post.setPostId(generatedKeys.getInt(1));
+                    }
+                }
+                return true;
+            }
+            return false;
 
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Error creating post: " + e.getMessage());
@@ -167,6 +191,7 @@ public class PostDAO {
             return false;
         }
     }
+
 
     // Lấy bài đăng theo ID
     public Post getPostById(int postId) {
@@ -213,7 +238,64 @@ public class PostDAO {
 
         return posts;
     }
+    
+    public List<Post> getPostsActiveByRecruiterId(int recruiterId) {
+        List<Post> posts = new ArrayList<>();
+        String sql = "SELECT * FROM Post WHERE recruiterID = ? AND statusPost='Approved' ORDER BY date_post DESC";
 
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, recruiterId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Post post = mapResultSetToPost(rs);
+                    posts.add(post);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Error getting posts by recruiter ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return posts;
+    }
+    
+    public boolean updateStatus(int postId, String statusPost) {
+        String sql = "UPDATE Post SET statusPost = ? WHERE postID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, statusPost);
+            ps.setInt(2, postId);
+            int affected = ps.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
+    public List<Post> getAllPostsExceptApproved() {
+        List<Post> posts = new ArrayList<>();
+        String sql = "SELECT * FROM Post WHERE statusPost = 'Pending' ORDER BY date_post DESC";
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Post post = mapResultSetToPost(rs);
+                posts.add(post);
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Error getting posts: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return posts;
+    }
     public boolean updatePost(Post post) {
         String sql = "UPDATE Post SET title = ?, image = ?, jobTypeID = ?, durationID = ?, " +
                     "expired_date = ?, quantity = ?, description = ?, budget_min = ?, " +
@@ -329,4 +411,84 @@ public class PostDAO {
 
         return 0;
     }
+    
+    private List<Post> getPostsByStatus(int recruiterId, String status) {
+        List<Post> posts = new ArrayList<>();
+        String sql = "SELECT * FROM Post WHERE recruiterID = ? AND statusPost = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            ps.setString(2, status);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Post post = new Post();
+                    post.setPostId(rs.getInt("postID"));
+                    post.setTitle(rs.getString("title"));
+                    post.setImage(rs.getString("image"));
+                    post.setJobTypeId(rs.getInt("jobTypeID"));
+                    post.setDurationId(rs.getInt("durationID"));
+                    post.setDatePost(rs.getTimestamp("date_post"));
+                    post.setExpiredDate(rs.getTimestamp("expired_date"));
+                    post.setQuantity(rs.getInt("quantity"));
+                    post.setDescription(rs.getString("description"));
+                    post.setBudgetMin(rs.getBigDecimal("budget_min"));
+                    post.setBudgetMax(rs.getBigDecimal("budget_max"));
+                    post.setBudgetType(rs.getString("budget_type"));
+                    post.setLocation(rs.getString("location"));
+                    post.setRecruiterId(rs.getInt("recruiterID"));
+                    post.setStatusPost(rs.getString("statusPost"));
+                    post.setCategoryId(rs.getInt("categoryID"));
+                    int adminID = rs.getInt("approvedByAdminID");
+                    post.setApprovedByAdminID(rs.wasNull() ? null : adminID);
+                    posts.add(post);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return posts;
+    }
+
+    public List<Post> getApprovedPosts(int recruiterId) {
+        return getPostsByStatus(recruiterId, "Approved");
+    }
+
+    public List<Post> getRejectedPosts(int recruiterId) {
+        return getPostsByStatus(recruiterId, "Rejected");
+    }
+
+    public List<Post> getPendingPosts(int recruiterId) {
+        return getPostsByStatus(recruiterId, "Pending");
+    }
+
+    public List<Post> getDraftPosts(int recruiterId) {
+        return getPostsByStatus(recruiterId, "Draft");
+    }
+    
+    
+    public List<Post> getPostWithApplicationCountsByRecruiter(int recruiterID) {
+    List<Post> results = new ArrayList<>();
+    String sql = """
+        SELECT p.postID, p.title, COUNT(j.applyID) AS countApplications
+        FROM Post p
+        LEFT JOIN JobApply j ON p.postID = j.postID
+        WHERE p.recruiterID = ? AND p.statusPost = 'Approved'
+        GROUP BY p.postID, p.title
+        ORDER BY p.postID
+        """;
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setInt(1, recruiterID);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Post pac = new Post();
+                pac.setPostId(rs.getInt("postID"));
+                pac.setTitle(rs.getString("title"));
+                pac.setJobTypeId(rs.getInt("countApplications"));
+                results.add(pac);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return results;
+}
 }

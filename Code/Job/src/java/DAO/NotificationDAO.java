@@ -52,6 +52,30 @@ public class NotificationDAO extends DBContext {
         return count;
     }
     
+    public int countNotificationsByRecruiterId(int recruiterID) {
+        String sql = "SELECT COUNT(*) AS NumberOfNotifications " +
+                     "FROM [Notifications] " +
+                     "WHERE [recipient_recruiterID] = ? AND isRead = 0";
+        int count = 0; 
+
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, recruiterID); 
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt("NumberOfNotifications");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error counting notifications for recruiter ID " + recruiterID + ": " + e.getMessage());
+            e.printStackTrace();
+            return -1; 
+        }
+        return count;
+    }
+    
     public ArrayList<Notification> getUnreadNotificationsForFreelancer(int freelancerID)  {
         ArrayList<Notification> list = new ArrayList<>();
         String sql = "SELECT * FROM Notifications WHERE recipient_freelancerID = ? AND isRead = 0";
@@ -59,6 +83,36 @@ public class NotificationDAO extends DBContext {
         try { 
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, freelancerID);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Notification noti = new Notification(
+                    rs.getInt("notificationID"),
+                    rs.getInt("recipient_freelancerID"),
+                    rs.getInt("recipient_recruiterID"),
+                    rs.getString("message"),
+                    rs.getString("notificationType"),
+                    rs.getInt("isRead"),
+                    rs.getDate("readDate"),
+                    (rs.getObject("createdBy_adminID") != null ? rs.getInt("createdBy_adminID") : null)
+                );
+                list.add(noti);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    public ArrayList<Notification> getUnreadNotificationsForRecruiter(int recruiterID)  {
+        ArrayList<Notification> list = new ArrayList<>();
+        String sql = "SELECT * FROM Notifications WHERE recipient_recruiterID = ? AND isRead = 0";
+
+        try { 
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, recruiterID);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -112,12 +166,57 @@ public class NotificationDAO extends DBContext {
         return list;
     }
     
+    public ArrayList<Notification> getNotificationsForRecruiter(int recruiterID)  {
+        ArrayList<Notification> list = new ArrayList<>();
+        String sql = "SELECT * FROM Notifications WHERE recipient_recruiterID = ? AND isRead != 2";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, recruiterID);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Notification noti = new Notification(
+                    rs.getInt("notificationID"),
+                    rs.getInt("recipient_freelancerID"),
+                    rs.getInt("recipient_recruiterID"),
+                    rs.getString("message"),
+                    rs.getString("notificationType"),
+                    rs.getInt("isRead"),
+                    rs.getDate("readDate"),
+                    (rs.getObject("createdBy_adminID") != null ? rs.getInt("createdBy_adminID") : null)
+                );
+                list.add(noti);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
     public boolean markAllNotificationsAsRead(int freelancerID, int notificationID) {
         String sql = "UPDATE Notifications SET isRead = 1 WHERE recipient_freelancerID = ? AND isRead = 0 AND notificationID = ?";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, freelancerID);
+            ps.setInt(2, notificationID);
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean markAllNotificationsAsReadRecruiter(int recruiterID, int notificationID) {
+        String sql = "UPDATE Notifications SET isRead = 1 WHERE recipient_recruiterID = ? AND isRead = 0 AND notificationID = ?";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, recruiterID);
             ps.setInt(2, notificationID);
             int rowsUpdated = ps.executeUpdate();
             return rowsUpdated > 0;
@@ -133,6 +232,20 @@ public class NotificationDAO extends DBContext {
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, freelancerID);
+            ps.setInt(2, notificationID);
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean markAllNotificationsAsDeletedRecruiter(int recruiterID, int notificationID) {
+        String sql = "UPDATE Notifications SET isRead = 2 WHERE recipient_recruiterID = ? AND notificationID = ? AND isRead !=2";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, recruiterID);
             ps.setInt(2, notificationID);
             int rowsUpdated = ps.executeUpdate();
             return rowsUpdated > 0;

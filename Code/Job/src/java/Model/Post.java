@@ -35,6 +35,13 @@ public class Post {
     public Post() {
     }
 
+    public Post(int postId, String title, int jobTypeId) {
+        this.postId = postId;
+        this.title = title;
+        this.jobTypeId = jobTypeId;
+    }
+    
+
     // Constructor đầy đủ
     public Post(int postId, String title, String image, int jobTypeId, int durationId,
                 Date datePost, Date expiredDate, int quantity, String description,

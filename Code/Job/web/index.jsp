@@ -223,7 +223,12 @@
                                                 <img src="${sessionScope.jobseeker.image}" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
                                             </a>
                                         </div>
+                                        <a href="${pageContext.request.contextPath}/logout" class="header-btn logout-btn">
+                                            <i class="fas fa-sign-out-alt mr-2"></i>
+                                            <span>Logout</span>
+                                        </a>
                                     </div>
+                                    
                                 </c:if>
 
                                 

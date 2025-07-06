@@ -9,6 +9,10 @@ import DAO.CategoryDAO;
 import DAO.DurationDAO;
 import DAO.FreelancerFavoriteDAO;
 import DAO.JobTypeDAO;
+import Model.Post;
+import Model.Report;
+import DAO.ReportDAO;
+import DAO.PostDAO;
 import Model.UserTierSubscriptions;
 import DAO.UserTierSubscriptionDAO;
 import Model.Category;
@@ -39,6 +43,7 @@ public class ffavoriteController extends HttpServlet {
     private JobTypeDAO jobTypeDAO = new JobTypeDAO();
     private DurationDAO durationDAO = new DurationDAO();
     private UserTierSubscriptionDAO userDAO = new UserTierSubscriptionDAO();
+    private PostDAO postDAO = new PostDAO();
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -66,8 +71,20 @@ public class ffavoriteController extends HttpServlet {
             case "deleteFavo":
                 deleteNotification(request, response);
                 break;
+            case "readNoti":
+                readNotificationRecruiter(request, response);
+                break;
+            case "deleteNoti":
+                deleteNotificationRecruiter(request, response);
+                break;
             case "register":
                 registerAccountTier(request, response);
+                break;
+            case "report":
+                reportPost(request, response);
+                break;
+            case "submitReport":
+                submitReport(request, response);
                 break;
             default:
                 showFavoriteList(request, response);
@@ -102,6 +119,52 @@ public class ffavoriteController extends HttpServlet {
         processRequest(request, response);
     }
     
+    private void submitReport(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            HttpSession session = request.getSession();
+            int jobseekerID = Integer.parseInt(request.getParameter("jobseekerID"));
+            int postId = Integer.parseInt(request.getParameter("postId"));
+            String reason = request.getParameter("reason");
+            if (reason == null || reason.equals("Lý do khác")) {
+                reason = request.getParameter("otherReason");
+            }
+            ReportDAO reDAO = new ReportDAO();
+            
+            boolean succes = reDAO.insertReportBasic(jobseekerID, postId, reason);
+            
+            response.sendRedirect("post?action=view&id=" + postId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi xử lý báo cáo bài viết!");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+        }
+    }
+    private void reportPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            HttpSession session = request.getSession();
+            int jobseekerID = Integer.parseInt(request.getParameter("jobseekerID"));
+            int notiID = Integer.parseInt(request.getParameter("postID"));
+
+            Post post = postDAO.getPostById(notiID);
+            if (post == null) {
+                request.setAttribute("error", "Bài đăng không tồn tại.");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
+            }
+            
+
+            request.setAttribute("post", post);
+            request.getRequestDispatcher("jobseeker_reportPost.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi xử lý báo cáo bài viết!");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+        }
+    }
     private void readNotification(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -120,6 +183,35 @@ public class ffavoriteController extends HttpServlet {
             if (success) {
                 
                 response.sendRedirect("jobseeker_notification.jsp"); // chuyển lại trang danh sách yêu thích
+            } else {
+                request.setAttribute("error", "Xóa thất bại!");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi xử lý yêu cầu xóa!");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+        }
+    }
+    private void readNotificationRecruiter(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            HttpSession session = request.getSession();
+            int recruiterID = Integer.parseInt(request.getParameter("recruiterID"));
+            int notiID = Integer.parseInt(request.getParameter("notiID"));
+            NotificationDAO notiDAO = new NotificationDAO();
+            boolean success = notiDAO.markAllNotificationsAsReadRecruiter(recruiterID,notiID);
+            int number = notiDAO.countNotificationsByRecruiterId(recruiterID);
+            ArrayList<Notification> listNoti = notiDAO.getUnreadNotificationsForRecruiter(recruiterID);
+            ArrayList<Notification> allNoti = notiDAO.getNotificationsForRecruiter(recruiterID);
+                    PrintWriter out = response.getWriter();out.print(listNoti);
+            session.setAttribute("listNoti", listNoti);
+            session.setAttribute("allNoti", allNoti);
+            session.setAttribute("number", number);
+            if (success) {
+                
+                response.sendRedirect("recruiter_notification.jsp"); // chuyển lại trang danh sách yêu thích
             } else {
                 request.setAttribute("error", "Xóa thất bại!");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
@@ -159,7 +251,34 @@ public class ffavoriteController extends HttpServlet {
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
-    
+    private void deleteNotificationRecruiter(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            HttpSession session = request.getSession();
+            int recruiterID = Integer.parseInt(request.getParameter("recruiterID"));
+            int notiID = Integer.parseInt(request.getParameter("notiID"));
+            NotificationDAO notiDAO = new NotificationDAO();
+            boolean success = notiDAO.markAllNotificationsAsDeletedRecruiter(recruiterID,notiID);
+            int number = notiDAO.countNotificationsByRecruiterId(recruiterID);
+            ArrayList<Notification> listNoti = notiDAO.getUnreadNotificationsForRecruiter(recruiterID);
+            ArrayList<Notification> allNoti = notiDAO.getNotificationsForRecruiter(recruiterID);
+            session.setAttribute("listNoti", listNoti);
+            session.setAttribute("allNoti", allNoti);
+            session.setAttribute("number", number);
+            if (success) {
+                
+                response.sendRedirect("recruiter_notification.jsp"); 
+            } else {
+                request.setAttribute("error", "Xóa thất bại!");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi xử lý yêu cầu xóa!");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+        }
+    }
     private void registerAccountTier(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {

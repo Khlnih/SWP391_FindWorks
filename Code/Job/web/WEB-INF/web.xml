@@ -29,4 +29,14 @@
         <servlet-name>JobseekerDetailController</servlet-name>
         <url-pattern>/JobseekerDetailController</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>RecruiterDetailController</servlet-name>
+        <servlet-class>Controller.RecruiterDetailController</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>RecruiterDetailController</servlet-name>
+        <url-pattern>/RecruiterDetailController</url-pattern>
+    </servlet-mapping>
 </web-app>

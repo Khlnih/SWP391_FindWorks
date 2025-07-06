@@ -460,7 +460,7 @@ public boolean updateRecruiterProfile(Recruiter r) {
     }
     
     // Lưu ý: Không cho phép cập nhật username, password, status, money... từ trang này
-    String sql = "UPDATE Recruiter SET first_name = ?, last_name = ?, gender = ?, dob = ?, email_contact = ?, phone_contact = ? WHERE recruiterID = ?";
+    String sql = "UPDATE Recruiter SET first_name = ?, last_name = ?, gender = ?, dob = ?, email_contact = ?, phone_contact = ?, image = ? WHERE recruiterID = ?";
     
     try (PreparedStatement stm = connection.prepareStatement(sql)) {
         stm.setString(1, r.getFirstName());
@@ -469,7 +469,8 @@ public boolean updateRecruiterProfile(Recruiter r) {
         stm.setString(4, r.getDob());
         stm.setString(5, r.getEmailContact());
         stm.setString(6, r.getPhoneContact());
-        stm.setInt(7, r.getRecruiterID());
+        stm.setString(7, r.getImage());
+        stm.setInt(8, r.getRecruiterID());
         
         int rowsAffected = stm.executeUpdate();
         return rowsAffected > 0;

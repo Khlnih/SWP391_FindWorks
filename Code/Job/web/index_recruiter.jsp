@@ -52,19 +52,73 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
     <style>
-        /* Custom styles for recruiter dashboard */
-        .profile-btn {
-            display: flex !important;
+        :root {
+            --primary: #007bff;
+            --primary-hover: #0056b3;
+            --light: #f8f9fa;
+        }
+        
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4e54c8;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a3f9e;
+        }
+        
+        /* Header buttons container */
+        .header-buttons {
+            display: flex;
             align-items: center;
-            background: linear-gradient(135deg, #00D363 0%, #28a745 100%) !important;
+            gap: 12px;
+            height: 50px;
+            padding: 5px 0;
+        }
+        
+        .boxed-btn3 {
+            background: var(--gradient-success);
             color: white !important;
-            padding: 8px 16px;
-            border-radius: 25px;
-            text-decoration: none !important;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0, 211, 99, 0.3);
-            margin-right: 10px;
+            box-shadow: 0 4px 12px rgba(28, 200, 138, 0.25);
+        }
+        
+        .header-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            border-radius: 20px;
+            padding: 0 18px;
             font-weight: 500;
+            font-size: 14px;
+            text-decoration: none !important;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .profile-btn {
+            background: var(--gradient-primary) !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(78, 115, 223, 0.25);
+            padding-left: 15px;
+            padding-right: 20px;
         }
         
         .profile-btn:hover {
@@ -76,13 +130,14 @@
         }
         
         .profile-avatar {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            border: 2px solid white;
+            border: 2px solid rgba(255,255,255,0.9);
             margin-right: 10px;
             object-fit: cover;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
         }
         
         .profile-text {
@@ -91,22 +146,43 @@
         }
         
         .logout-btn {
-            color: #dc3545 !important;
-            font-weight: 500;
-            padding: 8px 12px;
-            border-radius: 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.25);
+        }
+        
+        .logout-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
             transition: all 0.3s ease;
-            text-decoration: none !important;
-            margin-right: 10px;
         }
         
         .logout-btn:hover {
-            background-color: #dc3545 !important;
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b6b 100%);
             color: white !important;
             text-decoration: none !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
         }
-
-        /* Header appointment section updates */
+        
+        .logout-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .logout-btn i {
+            transition: transform 0.3s ease;
+        }
+        
+        .logout-btn:hover i {
+            transform: rotate(180deg);
+        }
+        
         .Appointment {
             display: flex;
             align-items: center;
@@ -119,33 +195,70 @@
         
         /* Dashboard stats in hero section */
         .dashboard-stats {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
-            margin-bottom: 15px;
+            background: white;
+            border-radius: 12px;
+            padding: 25px 20px;
+            text-align: left;
+            margin-bottom: 20px;
             transition: all 0.3s ease;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+            border-left: 4px solid var(--primary-color);
+            position: relative;
+            overflow: hidden;
         }
         
+        .dashboard-stats.primary { border-left-color: var(--primary-color); }
+        .dashboard-stats.success { border-left-color: var(--secondary-color); }
+        .dashboard-stats.warning { border-left-color: var(--accent-color); }
+        .dashboard-stats.danger { border-left-color: #e74a3b; }
+        
         .dashboard-stats:hover {
-            background: rgba(255,255,255,0.25);
             transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1.5rem 0.5rem rgba(58, 59, 69, 0.15);
+        }
+        
+        .stat-icon {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 2.5rem;
+            opacity: 0.3;
+            color: var(--dark-color);
         }
         
         .stat-number {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            color: white;
+            color: var(--dark-color);
             display: block;
+            margin-bottom: 5px;
         }
         
         .stat-label {
             font-size: 0.9rem;
-            opacity: 0.8;
-            color: white;
+            color: #858796;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-change {
+            display: inline-block;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 10px;
             margin-top: 5px;
+            font-weight: 600;
+        }
+        
+        .stat-change.positive {
+            color: #1cc88a;
+            background-color: rgba(28, 200, 138, 0.1);
+        }
+        
+        .stat-change.negative {
+            color: #e74a3b;
+            background-color: rgba(231, 74, 59, 0.1);
         }
 
         /* Customize hero section for recruiter */
@@ -219,11 +332,7 @@
 </head>
 
 <body>
-    <!--[if lte IE 9]>
-        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-    <![endif]-->
-
-    <!-- header-start -->
+    
     <header>
         <div class="header-area">
             <div id="sticky-header" class="main-header-area">
@@ -258,24 +367,23 @@
                             </div>
                             <div class="col-xl-3 col-lg-3 d-none d-lg-block">
                                 <div class="Appointment">
-                                    <!-- Profile Button with Avatar -->
-                                    <div class="phone_num d-none d-xl-block">
-                                        <a href="${pageContext.request.contextPath}/recruiter_profile.jsp" class="profile-btn">
+                                    <div class="header-buttons">
+                                        <!-- Profile Button with Avatar -->
+                                        <a href="recruiter_details.jsp" class="header-btn profile-btn">
                                             <img src="<%= avatarPath %>" alt="Avatar" class="profile-avatar">
                                             <span class="profile-text"><%= userName %></span>
                                         </a>
-                                    </div>
-                                    
-                                    <!-- Logout Button -->
-                                    <div class="phone_num d-none d-xl-block">
-                                         <a href="${pageContext.request.contextPath}/logout" class="logout-btn">
-                                             <i class="ti-power-off"></i> Logout
-                                         </a>
-                                    </div>
-                                    
-                                    <!-- Post Job Button -->
-                                    <div class="d-none d-lg-block">
-                                        <a class="boxed-btn3" href="post?action=create">Post a Job</a>
+                                        
+                                        <!-- Post Job Button -->
+                                        <a href="post?action=create" class="header-btn boxed-btn3">
+                                            <i class="fas fa-plus mr-2"></i> Post Job
+                                        </a>
+                                        
+                                        <!-- Logout Button -->
+                                        <a href="${pageContext.request.contextPath}/logout" class="header-btn logout-btn">
+                                            <i class="fas fa-sign-out-alt mr-2"></i>
+                                            <span>Logout</span>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -290,102 +398,354 @@
     </header>
     <!-- header-end -->
 
-    <!-- slider_area_start -->
-    <div class="slider_area">
-        <div class="single_slider d-flex align-items-center slider_bg_1">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-7 col-md-6">
-                        <div class="slider_text" style="position: relative; z-index: 10;">
-                            <h5 class="wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".2s">
-                                Welcome back, <%= userName %>!
-                            </h5>
-                            <h3 class="wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".3s">
-                                Manage Your Recruitment
-                            </h3>
-                            <p class="wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".4s">
-                                Post jobs, find candidates, and manage your hiring process all in one place
-                            </p>
-                            <div class="sldier_btn wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".5s">
-                                <a href="post?action=create" class="boxed-btn3">Post New Job</a>
-                                <a href="post?action=list" class="boxed-btn3" style="margin-left: 15px;">Manage Jobs</a>
-                            </div>
+    <!-- Hero Section -->
+    <div class="hero-section" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); padding: 100px 0 150px; position: relative; overflow: hidden;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content" style="position: relative; z-index: 10;">
+                        <h1 class="wow fadeInUp" data-wow-duration="1s" data-wow-delay=".3s" style="font-size: 3rem; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 20px;">
+                            Tìm Ứng Viên <span style="color: #00ff9d;">Tài Năng</span> Cho Doanh Nghiệp Của Bạn
+                        </h1>
+                        <p class="wow fadeInUp" data-wow-duration="1s" data-wow-delay=".4s" style="font-size: 1.1rem; color: rgba(255,255,255,0.9); margin-bottom: 30px; max-width: 600px;">
+                            Kết nối với hàng ngàn ứng viên tiềm năng, đăng tin tuyển dụng dễ dàng và tìm kiếm nhân sự phù hợp nhất cho doanh nghiệp của bạn.
+                        </p>
+                        <div class="hero-search wow fadeInUp" data-wow-duration="1s" data-wow-delay=".5s" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                            <form action="freelancer_list" method="GET">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                            <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Tên công việc, kỹ năng hoặc từ khóa">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-map-marker-alt text-muted"></i></span>
+                                            <select name="location" class="form-select border-start-0 ps-0">
+                                                <option value="">Tất cả địa điểm</option>
+                                                <option>Hồ Chí Minh</option>
+                                                <option>Hà Nội</option>
+                                                <option>Đà Nẵng</option>
+                                                <option>Làm việc từ xa</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary w-100" style="height: 45px;">
+                                            <i class="fas fa-search me-1"></i> Tìm kiếm
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="mt-4 wow fadeInUp" data-wow-duration="1s" data-wow-delay=".6s">
+                            <a href="post?action=create" class="btn btn-light me-3" style="padding: 12px 30px; border-radius: 50px; font-weight: 600; box-shadow: 0 10px 20px rgba(0,0,0,0.1); background: var(--primary); border: none; color: white; transition: all 0.3s ease;">
+                            <i class="fas fa-plus me-2"></i> Đăng tin tuyển dụng
+                        </a>    
+                            <a href="#how-it-works" class="btn btn-outline-light" style="padding: 10px 25px; border-radius: 50px; font-weight: 500; border: 2px solid rgba(255,255,255,0.3);">
+                                <i class="fas fa-play-circle me-2"></i> Xem hướng dẫn
+                            </a>
                         </div>
                     </div>
-                    <div class="col-lg-5 col-md-6">
-                        <div class="row" style="position: relative; z-index: 10;">
-                            <div class="col-6">
-                                <div class="dashboard-stats wow fadeInRight" data-wow-duration="1s" data-wow-delay=".2s">
-                                    <span class="stat-number">12</span>
-                                    <div class="stat-label">Active Jobs</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="dashboard-stats wow fadeInRight" data-wow-duration="1s" data-wow-delay=".3s">
-                                    <span class="stat-number">45</span>
-                                    <div class="stat-label">Applications</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="dashboard-stats wow fadeInRight" data-wow-duration="1s" data-wow-delay=".4s">
-                                    <span class="stat-number">8</span>
-                                    <div class="stat-label">Interviews</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="dashboard-stats wow fadeInRight" data-wow-duration="1s" data-wow-delay=".5s">
-                                    <span class="stat-number">3</span>
-                                    <div class="stat-label">Hired</div>
-                                </div>
-                            </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <img src="img/banner/recruiter-hero.svg" alt="Tuyển dụng hiệu quả" class="img-fluid wow fadeIn" data-wow-duration="1.5s">
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <!-- Các tính năng nổi bật -->
+    <section class="py-5" id="features" style="background-color: #f8fafd;">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold mb-3">Giải Pháp Tuyển Dụng Toàn Diện</h2>
+                <p class="text-muted">Công cụ mạnh mẽ giúp doanh nghiệp của bạn tìm kiếm và thu hút nhân tài</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card p-4 h-100 text-center border-0 shadow-sm rounded-3" 
+                         style="background: white; transition: all 0.3s ease; border-top: 4px solid var(--primary) !important;"
+                         onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0, 123, 255, 0.15) !important';"
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 0.5rem 1rem rgba(0, 0, 0, 0.05) !important';">
+                        <div class="icon-box mx-auto mb-4" style="width: 80px; height: 80px; background: rgba(0, 123, 255, 0.1); border-radius: 20px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-bullhorn fa-2x" style="color: var(--primary); transition: all 0.3s ease;"></i>
                         </div>
+                        <h4 class="mb-3" style="color: #2d3748;">Đăng Tin Tuyển Dụng</h4>
+                        <p class="text-muted" style="color: #718096 !important;">Tạo và đăng tin tuyển dụng chuyên nghiệp, tiếp cận hàng ngàn ứng viên tiềm năng chỉ trong vài phút.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card p-4 h-100 text-center">
+                        <div class="icon-box mx-auto mb-4" style="width: 80px; height: 80px; background: rgba(28, 200, 138, 0.1); border-radius: 20px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-search fa-2x" style="color: #1cc88a;"></i>
+                        </div>
+                        <h4 class="mb-3">Tìm Kiếm Ứng Viên</h4>
+                        <p class="text-muted">Kho dữ liệu ứng viên đa dạng với đầy đủ thông tin, giúp bạn dễ dàng tìm thấy ứng viên phù hợp.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card p-4 h-100 text-center">
+                        <div class="icon-box mx-auto mb-4" style="width: 80px; height: 80px; background: rgba(246, 194, 62, 0.1); border-radius: 20px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-tasks fa-2x" style="color: #f6c23e;"></i>
+                        </div>
+                        <h4 class="mb-3">Quản Lý Ứng Tuyển</h4>
+                        <p class="text-muted">Theo dõi và quản lý tất cả đơn ứng tuyển một cách hiệu quả với công cụ quản lý thông minh.</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="ilstration_img wow fadeInRight d-none d-lg-block" 
-             data-wow-duration="1s" data-wow-delay=".2s"
-             style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); z-index: 1; max-width: 35%;">
-            <img src="img/banner/illustration.png" alt="" style="width: 100%; height: auto;">
+    </section>
+
+    <!-- Cách hoạt động -->
+    <section class="py-5" id="how-it-works" style="background: linear-gradient(135deg, #f8fafd 0%, #eef4ff 100%);">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <img src="img/banner/recruiter-process.svg" alt="Quy trình tuyển dụng" class="img-fluid" style="filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));">
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="fw-bold mb-4">Bắt Đầu Tuyển Dụng Dễ Dàng</h2>
+                    <div class="d-flex mb-4">
+                        <div class="me-4">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: var(--primary); color: white; font-weight: 600; font-size: 1.25rem; box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);">1</div>
+                        </div>
+                        <div>
+                            <h5 class="mb-2">Tạo tài khoản doanh nghiệp</h5>
+                            <p class="text-muted mb-0">Đăng ký và xác minh tài khoản doanh nghiệp của bạn trong vài bước đơn giản.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-4">
+                        <div class="me-4">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">2</div>
+                        </div>
+                        <div>
+                            <h5 class="mb-2">Đăng tin tuyển dụng</h5>
+                            <p class="text-muted mb-0">Tạo tin tuyển dụng hấp dẫn với đầy đủ thông tin về vị trí và yêu cầu công việc.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="me-4">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">3</div>
+                        </div>
+                        <div>
+                            <h5 class="mb-2">Tiếp cận ứng viên</h5>
+                            <p class="text-muted mb-0">Tiếp cận hàng ngàn ứng viên tiềm năng và bắt đầu quá trình tuyển dụng.</p>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <a href="post?action=create" class="btn btn-primary px-4 py-2">Bắt đầu ngay</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lý do lựa chọn -->
+    <section class="py-5" style="background-color: #ffffff;">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold mb-3">Tại Sao Chọn Chúng Tôi?</h2>
+                <p class="text-muted">Những lý do hàng đầu khiến hơn 10,000+ doanh nghiệp tin tưởng sử dụng dịch vụ của chúng tôi</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-4 h-100 rounded-3" style="background: white; border: 1px solid #e2e8f0; transition: all 0.3s ease; height: 100%;">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3" style="width: 50px; height: 50px; background: rgba(0, 123, 255, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-users" style="color: var(--primary); font-size: 1.25rem;"></i>
+                            </div>
+                            <h4 class="mb-0" style="color: #2d3748;">Đa Dạng Ứng Viên</h4>
+                        </div>
+                        <p class="mb-0" style="color: #718096 !important;">Tiếp cận hàng trăm ngàn hồ sơ ứng viên chất lượng cao từ nhiều ngành nghề khác nhau.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-4 h-100 border rounded-3">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3 text-success">
+                                <i class="fas fa-bolt fa-2x"></i>
+                            </div>
+                            <h4 class="mb-0">Tốc Độ Nhanh</h4>
+                        </div>
+                        <p class="text-muted mb-0">Tìm kiếm và kết nối với ứng viên phù hợp chỉ trong thơi gian ngắn.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-4 h-100 border rounded-3">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3 text-warning">
+                                <i class="fas fa-shield-alt fa-2x"></i>
+                            </div>
+                            <h4 class="mb-0">Bảo Mật Tuyệt Đối</h4>
+                        </div>
+                        <p class="text-muted mb-0">Đảm bảo an toàn và bảo mật thông tin doanh nghiệp của bạn.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-5" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); color: white;">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h2 class="fw-bold mb-4">Sẵn Sàng Tìm Ứng Viên Tài Năng?</h2>
+                    <p class="lead mb-5">Đăng ký ngay hôm nay để bắt đầu hành trình tìm kiếm nhân tài cho doanh nghiệp của bạn.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="post?action=create" class="btn btn-light btn-lg px-4 me-3" style="background: white; color: var(--primary); font-weight: 600; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;"
+                       onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)';"
+                       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)';">
+                        <i class="fas fa-plus me-2"></i>Đăng tin tuyển dụng
+                    </a>
+                    <a href="freelancer_list" class="btn btn-outline-light btn-lg px-4" style="border: 2px solid rgba(255,255,255,0.5); transition: all 0.3s ease;"
+                       onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'; this.style.transform='translateY(-2px)';"
+                       onmouseout="this.style.backgroundColor='transparent'; this.style.transform='translateY(0)';">
+                        <i class="fas fa-search me-2"></i>Tìm ứng viên ngay
+                    </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Action Cards -->
+    <div class="quick-actions py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <h4 class="font-weight-bold">Quick Actions</h4>
+                    <p class="text-muted">Manage your recruitment process efficiently</p>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <a href="post?action=create" class="card h-100 border-0 shadow-sm text-decoration-none">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-box bg-primary bg-gradient text-white rounded-circle mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-plus fa-2x"></i>
+                            </div>
+                            <h5 class="mb-2">Post New Job</h5>
+                            <p class="text-muted small mb-0">Create and publish a new job listing</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <a href="post?action=list" class="card h-100 border-0 shadow-sm text-decoration-none">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-box bg-success bg-gradient text-white rounded-circle mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-briefcase fa-2x"></i>
+                            </div>
+                            <h5 class="mb-2">Manage Jobs</h5>
+                            <p class="text-muted small mb-0">View and edit your job postings</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <a href="freelancer_list" class="card h-100 border-0 shadow-sm text-decoration-none">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-box bg-warning bg-gradient text-white rounded-circle mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-search fa-2x"></i>
+                            </div>
+                            <h5 class="mb-2">Find Candidates</h5>
+                            <p class="text-muted small mb-0">Browse potential candidates</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <a href="#" class="card h-100 border-0 shadow-sm text-decoration-none">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-box bg-info bg-gradient text-white rounded-circle mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-chart-line fa-2x"></i>
+                            </div>
+                            <h5 class="mb-2">View Reports</h5>
+                            <p class="text-muted small mb-0">Track your hiring analytics</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- slider_area_end -->
 
-    <!-- catagory_area - Search for candidates -->
-    <div class="catagory_area">
+    <!-- Advanced Search Section -->
+    <div class="search-section py-5 bg-white">
         <div class="container">
-            <div class="row cat_search">
-                <div class="col-lg-3 col-md-4">
-                    <div class="single_input">
-                        <input type="text" placeholder="Search candidates">
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4">
-                    <div class="single_input">
-                        <select class="wide">
-                            <option data-display="Location">Location</option>
-                            <option value="1">New York</option>
-                            <option value="2">Los Angeles</option>
-                            <option value="4">Chicago</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4">
-                    <div class="single_input">
-                        <select class="wide">
-                            <option data-display="Skills">Skills</option>
-                            <option value="1">Web Development</option>
-                            <option value="2">Design</option>
-                            <option value="4">Marketing</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-12">
-                    <div class="job_btn">
-                        <a href="freelancer_list" class="boxed-btn3">Find Candidates</a>
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card border-0 shadow">
+                        <div class="card-body p-4">
+                            <h5 class="mb-4">Find Perfect Candidates</h5>
+                            <form>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                                <input type="text" class="form-control border-start-0 ps-0" placeholder="Job title, skills, or keywords">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-map-marker-alt text-muted"></i></span>
+                                                <select class="form-select border-start-0 ps-0">
+                                                    <option selected>Location</option>
+                                                    <option>Ho Chi Minh</option>
+                                                    <option>Hanoi</option>
+                                                    <option>Da Nang</option>
+                                                    <option>Remote</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-tools text-muted"></i></span>
+                                                <select class="form-select border-start-0 ps-0">
+                                                    <option selected>Skills</option>
+                                                    <option>Java</option>
+                                                    <option>JavaScript</option>
+                                                    <option>Python</option>
+                                                    <option>React</option>
+                                                    <option>Node.js</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-search me-2"></i> Search
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <span class="text-muted small me-2">Popular Searches:</span>
+                                            <a href="#" class="badge bg-light text-dark text-decoration-none me-2 mb-2">
+                                                <i class="fas fa-code me-1"></i> Full Stack Developer
+                                            </a>
+                                            <a href="#" class="badge bg-light text-dark text-decoration-none me-2 mb-2">
+                                                <i class="fas fa-paint-brush me-1"></i> UI/UX Designer
+                                            </a>
+                                            <a href="#" class="badge bg-light text-dark text-decoration-none me-2 mb-2">
+                                                <i class="fas fa-server me-1"></i> DevOps Engineer
+                                            </a>
+                                            <a href="#" class="badge bg-light text-dark text-decoration-none me-2 mb-2">
+                                                <i class="fas fa-mobile-alt me-1"></i> Mobile Developer
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
             <div class="row">
                 <div class="col-lg-12">
                     <div class="popular_search d-flex align-items-center">
@@ -681,93 +1041,58 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="footer_top">
-            <div class="container">
-                <div class="row">
-                    <div class="col-xl-3 col-md-6 col-lg-3">
-                        <div class="footer_widget">
-                            <div class="footer_logo">
-                                <a href="#">
-                                    <img src="img/footer_logo.png" alt="">
-                                </a>
-                            </div>
-                            <p>
-                                5th flora, 700/D kings road, green <br>
-                                lane New York - 10010 <br>
-                                <a href="#">+10 365 265 (8080)</a>
-                            </p>
-                            <div class="socail_links">
-                                <ul>
-                                    <li>
-                                        <a href="#">
-                                            <i class="ti-facebook"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <i class="ti-twitter-alt"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <i class="ti-instagram"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-2 col-md-6 col-lg-4">
-                        <div class="footer_widget">
-                            <h3 class="footer_title">
-                                For Recruiters
-                            </h3>
-                            <ul class="links">
-                                <li><a href="post?action=create">Post Jobs</a></li>
-                                <li><a href="freelancer_list">Find Candidates</a></li>
-                                <li><a href="post?action=list">Manage Jobs</a></li>
-                                <li><a href="recruiter_profile.jsp">Profile</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 col-lg-4">
-                        <div class="footer_widget">
-                            <h3 class="footer_title">
-                                Popular Categories
-                            </h3>
-                            <ul class="links">
-                                <li><a href="#">Web Developer</a></li>
-                                <li><a href="#">UI/UX Designer</a></li>
-                                <li><a href="#">Project Manager</a></li>
-                                <li><a href="#">Digital Marketing</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 col-lg-4">
-                        <div class="footer_widget">
-                            <h3 class="footer_title">
-                                Subscribe
-                            </h3>
-                            <form action="#" class="newsletter_form">
-                                <input type="text" placeholder="Enter your mail">
-                                <button type="submit">Subscribe</button>
-                            </form>
-                            <p class="newsletter_text">Subscribe newsletter to get updates</p>
-                        </div>
+    <footer style="background: #343a40; color: white; padding-top: 4rem; padding-bottom: 2rem;">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="text-white mb-4">Về FindWorks</h5>
+                    <p class="text-muted">Nền tảng kết nối nhà tuyển dụng và ứng viên tiềm năng, giúp quá trình tuyển dụng trở nên đơn giản và hiệu quả hơn bao giờ hết.</p>
+                    <div class="social-links mt-4">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="text-white mb-4">Dành cho NTD</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Đăng tin tuyển dụng</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Tìm kiếm ứng viên</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Bảng giá dịch vụ</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Hướng dẫn sử dụng</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="text-white mb-4">Tài nguyên</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Mẫu tin tuyển dụng</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Kinh nghiệm tuyển dụng</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Xu hướng tuyển dụng</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Hỏi đáp</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="text-white mb-4">Liên hệ</h5>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 123 Đ. ABC, Quận 1, TP.HCM</li>
+                        <li class="mb-2"><i class="fas fa-phone-alt me-2"></i> 1900 1234</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> ntd@findworks.vn</li>
+                        <li class="mb-2"><i class="fas fa-clock me-2"></i> Thứ 2 - Thứ 7: 8:00 - 17:30</li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        <div class="copy-right_text">
-            <div class="container">
-                <div class="footer_border"></div>
-                <div class="row">
-                    <div class="col-xl-12">
-                        <p class="copy_right text-center">
-                            Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                        </p>
-                    </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <p class="mb-0 text-muted"> 2023 FindWorks. Bảo lưu mọi quyền.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <ul class="list-inline mb-0">
+                        <li class="list-inline-item"><a href="#" class="text-muted text-decoration-none">Điều khoản sử dụng</a></li>
+                        <li class="list-inline-item mx-3">|</li>
+                        <li class="list-inline-item"><a href="#" class="text-muted text-decoration-none">Chính sách bảo mật</a></li>
+                    </ul>
                 </div>
             </div>
         </div>

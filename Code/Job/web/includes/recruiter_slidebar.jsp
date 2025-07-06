@@ -10,119 +10,72 @@
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo-container">
-            <i class="fa fa-shield-alt logo-icon"></i>
-            <h3 class="logo-text">Admin Panel</h3>
+            <i class="fa fa-user-circle logo-icon"></i>
+            <h3 class="logo-text">Recruiter</h3>
         </div>
-        <div class="sidebar-close" onclick="toggleSidebar()" title="Collapse Menu">
+        <div class="sidebar-close" onclick="toggleSidebar()" >
             <i class="fa fa-times"></i>
         </div>
     </div>
     
     <div class="sidebar-profile">
         <div class="profile-avatar">
-            <i class="fa fa-user-circle"></i>
+            <img src="${sessionScope.recruiter.image}" 
+                             class="rounded-circle border border-3 border-white" 
+                             alt="Profile Avatar"
+                             style="width: 100px; height: 100px; object-fit: cover;">
+                        
         </div>
-        <div class="profile-info">
-           <div class="profile-name">${sessionScope.admin.firstName}</div>
-
-        </div>
+         
     </div>
     
     <nav class="sidebar-nav">
         <ul class="nav-menu">
             <li class="nav-item">
-                <a href="admin?action=dashboard" class="nav-link ${param.action == 'dashboard' || empty param.action ? 'active' : ''}">
-                    <i class="fa fa-tachometer-alt"></i>
-                    <span class="link-text">Dashboard</span>
-                    <span class="link-badge"></span>
+                <a href="index_recruiter.jsp" class="nav-link ${param.active == 'overview' ? 'active' : ''}">
+                    <i class="fas fa-home"></i>
+                    <span class="link-text">Home</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="recruiter_details.jsp" class="nav-link ${param.active == 'overview' ? 'active' : ''}">
+                    <i class="fas fa-home"></i>
+                    <span class="link-text">Overview</span>
+                </a>
+            </li>
+            
+            
+            
+            <li class="nav-item">
+                <a href="recruiter_notification.jsp" class="nav-link ${param.active == 'applications' ? 'active' : ''}">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="link-text">Notificationn</span>
+                    <span class="badge bg-danger rounded-pill">${sessionScope.number}</span>
                 </a>
             </li>
             
             <li class="nav-item">
-                <a href="admin?action=jobseekers" class="nav-link ${param.action == 'jobseekers' ? 'active' : ''}">
-<!--                    <i class="fa fa-users"></i>-->
-                    <span class="link-text">Manager JobSeekers</span>
+                <a href="recruiter_listPost.jsp" class="nav-link ${param.active == 'applications' ? 'active' : ''}">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="link-text">My Post</span>
+                    <span class="badge bg-danger rounded-pill">${sessionScope.number}</span>
                 </a>
             </li>
             
-            <li class="nav-item">
-                <a href="admin?action=recruiters" class="nav-link ${param.action == 'recruiters' ? 'active' : ''}">
-<!--                    <i class="fa fa-user-tie"></i>-->
-                    <span class="link-text">Manager Recruiters</span>
-                </a>
-            </li>
             
-            <li class="nav-item">
-                <a href="admin?action=jobs" class="nav-link ${param.action == 'jobs' ? 'active' : ''}">
-<!--                    <i class="fa fa-briefcase"></i>-->
-                    <span class="link-text">Job Listings</span>
-                </a>
-            </li>
             
-            <li class="nav-item">
-                <a href="admin?action=skills" class="nav-link ${param.action == 'skills' ? 'active' : ''}">
-<!--                    <i class="fa fa-cogs"></i>-->
-                    <span class="link-text">Manage Skills</span>
-                </a>
-            </li>
-              <li class="nav-item">
-                <a href="admin?action=categories" class="nav-link ${param.action == 'categories' || param.action == 'addCategory' || param.action == 'editCategory' ? 'active' : ''}">
-                    
-                    <span class="link-text">Manage Categories</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="admin?action=accounttier" class="nav-link ${param.action == 'skills' ? 'active' : ''}">
-<!--                    <i class="fa fa-cogs"></i>-->
-                    <span class="link-text">Manager account tier</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="admin?action=registration" class="nav-link ${param.action == 'skills' ? 'active' : ''}">
-<!--                    <i class="fa fa-cogs"></i>-->
-                    <span class="link-text">Manager tier registrations</span>
-                </a>
-            </li>
-            
-            <li class="nav-item">
-                <a href="admin_post.jsp" class="nav-link ${param.action == 'skills' ? 'active' : ''}">
-<!--                    <i class="fa fa-cogs"></i>-->
-                    <span class="link-text">Manager Post</span>
-                </a>
-            </li>
             
             
             <li class="nav-divider"></li>
             
-            <li class="nav-item">
-                <a href="admin?action=settings" class="nav-link ${param.action == 'settings' ? 'active' : ''}">
-                    <i class="fa fa-cog"></i>
-                    <span class="link-text">Settings</span>
-                </a>
-            </li>
-            
-            <li class="nav-item">
-                <a href="admin?action=help" class="nav-link ${param.action == 'help' ? 'active' : ''}">
-                    <i class="fa fa-question-circle"></i>
-                    <span class="link-text">Help & Support</span>
-                </a>
-            </li>
-            
             <li class="nav-item logout-item">
                 <a href="${pageContext.request.contextPath}/logout" class="nav-link">
-                    <i class="fa fa-sign-out-alt"></i>
-                    <span class="link-text">Logout</span>
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="link-text">Log out</span>
                 </a>
             </li>
         </ul>
     </nav>
-    
-    <div class="sidebar-footer">
-        <div class="system-status">
-            <div class="status-indicator online"></div>
-            <span>Account Status: <strong>Online</strong></span>
-        </div>
-    </div>
 </aside>
 
 <!-- Sidebar Styles -->
