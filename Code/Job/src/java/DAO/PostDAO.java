@@ -191,6 +191,65 @@ public class PostDAO extends DBContext{
             return false;
         }
     }
+   
+    public boolean updatePostByID(Post post) {
+        String sql = "UPDATE Post SET "
+                + "title = ?, "
+                + "jobTypeID = ?, "
+                + "durationID = ?, "
+                + "date_post = ?, "
+                + "expired_date = ?, "
+                + "quantity = ?, "
+                + "budget_min = ?, "
+                + "budget_max = ?, "
+                + "location = ?, "
+                + "categoryID = ?, "
+                + "budget_type = ?, "
+                + "description = ? , statusPost = 'Pending' "
+                + "WHERE postID = ?";
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            int paramIndex = 1;
+            ps.setString(paramIndex++, post.getTitle());
+            ps.setInt(paramIndex++, post.getJobTypeId());
+            ps.setInt(paramIndex++, post.getDurationId());
+
+            // date_post
+            if (post.getDatePost() != null) {
+                ps.setTimestamp(paramIndex++, new java.sql.Timestamp(post.getDatePost().getTime()));
+            } else {
+                ps.setTimestamp(paramIndex++, new java.sql.Timestamp(System.currentTimeMillis()));
+            }
+
+            // expired_date
+            if (post.getExpiredDate() != null) {
+                ps.setTimestamp(paramIndex++, new java.sql.Timestamp(post.getExpiredDate().getTime()));
+            } else {
+                throw new SQLException("Expired date is required");
+            }
+
+            ps.setInt(paramIndex++, post.getQuantity());
+            ps.setBigDecimal(paramIndex++, post.getBudgetMin());
+            ps.setBigDecimal(paramIndex++, post.getBudgetMax());
+            ps.setString(paramIndex++, post.getLocation());
+            ps.setInt(paramIndex++, post.getCategoryId());
+            ps.setString(paramIndex++, post.getBudgetType());
+            ps.setString(paramIndex++, post.getDescription());
+
+            // WHERE postID = ?
+            ps.setInt(paramIndex++, post.getPostId());
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Error updating post: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 
     // Lấy bài đăng theo ID
@@ -471,7 +530,7 @@ public class PostDAO extends DBContext{
         SELECT p.postID, p.title, COUNT(j.applyID) AS countApplications
         FROM Post p
         LEFT JOIN JobApply j ON p.postID = j.postID
-        WHERE p.recruiterID = ? AND p.statusPost = 'Approved'
+        WHERE p.recruiterID = ? AND p.statusPost = 'Approved' AND j.statusApply != 'Completed'
         GROUP BY p.postID, p.title
         ORDER BY p.postID
         """;

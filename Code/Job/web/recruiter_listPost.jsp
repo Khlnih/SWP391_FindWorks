@@ -58,7 +58,7 @@
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Quản lý bài đăng tuyển dụng</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
-                        <a href="RecruiterPostController?action=create" class="btn btn-primary">
+                        <a href="recruiter_postJob.jsp" class="btn btn-primary">
                             <i class="fas fa-plus me-1"></i> Đăng tin mới
                         </a>
                     </div>
@@ -250,9 +250,12 @@
                                                         </c:if>
                                                     </td>
                                                     <td>
-                                                        <a href="recruiter_applyJob.jsp" class="btn btn-sm btn-outline-primary">
-                                                            <i class="fas fa-users"></i> Xem
-                                                        </a>
+                                                        <form action="RecruiterListPostController" method="POST" >
+                                                            <input type="hidden" name="action" value="show_applyPost">
+                                                            <input type="hidden" name="postID" value="${post.postId}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fas fa-users"></i>Xem</button>
+                                                        </form>
+                                                        
                                                     </td>
                                                 </tr>
                                             </c:forEach>
@@ -290,9 +293,12 @@
                                                     </td>
                                                     <td><fmt:formatDate value="${post.datePost}" pattern="dd/MM/yyyy"/></td>
                                                     <td>
-                                                        <a href="RecruiterPostController?action=edit&id=${post.postId}" class="btn btn-sm btn-outline-primary">
-                                                            <i class="fas fa-edit"></i> Sửa lại
-                                                        </a>
+                                                        
+                                                        <form action="RecruiterListPostController" method="POST" >
+                                                            <input type="hidden" name="action" value="editPost">
+                                                            <input type="hidden" name="postID" value="${post.postId}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i>Sửa lại</button>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                             </c:forEach>

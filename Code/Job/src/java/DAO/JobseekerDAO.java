@@ -10,6 +10,19 @@ import Model.FreelancerLocation;
 
 public class JobseekerDAO extends DBContext {
     
+    public int countJobSeekers() {
+        String sql = "SELECT COUNT(*) as total FROM Freelancer WHERE status != 'inactive'";
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
     public boolean deleteJobseeker(int id) {
         if (connection == null) {
             System.err.println("Database connection is null");

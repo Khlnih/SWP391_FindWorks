@@ -11,10 +11,21 @@ public class RecruiterTransaction {
     private String description;
     private Timestamp transactionDate;
     private Integer relatedID;
-
+    private Integer relatedTierSubscriptionID;
     public RecruiterTransaction() {
     }
 
+    public RecruiterTransaction(int transactionID, int recruiterID, String type, BigDecimal amount, String description, Timestamp transactionDate, Integer relatedID, Integer relatedTierSubscriptionID) {
+        this.transactionID = transactionID;
+        this.recruiterID = recruiterID;
+        this.type = type;
+        this.amount = amount;
+        this.description = description;
+        this.transactionDate = transactionDate;
+        this.relatedID = relatedID;
+        this.relatedTierSubscriptionID = relatedTierSubscriptionID;
+    }
+    
     public RecruiterTransaction(int transactionID, int recruiterID, String type, 
                               BigDecimal amount, String description, 
                               Timestamp transactionDate, Integer relatedID) {
@@ -27,6 +38,14 @@ public class RecruiterTransaction {
         this.relatedID = relatedID;
     }
 
+    public Integer getRelatedTierSubscriptionID() {
+        return relatedTierSubscriptionID;
+    }
+
+    public void setRelatedTierSubscriptionID(Integer relatedTierSubscriptionID) {
+        this.relatedTierSubscriptionID = relatedTierSubscriptionID;
+    }
+    
     // Getters and Setters
     public int getTransactionID() { return transactionID; }
     public void setTransactionID(int transactionID) { this.transactionID = transactionID; }
@@ -48,4 +67,8 @@ public class RecruiterTransaction {
     
     public Integer getRelatedID() { return relatedID; }
     public void setRelatedID(Integer relatedID) { this.relatedID = relatedID; }
+
+    public void setRecruiter(Recruiter recruiter) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

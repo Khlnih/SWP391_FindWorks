@@ -88,6 +88,8 @@ public class JobApply {
         this.resumePath = resumePath;
     }
 
+   
+
     
     
     

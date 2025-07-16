@@ -262,6 +262,7 @@
                 <div class="info-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="mb-0"><i class="fas fa-briefcase me-2 text-primary"></i>Tin tuyển dụng đang được đăng</h4>
+                        
                         <a href="recruiter_postJob.jsp" class="btn btn-sm btn-outline-primary"><i class="fas fa-plus me-1"></i> Đăng tin mới</a>
                     </div>
                     <hr>
@@ -468,7 +469,7 @@
                 <div class="info-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="mb-0"><i class="fas fa-cubes me-2 text-primary"></i>Dịch vụ đang sử dụng</h4>
-                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-plus me-1"></i> Thay đổi</button>
+                        <a href="recruiter_accountTier.jsp" class="btn btn-sm btn-outline-primary"><i class="fas fa-plus me-1"></i> Thay đổi</a>
                     </div>
                     <hr>
                     <div class="list-group list-group-flush">

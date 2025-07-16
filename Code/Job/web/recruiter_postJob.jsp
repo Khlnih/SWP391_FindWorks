@@ -41,115 +41,230 @@
                     <div class="form-container">
                         <h3><i class="fas fa-briefcase me-2 text-primary"></i>Đăng tin tuyển dụng mới</h3>
                         <p class="text-muted">Điền đầy đủ thông tin bên dưới để đăng tin tuyển dụng</p>
-                        
-                        <form action="RecruiterDetailController" method="POST" enctype="multipart/form-data" id="postJobForm">
-                            <input type="hidden" name="recruiterID" value="${sessionScope.recruiter.recruiterID}">
-                            <div class="mb-4">
-                                <label for="title" class="form-label fw-bold">Tiêu đề công việc <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="title" name="title" required>
-                            </div>
-                            
+                        <c:if test="${edit != 'editPost'}">
+                            <form action="RecruiterDetailController" method="POST" enctype="multipart/form-data" id="postJobForm">
+                                <input type="hidden" name="recruiterID" value="${sessionScope.recruiter.recruiterID}">
+                                <div class="mb-4">
+                                    <label for="title" class="form-label fw-bold">Tiêu đề công việc <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="title" name="title" required>
+                                </div>
 
-                            <!-- Job Type -->
-                            <div class="mb-4">
-                                <label for="jobTypeId" class="form-label fw-bold">Loại công việc <span class="text-danger">*</span></label>
-                                <select class="form-select" id="jobTypeId" name="jobTypeId" required>
-                                    <option value="">-- Chọn loại công việc --</option>
-                                    <c:forEach items="${sessionScope.jobType}" var="cat">
-                                        <option value="${cat.jobTypeID}">${cat.jobTypeName}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            
-                            <!-- Duration -->
-                            <div class="mb-4">
-                                <label for="durationId" class="form-label fw-bold">Thời hạn công việc <span class="text-danger">*</span></label>
-                                <select class="form-select" id="durationId" name="durationId" required>
-                                    <option value="">-- Chọn thời hạn --</option>
-                                    <c:forEach items="${sessionScope.durations}" var="cat">
-                                        <option value="${cat.durationID}">${cat.durationName}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            
-                            <!-- Posting Date & Expiry Date -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <label for="datePost" class="form-label fw-bold">Ngày bắt đầu đăng tuyển <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" id="datePost" name="datePost" required>
+
+                                <!-- Job Type -->
+                                <div class="mb-4">
+                                    <label for="jobTypeId" class="form-label fw-bold">Loại công việc <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="jobTypeId" name="jobTypeId" required>
+                                        <option value="">-- Chọn loại công việc --</option>
+                                        <c:forEach items="${sessionScope.jobType}" var="cat">
+                                            <option value="${cat.jobTypeID}">${cat.jobTypeName}</option>
+                                        </c:forEach>
+                                    </select>
                                 </div>
-                                <div class="col-md-6">
-                                    <label for="expiredDate" class="form-label fw-bold">Ngày kết thúc <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" id="expiredDate" name="expiredDate" required>
+
+                                <!-- Duration -->
+                                <div class="mb-4">
+                                    <label for="durationId" class="form-label fw-bold">Thời hạn công việc <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="durationId" name="durationId" required>
+                                        <option value="">-- Chọn thời hạn --</option>
+                                        <c:forEach items="${sessionScope.durations}" var="cat">
+                                            <option value="${cat.durationID}">${cat.durationName}</option>
+                                        </c:forEach>
+                                    </select>
                                 </div>
-                            </div>
-                            
-                            <!-- Quantity -->
-                            <div class="mb-4">
-                                <label for="quantity" class="form-label fw-bold">Số lượng tuyển dụng <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="quantity" name="quantity" min="1" required>
-                            </div>
-                            
-                            <!-- Budget Range -->
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Mức lương</label>
-                                <div class="row g-2">
-                                    <div class="col-md-5">
-                                        <div class="input-group">
-                                            <input type="number" step="0.01" class="form-control" id="budgetMin" name="budgetMin" placeholder="Tối thiểu">
-                                            <span class="input-group-text">-</span>
-                                            <input type="number" step="0.01" class="form-control" id="budgetMax" name="budgetMax" placeholder="Tối đa">
+
+                                <!-- Posting Date & Expiry Date -->
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label for="datePost" class="form-label fw-bold">Ngày bắt đầu đăng tuyển <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="datePost" name="datePost" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="expiredDate" class="form-label fw-bold">Ngày kết thúc <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="expiredDate" name="expiredDate" required>
+                                    </div>
+                                </div>
+
+                                <!-- Quantity -->
+                                <div class="mb-4">
+                                    <label for="quantity" class="form-label fw-bold">Số lượng tuyển dụng <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="quantity" name="quantity" min="1" required>
+                                </div>
+
+                                <!-- Budget Range -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Mức lương</label>
+                                    <div class="row g-2">
+                                        <div class="col-md-5">
+                                            <div class="input-group">
+                                                <input type="number" step="0.01" class="form-control" id="budgetMin" name="budgetMin" placeholder="Tối thiểu">
+                                                <span class="input-group-text">-</span>
+                                                <input type="number" step="0.01" class="form-control" id="budgetMax" name="budgetMax" placeholder="Tối đa">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="budgetType" name="budgetType">
+                                                <option value="Fixed">Fixed</option>
+                                                <option value="Hourly">Hourly</option>
+                                                <option value="Per Article">Per Article</option>
+                                                <option value="Range">Range</option>
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <select class="form-select" id="budgetType" name="budgetType">
-                                            <option value="Fixed">Fixed</option>
-                                            <option value="Hourly">Hourly</option>
-                                            <option value="Per Article">Per Article</option>
-                                            <option value="Range">Range</option>
-                                        </select>
+                                    <div class="form-text">Để trống nếu thỏa thuận lương</div>
+                                </div>
+
+                                <!-- Location -->
+                                <div class="mb-4">
+                                    <label for="location" class="form-label fw-bold">Địa điểm làm việc <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="location" name="location" required>
+                                    <div class="form-text">Ví dụ: Hà Nội, TP.HCM, hoặc 'Làm việc từ xa'</div>
+                                </div>
+
+                                <!-- Job Category -->
+                                <div class="mb-4">
+                                    <label for="categoryId" class="form-label fw-bold">Danh mục công việc <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="categoryId" name="categoryId" required>
+                                        <option value="">-- Chọn danh mục --</option>
+                                        <c:forEach items="${sessionScope.category}" var="cat">
+                                            <option value="${cat.categoryID}">${cat.categoryName}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+
+                                <!-- Job Description -->
+                                <div class="mb-4">
+                                    <label for="description" class="form-label fw-bold">Mô tả công việc <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="description" name="description" rows="10" required placeholder="Nhập mô tả công việc..."></textarea>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="d-flex justify-content-between mt-5">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                    </button>
+                                    <div>
+
+                                        <button type="submit" name="action" value="createJob" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane me-2"></i>Đăng tin ngay
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="form-text">Để trống nếu thỏa thuận lương</div>
-                            </div>
+                            </form>
+                        </c:if>
+                        <c:if test="${edit == 'editPost'}">
                             
-                            <!-- Location -->
-                            <div class="mb-4">
-                                <label for="location" class="form-label fw-bold">Địa điểm làm việc <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="location" name="location" required>
-                                <div class="form-text">Ví dụ: Hà Nội, TP.HCM, hoặc 'Làm việc từ xa'</div>
-                            </div>
-                            
-                            <!-- Job Category -->
-                            <div class="mb-4">
-                                <label for="categoryId" class="form-label fw-bold">Danh mục công việc <span class="text-danger">*</span></label>
-                                <select class="form-select" id="categoryId" name="categoryId" required>
-                                    <option value="">-- Chọn danh mục --</option>
-                                    <c:forEach items="${sessionScope.category}" var="cat">
-                                        <option value="${cat.categoryID}">${cat.categoryName}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            
-                            <!-- Job Description -->
-                            <div class="mb-4">
-                                <label for="description" class="form-label fw-bold">Mô tả công việc <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="description" name="description" rows="10" required placeholder="Nhập mô tả công việc..."></textarea>
-                            </div>
-                            
-                            <!-- Submit Button -->
-                            <div class="d-flex justify-content-between mt-5">
-                                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
-                                    <i class="fas fa-arrow-left me-2"></i>Quay lại
-                                </button>
-                                <div>
-                                    
-                                    <button type="submit" name="action" value="createJob" class="btn btn-primary">
-                                        <i class="fas fa-paper-plane me-2"></i>Đăng tin ngay
-                                    </button>
+                            <form action="RecruiterListPostController" method="POST" >
+                               
+                                <div class="mb-4">
+                                    <label for="title" class="form-label fw-bold">Tiêu đề công việc <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="title" name="title" value="${post.title}" required>
                                 </div>
-                            </div>
-                        </form>
+
+
+                                <!-- Job Type -->
+                                <div class="mb-4">
+                                    <label for="jobTypeId" class="form-label fw-bold">Loại công việc <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="jobTypeId" name="jobTypeId" required>
+                                        <option value="">-- Chọn loại công việc --</option>
+                                        <c:forEach items="${sessionScope.jobType}" var="cat">
+                                            <option value="${cat.jobTypeID}" <c:if test="${cat.jobTypeID == post.jobTypeId}">selected</c:if>>${cat.jobTypeName}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+
+                                <!-- Duration -->
+                                <div class="mb-4">
+                                    <label for="durationId" class="form-label fw-bold">Thời hạn công việc <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="durationId" name="durationId" required>
+                                        <option value="">-- Chọn thời hạn --</option>
+                                        <c:forEach items="${sessionScope.durations}" var="cat">
+                                            <option value="${cat.durationID}"<c:if test="${cat.durationID == post.durationId}">selected</c:if> >${cat.durationName}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+
+                                <!-- Posting Date & Expiry Date -->
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label for="datePost" class="form-label fw-bold">Ngày bắt đầu đăng tuyển <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="datePost" name="datePost" value="${post.datePost}" required >
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="expiredDate" class="form-label fw-bold">Ngày kết thúc <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="expiredDate" name="expiredDate" value="${post.expiredDate}" required>
+                                    </div>
+                                </div>
+
+                                <!-- Quantity -->
+                                <div class="mb-4">
+                                    <label for="quantity" class="form-label fw-bold">Số lượng tuyển dụng <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="quantity" name="quantity" min="1"  value="${post.quantity}" required>
+                                </div>
+
+                                <!-- Budget Range -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Mức lương</label>
+                                    <div class="row g-2">
+                                        <div class="col-md-5">
+                                            <div class="input-group">
+                                                <input type="number" step="0.01" class="form-control" id="budgetMin" name="budgetMin" placeholder="Tối thiểu" value="${post.budgetMin}">
+                                                <span class="input-group-text">-</span>
+                                                <input type="number" step="0.01" class="form-control" id="budgetMax" name="budgetMax" placeholder="Tối đa" value="${post.budgetMax}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="budgetType" name="budgetType">
+                                                <option value="Fixed">Fixed</option>
+                                                <option value="Hourly">Hourly</option>
+                                                <option value="Per Article">Per Article</option>
+                                                <option value="Range">Range</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-text">Để trống nếu thỏa thuận lương</div>
+                                </div>
+
+                                <!-- Location -->
+                                <div class="mb-4">
+                                    <label for="location" class="form-label fw-bold">Địa điểm làm việc <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="location" name="location" value="${post.location}" required>
+                                    <div class="form-text">Ví dụ: Hà Nội, TP.HCM, hoặc 'Làm việc từ xa'</div>
+                                </div>
+
+                                <!-- Job Category -->
+                                <div class="mb-4">
+                                    <label for="categoryId" class="form-label fw-bold">Danh mục công việc <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="categoryId" name="categoryId" required>
+                                        <option value="">-- Chọn danh mục --</option>
+                                        <c:forEach items="${sessionScope.category}" var="cat">
+                                            <option value="${cat.categoryID}" <c:if test="${cat.categoryID == post.categoryId}">selected</c:if>>${cat.categoryName}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+
+                                <!-- Job Description -->
+                                <div class="mb-4">
+                                    <label for="description" class="form-label fw-bold">Mô tả công việc <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="description" name="description" rows="10" required">${post.description}</textarea>
+                               
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="d-flex justify-content-between mt-5">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                    </button>
+                                    <div>
+                                        <input type="hidden" name="action" value="updatePost">
+                                        <input type="hidden" name="postID" value="${post.postId}">
+                                        <input type="hidden" name="recruiterID" value="${post.recruiterId}">
+                                        <button type="submit"  class="btn btn-primary">
+                                            <i class="fas fa-paper-plane me-2"></i>Sửa lại 
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </c:if> 
                     </div>
                 </div>
             </div>

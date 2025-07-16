@@ -332,7 +332,8 @@
 </head>
 
 <body>
-    
+        <jsp:include page="includes/recruiter_slidebar.jsp" />
+
     <header>
         <div class="header-area">
             <div id="sticky-header" class="main-header-area">

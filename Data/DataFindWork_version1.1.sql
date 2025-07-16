@@ -133,6 +133,13 @@ CREATE TABLE [Freelancer] (
 );
 GO
 
+ ALTER TABLE [Freelancer]
+ADD [money] [decimal](18, 2) NOT NULL DEFAULT 0.00;
+GO 
+
+
+
+
 CREATE TABLE [Blogs] (
     [blogID] [int] IDENTITY(1,1) NOT NULL,
     [title] [nvarchar](220) NULL,
@@ -279,6 +286,8 @@ CREATE TABLE [FreelancerFavorites] ( -- Bài đăng Freelancer yêu thích
 );
 GO
 
+
+
 CREATE TABLE [Report] (
     [reportID] [int] IDENTITY(1,1) NOT NULL,
     [reporter_freelancerID] [int] NOT NULL, -- Đổi freelanceID
@@ -412,6 +421,10 @@ CREATE TABLE [FreelancerLocation] (
 );
 GO
 
+
+
+
+
 -- Thêm CHECK constraint để giới hạn các giá trị cho trường work_preference
 ALTER TABLE [FreelancerLocation]
 ADD CONSTRAINT [CK_FreelancerLocation_WorkPreference]
@@ -419,4 +432,244 @@ CHECK ([work_preference] IN ('Remote', 'On-site', 'Hybrid', 'Negotiable'));
 GO
 
 PRINT 'Bang FreelancerLocation (phien ban chi tiet hon mot chut) da duoc tao thanh cong.';
+GO
+
+CREATE TABLE [FreelancerTransaction] (
+    [transactionID] [int] IDENTITY(1,1) NOT NULL,
+    [freelancerID] [int] NOT NULL,
+    [transactionType] [nvarchar](50) NOT NULL,
+    [amount] [decimal](18, 2) NOT NULL,
+    [transactionDate] [datetime] NOT NULL DEFAULT GETDATE(),
+    [description] [nvarchar](max) NULL,
+    [statusTransaction] [nvarchar](50) NOT NULL DEFAULT 'Pending',
+    [relatedPostID] [int] NULL,
+    [relatedTierSubscriptionID] [int] NULL,
+
+    CONSTRAINT [PK_FreelancerTransaction] PRIMARY KEY CLUSTERED ([transactionID] ASC),
+
+    -- *** CÁC RÀNG BUỘC QUAN TRỌNG ***
+
+    -- 1. Khóa ngoại đến Freelancer (bạn đã có)
+    CONSTRAINT [FK_FreelancerTransaction_Freelancer] FOREIGN KEY ([freelancerID]) REFERENCES [Freelancer]([freelancerID]) ON DELETE CASCADE,
+
+    -- 2. Khóa ngoại đến Post (bị thiếu)
+    CONSTRAINT [FK_FreelancerTransaction_Post] FOREIGN KEY ([relatedPostID]) REFERENCES [Post]([postID]) ON DELETE SET NULL,
+
+    -- 3. Khóa ngoại đến UserTierSubscriptions (bị thiếu)
+    CONSTRAINT [FK_FreelancerTransaction_UserTierSubscription] FOREIGN KEY ([relatedTierSubscriptionID]) REFERENCES [UserTierSubscriptions]([subscriptionID]) ON DELETE SET NULL,
+
+    
+);
+GO
+
+
+PRINT 'Bang [FreelancerTransaction] da duoc tao lai thanh cong voi day du cac rang buoc.';
+GO
+
+
+
+IF (OBJECT_ID('CK_UserTierSubscriptions_IsActive', 'C') IS NOT NULL)
+BEGIN
+    ALTER TABLE [UserTierSubscriptions] DROP CONSTRAINT [CK_UserTierSubscriptions_IsActive];
+END
+GO
+
+-- Thêm constraint mới với các giá trị được phép là 0, 1, 2
+ALTER TABLE [UserTierSubscriptions]
+ADD CONSTRAINT [CK_UserTierSubscriptions_IsActive]
+CHECK ([isActiveSubscription] IN (0, 1, 2));
+GO
+
+PRINT 'Constraint [CK_UserTierSubscriptions_IsActive] da duoc cap nhat de chap nhan gia tri 0, 1, 2.';
+GO
+
+
+-- Kiểm tra xem trigger có tồn tại trong cơ sở dữ liệu không
+IF OBJECT_ID ('[dbo].[trg_EnsureSingleActiveSubscription]', 'TR') IS NOT NULL
+BEGIN
+    -- Nếu có, thực hiện lệnh xóa trigger
+    DROP TRIGGER [dbo].[trg_EnsureSingleActiveSubscription];
+    PRINT 'Trigger [trg_EnsureSingleActiveSubscription] da duoc xoa thanh cong.';
+END
+ELSE
+BEGIN
+    -- Nếu không, thông báo rằng trigger không tồn tại
+    PRINT 'Trigger [trg_EnsureSingleActiveSubscription] khong ton tai de xoa.';
+END
+GO
+
+
+CREATE OR ALTER TRIGGER [dbo].[trg_EnsureSingleActiveSubscription]
+ON [dbo].[UserTierSubscriptions]
+AFTER UPDATE
+AS
+BEGIN
+    -- Ngăn SQL Server trả về số dòng bị ảnh hưởng
+    SET NOCOUNT ON;
+
+    -- Chỉ thực thi logic nếu cột 'isActiveSubscription' được cập nhật
+    -- và có ít nhất một dòng được cập nhật thành trạng thái 0 (Hoạt động).
+    IF NOT UPDATE(isActiveSubscription) OR NOT EXISTS (SELECT 1 FROM inserted WHERE isActiveSubscription = 0)
+    BEGIN
+        RETURN;
+    END; -- Dấu chấm phẩy có thể đặt ở đây hoặc trước WITH đều được, nhưng đặt trước WITH rõ ràng hơn.
+
+    -- *** SỬA LỖI: Thêm dấu chấm phẩy ở đây ***
+    ;WITH NewlyActivatedSubs AS (
+        SELECT
+            subscriptionID,
+            recruiterID,
+            freelancerID
+        FROM
+            inserted -- Bảng ảo chứa các dòng SAU KHI được cập nhật
+        WHERE
+            isActiveSubscription = 0 -- Trạng thái 0: Hoạt động
+    )
+
+    -- Cập nhật các gói đăng ký CŨ đang hoạt động của cùng người dùng thành trạng thái 2 (Không hoạt động)
+    UPDATE uts
+    SET
+        uts.isActiveSubscription = 2 -- Đổi trạng thái thành "2: Không hoạt động"
+    FROM
+        [dbo].[UserTierSubscriptions] AS uts
+    INNER JOIN
+        NewlyActivatedSubs AS nas ON
+        -- Kết nối dựa trên ID của Recruiter hoặc Freelancer
+        (uts.recruiterID IS NOT NULL AND uts.recruiterID = nas.recruiterID)
+        OR
+        (uts.freelancerID IS NOT NULL AND uts.freelancerID = nas.freelancerID)
+    WHERE
+        -- Điều kiện để cập nhật:
+        -- 1. Gói đăng ký phải đang ở trạng thái 0 (Hoạt động)
+        uts.isActiveSubscription = 0
+        -- 2. Gói đăng ký này không phải là gói vừa được kích hoạt
+        AND uts.subscriptionID <> nas.subscriptionID;
+END
+GO
+
+PRINT 'Trigger [trg_EnsureSingleActiveSubscription] da duoc tao/cap nhat thanh cong.';
+GO
+
+-- Kiểm tra và xóa trigger cũ nếu tồn tại để tạo mới
+IF OBJECT_ID ('[dbo].[trg_UpdateRecruiterMoneyOnTransaction]', 'TR') IS NOT NULL
+BEGIN
+    DROP TRIGGER [dbo].[trg_UpdateRecruiterMoneyOnTransaction];
+    PRINT 'Trigger [trg_UpdateRecruiterMoneyOnTransaction] da duoc xoa de tao moi.';
+END
+GO
+
+CREATE TRIGGER [dbo].[trg_UpdateRecruiterMoneyOnTransaction]
+ON [dbo].[RecruiterTransaction]
+AFTER INSERT, UPDATE, DELETE -- Kích hoạt trigger khi có hành động Thêm, Sửa, hoặc Xóa
+AS
+BEGIN
+    -- Ngăn SQL Server trả về số dòng bị ảnh hưởng, giúp tăng hiệu năng
+    SET NOCOUNT ON;
+
+    -- Bảng tạm để tính toán tổng số tiền thay đổi cho mỗi Recruiter bị ảnh hưởng
+    -- Thiết kế này đảm bảo trigger hoạt động đúng ngay cả khi có nhiều giao dịch được thêm/sửa/xóa cùng lúc
+    ;WITH BalanceChanges AS (
+        -- Xử lý các giao dịch được THÊM MỚI hoặc CẬP NHẬT
+        SELECT
+            i.recruiterID,
+            -- Nếu là 'Deposit' thì cộng tiền, ngược lại thì trừ tiền
+            CASE
+                WHEN i.transactionType = 'Deposit' THEN i.amount
+                ELSE -i.amount
+            END AS ChangeAmount
+        FROM
+            inserted i -- 'inserted' là bảng ảo chứa các dòng vừa được thêm/sửa
+
+        UNION ALL
+
+        -- Xử lý các giao dịch bị XÓA hoặc CẬP NHẬT (phần cũ của dòng được cập nhật)
+        SELECT
+            d.recruiterID,
+            -- Logic ngược lại: Nếu xóa một giao dịch 'Deposit', ta phải TRỪ tiền đi. Nếu xóa một giao dịch trừ tiền, ta phải CỘNG tiền lại.
+            CASE
+                WHEN d.transactionType = 'Deposit' THEN -d.amount
+                ELSE d.amount
+            END AS ChangeAmount
+        FROM
+            deleted d -- 'deleted' là bảng ảo chứa các dòng vừa bị xóa/sửa
+    )
+    -- Cập nhật bảng Recruiter bằng cách cộng tổng số tiền thay đổi
+    UPDATE r
+    SET
+        r.money = r.money + bc.TotalChange
+    FROM
+        dbo.Recruiter r
+    INNER JOIN (
+        -- Gom nhóm các thay đổi theo từng recruiterID để chỉ phải cập nhật mỗi Recruiter một lần duy nhất
+        SELECT recruiterID, SUM(ChangeAmount) AS TotalChange
+        FROM BalanceChanges
+        GROUP BY recruiterID
+    ) AS bc ON r.recruiterID = bc.recruiterID;
+
+END
+GO
+
+PRINT 'Trigger [trg_UpdateRecruiterMoneyOnTransaction] da duoc tao thanh cong.';
+GO
+
+
+-- Kiểm tra và xóa trigger cũ nếu tồn tại để tạo mới
+IF OBJECT_ID ('[dbo].[trg_UpdateFreelancerMoneyOnTransaction]', 'TR') IS NOT NULL
+BEGIN
+    DROP TRIGGER [dbo].[trg_UpdateFreelancerMoneyOnTransaction];
+    PRINT 'Trigger [trg_UpdateFreelancerMoneyOnTransaction] da duoc xoa de tao moi.';
+END
+GO
+
+CREATE TRIGGER [dbo].[trg_UpdateFreelancerMoneyOnTransaction]
+ON [dbo].[FreelancerTransaction]
+AFTER INSERT, UPDATE, DELETE -- Kích hoạt trigger khi Thêm, Sửa, hoặc Xóa giao dịch
+AS
+BEGIN
+    -- Ngăn SQL Server trả về số dòng bị ảnh hưởng
+    SET NOCOUNT ON;
+
+    -- Bảng tạm để tính toán tổng số tiền thay đổi cho mỗi Freelancer bị ảnh hưởng
+    ;WITH BalanceChanges AS (
+        -- Xử lý các giao dịch được THÊM MỚI hoặc CẬP NHẬT (phần dữ liệu mới)
+        SELECT
+            i.freelancerID,
+            -- Logic: Cộng tiền nếu là thanh toán, thưởng, hoàn tiền. Trừ tiền cho các trường hợp còn lại.
+            CASE
+                WHEN i.transactionType IN ('PaymentReceived', 'Bonus', 'Refund') THEN i.amount
+                ELSE -i.amount
+            END AS ChangeAmount
+        FROM
+            inserted i
+
+        UNION ALL
+
+        -- Xử lý các giao dịch bị XÓA hoặc CẬP NHẬT (phần dữ liệu cũ)
+        SELECT
+            d.freelancerID,
+            -- Logic ngược lại: Nếu xóa một giao dịch cộng tiền, ta phải TRỪ đi. Nếu xóa một giao dịch trừ tiền, ta phải CỘNG lại.
+            CASE
+                WHEN d.transactionType IN ('Deposit', 'Bonus', 'Refund') THEN -d.amount
+                ELSE d.amount
+            END AS ChangeAmount
+        FROM
+            deleted d
+    )
+    -- Cập nhật bảng Freelancer bằng cách cộng tổng số tiền thay đổi
+    UPDATE f
+    SET
+        f.money = f.money + bc.TotalChange
+    FROM
+        dbo.Freelancer f
+    INNER JOIN (
+        -- Gom nhóm các thay đổi theo từng freelancerID để cập nhật hiệu quả
+        SELECT freelancerID, SUM(ChangeAmount) AS TotalChange
+        FROM BalanceChanges
+        GROUP BY freelancerID
+    ) AS bc ON f.freelancerID = bc.freelancerID;
+
+END
+GO
+
+PRINT 'Trigger [trg_UpdateFreelancerMoneyOnTransaction] da duoc tao thanh cong.';
 GO

@@ -76,6 +76,30 @@ public class AdminController extends HttpServlet {
 
         switch (action) {
             case "dashboard":
+                // Get dashboard statistics
+                int totalJobSeekers = jobseekerDAO.countJobSeekers();
+                int totalRecruiters = recruiterDAO.countRecruiters();
+                int totalUsers = totalJobSeekers + totalRecruiters;
+                int totalJobs = 0; // You'll need to implement this in your DAO
+                int totalApplications = 0; // You'll need to implement this in your DAO
+                
+                // Get total revenue as BigDecimal and convert to double for display
+                BigDecimal totalRevenueBD = recruiterTransactionDAO.getTotalRevenue();
+                double totalRevenue = totalRevenueBD != null ? totalRevenueBD.doubleValue() : 0.0;
+                
+                // Get recent transactions
+                List<RecruiterTransaction> recentTransactions = recruiterTransactionDAO.getRecentTransactions(5);
+                
+                // Set request attributes
+                request.setAttribute("totalUsers", totalUsers);
+                request.setAttribute("totalJobSeekers", totalJobSeekers);
+                request.setAttribute("totalRecruiters", totalRecruiters);
+                request.setAttribute("totalJobs", totalJobs);
+                request.setAttribute("totalApplications", totalApplications);
+                request.setAttribute("totalRevenue", totalRevenue);
+                request.setAttribute("recentTransactions", recentTransactions);
+                
+                // Forward to admin JSP
                 request.getRequestDispatcher("admin.jsp").forward(request, response);
                 break;
             case "jobseekers":

@@ -394,9 +394,12 @@
                                             
                                             <c:if test="${sessionScope.recruiter != null and sessionScope.recruiter.recruiterID == jobRecruiterId}">
                                               
-                                                <a href="login.jsp" class="btn-action btn-warning">
-                                                        <i class="fa fa-sign-in"></i> Edit post 
-                                                </a>
+                                                
+                                                <form action="RecruiterListPostController" method="POST" >
+                                                    <input type="hidden" name="action" value="editPost">
+                                                    <input type="hidden" name="postID" value="<%= job.getPostId() %>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fa fa-sign-in"></i> Edit post </button>
+                                                </form>
                                             </c:if>
                                         </div>
                                         

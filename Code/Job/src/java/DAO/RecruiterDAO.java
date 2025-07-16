@@ -1,12 +1,26 @@
 package DAO;
 
 import Model.Recruiter;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class RecruiterDAO extends DBContext {
+    
+    public int countRecruiters() {
+        String sql = "SELECT COUNT(*) as total FROM Recruiter WHERE status != 'inactive'";
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
     public ArrayList<Recruiter> getAllRecruiters() {
         ArrayList<Recruiter> list = new ArrayList<>();
@@ -223,6 +237,36 @@ public class RecruiterDAO extends DBContext {
         }
         
         return list;
+    }
+    
+    public BigDecimal getRecruiterMoney(int recruiterID) {
+        String sql = "SELECT money FROM Recruiter WHERE recruiterID = ?";
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            
+            ps.setInt(1, recruiterID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal("money");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+        return null; 
+    }
+    
+    public boolean updateRecruiterMoney(int recruiterID, BigDecimal newMoney) {
+        String sql = "UPDATE Recruiter SET money = ? WHERE recruiterID = ?";
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setBigDecimal(1, newMoney);
+            ps.setInt(2, recruiterID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
     
     public int countSearchResults(String keyword, String searchBy) {
@@ -453,57 +497,57 @@ public boolean isEmailInUseByAnotherRecruiter(String email, int currentRecruiter
     }
     // Thêm phương thức này vào cuối lớp RecruiterDAO.java
 
-public boolean updateRecruiterProfile(Recruiter r) {
-    if (connection == null) {
-        System.err.println("Database connection is null");
-        return false;
-    }
-    
-    // Lưu ý: Không cho phép cập nhật username, password, status, money... từ trang này
-    String sql = "UPDATE Recruiter SET first_name = ?, last_name = ?, gender = ?, dob = ?, email_contact = ?, phone_contact = ?, image = ? WHERE recruiterID = ?";
-    
-    try (PreparedStatement stm = connection.prepareStatement(sql)) {
-        stm.setString(1, r.getFirstName());
-        stm.setString(2, r.getLastName());
-        stm.setBoolean(3, r.isGender());
-        stm.setString(4, r.getDob());
-        stm.setString(5, r.getEmailContact());
-        stm.setString(6, r.getPhoneContact());
-        stm.setString(7, r.getImage());
-        stm.setInt(8, r.getRecruiterID());
-        
-        int rowsAffected = stm.executeUpdate();
-        return rowsAffected > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        System.err.println("Error updating recruiter profile: " + e.getMessage());
-        return false;
-    }
-}
-public boolean checkPassword(int recruiterID, String currentPassword) {
-    String sql = "SELECT password FROM Recruiter WHERE recruiterID = ?";
-    try (PreparedStatement stm = connection.prepareStatement(sql)) {
-        stm.setInt(1, recruiterID);
-        ResultSet rs = stm.executeQuery();
-        if (rs.next()) {
-            return rs.getString("password").equals(currentPassword);
+    public boolean updateRecruiterProfile(Recruiter r) {
+        if (connection == null) {
+            System.err.println("Database connection is null");
+            return false;
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return false;
-}
 
-public boolean updatePassword(int recruiterID, String newPassword) {
-    String sql = "UPDATE Recruiter SET password = ? WHERE recruiterID = ?";
-    try (PreparedStatement stm = connection.prepareStatement(sql)) {
-        stm.setString(1, newPassword);
-        stm.setInt(2, recruiterID);
-        return stm.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
+        // Lưu ý: Không cho phép cập nhật username, password, status, money... từ trang này
+        String sql = "UPDATE Recruiter SET first_name = ?, last_name = ?, gender = ?, dob = ?, email_contact = ?, phone_contact = ?, image = ? WHERE recruiterID = ?";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, r.getFirstName());
+            stm.setString(2, r.getLastName());
+            stm.setBoolean(3, r.isGender());
+            stm.setString(4, r.getDob());
+            stm.setString(5, r.getEmailContact());
+            stm.setString(6, r.getPhoneContact());
+            stm.setString(7, r.getImage());
+            stm.setInt(8, r.getRecruiterID());
+
+            int rowsAffected = stm.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error updating recruiter profile: " + e.getMessage());
+            return false;
+        }
     }
-    return false;
-}
+    public boolean checkPassword(int recruiterID, String currentPassword) {
+        String sql = "SELECT password FROM Recruiter WHERE recruiterID = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, recruiterID);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getString("password").equals(currentPassword);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updatePassword(int recruiterID, String newPassword) {
+        String sql = "UPDATE Recruiter SET password = ? WHERE recruiterID = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, newPassword);
+            stm.setInt(2, recruiterID);
+            return stm.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
 }

@@ -38,6 +38,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="payment.jsp" class="nav-link ${param.active == 'overview' ? 'active' : ''}">
+                    <i class="fas fa-home"></i>
+                    <span class="link-text">Desposit</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="recruiter_details.jsp" class="nav-link ${param.active == 'overview' ? 'active' : ''}">
                     <i class="fas fa-home"></i>
                     <span class="link-text">Overview</span>

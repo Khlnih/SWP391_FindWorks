@@ -5,6 +5,10 @@
 
 package Controller;
 
+import DAO.RecruiterDAO;
+import Model.Recruiter;
+import DAO.AccountTierDAO;
+import Model.AccountTier;
 import DAO.CategoryDAO;
 import DAO.DurationDAO;
 import DAO.FreelancerFavoriteDAO;
@@ -29,6 +33,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,6 +84,9 @@ public class ffavoriteController extends HttpServlet {
                 break;
             case "register":
                 registerAccountTier(request, response);
+                break;
+            case "registerRecruiter":
+                registerAccountTierRecruiter(request, response);
                 break;
             case "report":
                 reportPost(request, response);
@@ -290,6 +298,41 @@ public class ffavoriteController extends HttpServlet {
             if (success) {
                 
                 response.sendRedirect("jobseeker_accountTier.jsp"); // chuyển lại trang danh sách yêu thích
+            } else {
+                request.setAttribute("error", "Xóa thất bại!");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi xử lý yêu cầu xóa!");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+        }
+    }
+    private void registerAccountTierRecruiter(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            int recruiterID = Integer.parseInt(request.getParameter("recruiterID"));
+            int tierID = Integer.parseInt(request.getParameter("tierID"));
+            int duration = Integer.parseInt(request.getParameter("duration"));
+            
+            RecruiterDAO recruiterDAO = new RecruiterDAO();
+            AccountTierDAO accountDAO = new AccountTierDAO();
+            
+            BigDecimal price  = accountDAO.getTierById(tierID).getPrice();
+            BigDecimal money = recruiterDAO.getRecruiterMoney(recruiterID);
+            
+            if (money.compareTo(price) < 0) {
+                request.setAttribute("errorMessage", "Bạn không đủ số dư để đăng ký gói này!");
+                request.getRequestDispatcher("recruiter_accountTier.jsp").forward(request, response);
+                return;
+            }
+            
+            boolean success = userDAO.insertUserTierSubscriptionWithOptionalDurationRecruiter(recruiterID, tierID, duration);
+
+            if (success) {
+                
+                response.sendRedirect("recruiter_accountTier.jsp"); // chuyển lại trang danh sách yêu thích
             } else {
                 request.setAttribute("error", "Xóa thất bại!");
                 request.getRequestDispatcher("error.jsp").forward(request, response);

@@ -2,6 +2,7 @@ package DAO;
 
 import Model.JobApply;
 import java.sql.Connection;
+import Model.Jobseeker;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -77,10 +78,20 @@ public class JobApplyDAO extends DBContext {
             return false;
         }
     }
+    public boolean updateStatusApply(int applyID, String newStatus) throws SQLException {
+        String sql = "UPDATE JobApply SET statusApply = ? WHERE applyID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, applyID);
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;
+        }
+    }
+    
     
     public List<JobApply> getJobAppliesByPostID(int postID) {
         List<JobApply> applies = new ArrayList<>();
-        String sql = "SELECT * FROM JobApply WHERE postID = ?";
+        String sql = "SELECT * FROM JobApply WHERE postID = ? AND statusApply != 'Completed'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, postID);
             try (ResultSet rs = ps.executeQuery()) {
@@ -101,6 +112,10 @@ public class JobApplyDAO extends DBContext {
         }
         return applies;
     }
+    
+    
+    
+
     
     
 

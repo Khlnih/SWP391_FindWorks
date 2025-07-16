@@ -42,6 +42,35 @@ public class UserTierSubscriptionDAO extends DBContext{
             return false;
         }
     }
+    
+    public boolean insertUserTierSubscriptionWithOptionalDurationRecruiter(int recruiterID, int tierID, int durationDays) {
+        String sql;
+
+        if (durationDays > 0) {
+            sql = "INSERT INTO UserTierSubscriptions (recruiterID, tierID, startDate, endDate) " +
+                  "VALUES (?, ?, GETDATE(), DATEADD(DAY, ?, GETDATE()))";
+        } else {
+            sql = "INSERT INTO UserTierSubscriptions (recruiterID, tierID, startDate) " +
+                  "VALUES (?, ?, GETDATE())";
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterID);
+            ps.setInt(2, tierID);
+
+            if (durationDays > 0) {
+                ps.setInt(3, durationDays);
+            }
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public ArrayList<UserTierSubscriptions> getActiveSubscriptionsByRecruiter(int recruiterID) {
         ArrayList<UserTierSubscriptions> list = new ArrayList<>();
         String sql = "SELECT * FROM UserTierSubscriptions WHERE recruiterID = ? AND isActiveSubscription = 0";
