@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import Model.FreelancerLocation;
+import java.math.BigDecimal;
 
 public class JobseekerDAO extends DBContext {
     
@@ -156,6 +157,23 @@ public class JobseekerDAO extends DBContext {
             e.printStackTrace();
         }
         return 0;
+    }
+    
+    public BigDecimal getJobseekerMoney(int jobseekerID) {
+        String sql = "SELECT money FROM Freelancer WHERE freelancerID = ?";
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            
+            ps.setInt(1, jobseekerID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal("money");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+        return null; 
     }
     
     public int countSearchResults(String keyword, String searchBy) {

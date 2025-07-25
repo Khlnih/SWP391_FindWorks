@@ -203,8 +203,8 @@
                                                     <div class="popuplog">
                                                         <span class="close-btnlog" onclick="closePopuplog()">&times;</span>
                                                         <h3>Login</h3>
-                                                        <a href="login.jsp">I am Recruiter</a>
-                                                        <a href="loginjobseeker.jsp">I am Jobseekers</a>
+                                                        <a href="login.jsp?action=recruiter">I am Recruiter</a>
+                                                        <a href="login.jsp?action=jobseeker">I am Jobseekers</a>
                                                     </div>
                                                 </div>
                                             </div>

@@ -437,6 +437,7 @@
                                 <select class="form-select" id="typeScope" name="typeScope" required>
                                     <option value="Recruiter" selected>Recruiter</option>
                                     <option value="Jobseeker" >Jobseeker</option>
+                                    <option value="Post" >Post</option>
                                 </select>
                             </div>
                             <div class="form-text text-muted small">

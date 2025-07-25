@@ -85,9 +85,16 @@
             </li>
             
             <li class="nav-item">
-                <a href="admin_post.jsp" class="nav-link ${param.action == 'skills' ? 'active' : ''}">
+                <a href="admin?action=managerPost" class="nav-link ${param.action == 'skills' ? 'active' : ''}">
 <!--                    <i class="fa fa-cogs"></i>-->
                     <span class="link-text">Manager Post</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="admin?action=managerPostMoney" class="nav-link ${param.action == 'skills' ? 'active' : ''}">
+<!--                    <i class="fa fa-cogs"></i>-->
+                    <span class="link-text">Post</span>
                 </a>
             </li>
             

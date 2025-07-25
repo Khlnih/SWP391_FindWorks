@@ -9,7 +9,9 @@ import DAO.JobseekerSkillDAO;
 import DAO.RecruiterTransactionDAO;
 import DAO.AccountTierDAO;
 import DAO.CompanyDAO;
+import Model.Post;
 import DAO.NotificationDAO;
+import DAO.PostAccountTierDAO;
 import DAO.FreelancerSubscriptionDAO;
 import DAO.RecruiterSubscriptionDAO;
 import Model.Jobseeker;
@@ -34,7 +36,9 @@ import java.io.PrintWriter;
 import DAO.CategoryDAO;
 import Model.Category;
 import DAO.NotificationDAO;
+import DAO.PostDAO;
 import Model.Notification;
+import Model.PostAccountTier;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,7 +112,12 @@ public class AdminController extends HttpServlet {
             case "recruiters":
                 showRecruiters(request, response);
                 break;
-
+            case "managerPost":
+                managerPost(request, response);
+                break; 
+            case "managerPostMoney":
+                managerPostMoney(request, response);
+                break; 
             case "accounttier":
                 showAccountTier(request, response);
                 break;
@@ -194,13 +203,64 @@ public class AdminController extends HttpServlet {
     private void clearSessionMessages(HttpSession session, String currentAction) {
        
     }
+    private void managerPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        session.removeAttribute("post");
+        PostDAO postDAO = new PostDAO();
+        List<Post> post = postDAO.getAllPostsExceptApproved();
+        session.setAttribute("post", post);
+        request.getRequestDispatcher("admin_post.jsp").forward(request, response);
+    }
+    private void managerPostMoney(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        session.removeAttribute("listPost");
+        session.removeAttribute("listTransactionRecruiter");
+        session.removeAttribute("listTransactionFreelancer");
+        session.removeAttribute("listRecruiter");
+        session.removeAttribute("listJobseeker");
+        session.removeAttribute("listAccountTier");
+        session.removeAttribute("listPostAccountTier");
+        PostDAO postDAO = new PostDAO();
+        AccountTierDAO acDAO = new AccountTierDAO();
+        RecruiterDAO reDAO = new RecruiterDAO();
+        RecruiterTransactionDAO reTransaction = new RecruiterTransactionDAO();
+        JobseekerDAO jobDAO = new JobseekerDAO();
+        PostAccountTierDAO poDAO = new PostAccountTierDAO();
+        List<RecruiterTransaction> listTransactionRecruiter = reTransaction.getAllTransactionsByRecruiter();
+        List<RecruiterTransaction> listTransactionFreelancer = reTransaction.getAllTransactionsByFreelancer();
+        ArrayList<Recruiter> listRecruiter = reDAO.getAllRecruiters();
+        ArrayList<Jobseeker> listJobseeker = jobDAO.getAllJobSeeker();
+        List<Post> listPost = postDAO.getAllPosts();
+        List<PostAccountTier> listPostAccountTier = poDAO.getAllPostTierActive();
+        ArrayList<AccountTier> listAccountTier =  acDAO.getAllAccountTier();
+        session.setAttribute("listRecruiter", listRecruiter);
+        session.setAttribute("listPost", listPost);
+        session.setAttribute("listAccountTier", listAccountTier);
+        session.setAttribute("listPostAccountTier", listPostAccountTier);
+            session.setAttribute("listJobseeker", listJobseeker);
+            session.setAttribute("listTransactionRecruiter", listTransactionRecruiter);
+             session.setAttribute("listTransactionFreelancer", listTransactionFreelancer);
+             request.getRequestDispatcher("admin_managerPost.jsp").forward(request, response);
+             
+    }
+    
     private void updateStatus(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             HttpSession session = request.getSession();
             int subscriptionID = Integer.parseInt(request.getParameter("subscriptionID"));
             int status = Integer.parseInt(request.getParameter("statusInt"));
             String user = request.getParameter("user");
+            String priceStr = request.getParameter("price");
+                BigDecimal price = null;
+
+                try {
+                    price = new BigDecimal(priceStr);
+                } catch (NumberFormatException e) {
+                    // Xử lý nếu chuỗi không phải số hợp lệ
+                    e.printStackTrace();
+                }
             boolean success = freelancerSubscriptionDAO.updateStatus(subscriptionID, status);
+            RecruiterTransactionDAO reDAO = new RecruiterTransactionDAO();
             
             String userID = request.getParameter("userID");
             int id = Integer.parseInt(userID);
@@ -208,9 +268,17 @@ public class AdminController extends HttpServlet {
             String type = "ApplicationUpdate";
             if(user.equals("freelancer")){
                 notificationDAO.addFreelancerNotification(id, mess, type);
+                
+                if(status == 0){
+                     boolean succes = reDAO.insertTransactionJobseeker(id, price);
+                }
             }
             if(user.equals("recruiter")){
                 notificationDAO.addRecruiterNotification(id, mess, type);
+                if(status == 0){
+                    boolean succes = reDAO.insertTransaction(id, price);
+                }
+                
             }
             NotificationDAO notiDAO = new NotificationDAO();
             int number = notiDAO.countNotificationsByFreelancerId(Integer.parseInt(userID));
@@ -666,7 +734,7 @@ public class AdminController extends HttpServlet {
             System.out.println("status: " + status);
             
             // Validate typeScope
-            if (typeScope == null || (!typeScope.equalsIgnoreCase("Recruiter") && !typeScope.equalsIgnoreCase("Jobseeker"))) {
+            if (typeScope == null || (!typeScope.equalsIgnoreCase("Recruiter") && !typeScope.equalsIgnoreCase("Jobseeker")&& !typeScope.equalsIgnoreCase("Post"))) {
                 request.getSession().setAttribute("errorMessage", "Loại tài khoản không hợp lệ. Vui lòng chọn Recruiter hoặc Jobseeker.");
                 response.sendRedirect("admin?action=accounttier");
                 return;

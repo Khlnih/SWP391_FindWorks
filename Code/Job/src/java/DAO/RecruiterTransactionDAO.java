@@ -91,6 +91,63 @@ public class RecruiterTransactionDAO extends DBContext {
         return transactions;
     }
     
+    public List<RecruiterTransaction> getAllTransactionsByRecruiter() {
+        List<RecruiterTransaction> transactions = new ArrayList<>();
+        String sql = "SELECT * FROM RecruiterTransaction ORDER BY transactionDate DESC";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            ResultSet rs = stm.executeQuery();
+            
+            while (rs.next()) {
+                RecruiterTransaction rt = new RecruiterTransaction();
+                rt.setTransactionID(rs.getInt("transactionID"));
+                rt.setRecruiterID(rs.getInt("recruiterID"));
+                rt.setType(rs.getString("transactionType"));
+                rt.setAmount(rs.getBigDecimal("amount"));
+                rt.setDescription(rs.getString("description"));
+                rt.setTransactionDate(rs.getTimestamp("transactionDate"));
+                
+                int relatedID = rs.getInt("relatedPostID");
+                rt.setRelatedID(rs.wasNull() ? null : relatedID);
+                
+                transactions.add(rt);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting recruiter transactions: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return transactions;
+    }
+    
+    
+    public List<RecruiterTransaction> getAllTransactionsByFreelancer() {
+        List<RecruiterTransaction> transactions = new ArrayList<>();
+        String sql = "SELECT * FROM FreelancerTransaction ORDER BY transactionDate DESC";
+        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            ResultSet rs = stm.executeQuery();
+            
+            while (rs.next()) {
+                RecruiterTransaction rt = new RecruiterTransaction();
+                rt.setTransactionID(rs.getInt("transactionID"));
+                rt.setRecruiterID(rs.getInt("freelancerID"));
+                rt.setType(rs.getString("transactionType"));
+                rt.setAmount(rs.getBigDecimal("amount"));
+                rt.setDescription(rs.getString("description"));
+                rt.setTransactionDate(rs.getTimestamp("transactionDate"));
+                
+                int relatedID = rs.getInt("relatedPostID");
+                rt.setRelatedID(rs.wasNull() ? null : relatedID);
+                
+                transactions.add(rt);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting recruiter transactions: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return transactions;
+    }
+    
     public Double getTotalSpent(int recruiterID) {
         String sql = "SELECT COALESCE(SUM(amount), 0) AS TotalAmount " +
                    "FROM RecruiterTransaction WHERE recruiterID = ?";
@@ -124,9 +181,44 @@ public class RecruiterTransactionDAO extends DBContext {
         }
         return false;
     }
+    
+    public boolean insertTransaction(int recruiterID, BigDecimal amount) {
+        String sql = "INSERT INTO RecruiterTransaction (recruiterID,transactionType,amount,transactionDate,description,statusTransaction) " +
+                     "VALUES (?, 'TierSubscription', ?, GETDATE(), 'Thanh toán cho account tier', 'Completed')";
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, recruiterID);
+            ps.setBigDecimal(2, amount);
+
+            return  ps.executeUpdate()>0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
     public boolean insertDepositTransactionJobseeker(int jobseekerID, BigDecimal amount) {
         String sql = "INSERT INTO FreelancerTransaction (freelancerID,transactionType,amount,transactionDate,description,statusTransaction) " +
                      "VALUES (?, 'Deposit', ?, GETDATE(), 'Nạp tiền vào tài khoản', 'Completed')";
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, jobseekerID);
+            ps.setBigDecimal(2, amount);
+
+            return  ps.executeUpdate()>0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public boolean insertTransactionJobseeker(int jobseekerID, BigDecimal amount) {
+        String sql = "INSERT INTO FreelancerTransaction (freelancerID,transactionType,amount,transactionDate,description,statusTransaction) " +
+                     "VALUES (?, 'TierSubscription', ?, GETDATE(), 'Thanh toán cho account tier', 'Completed')";
         try (
              PreparedStatement ps = connection.prepareStatement(sql)) {
 

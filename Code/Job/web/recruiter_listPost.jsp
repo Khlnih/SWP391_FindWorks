@@ -217,6 +217,7 @@
                                         <th>Vị trí tuyển dụng</th>
                                         <th>Ngày đăng</th>
                                         <th>Hạn nộp</th>
+                                        <th>Gói đăng ký</th>
                                         <th>Hồ sơ</th>
                                         <th>Hành động</th>
                                     </tr>
@@ -237,6 +238,12 @@
                                                     </td>
                                                     <td><fmt:formatDate value="${post.datePost}" pattern="dd/MM/yyyy"/></td>
                                                     <td><fmt:formatDate value="${post.expiredDate}" pattern="dd/MM/yyyy"/></td>
+                                                     <td>
+                                                        <a href="post_accountTier.jsp?postId=${post.postId}" class="btn btn-sm btn-outline-info">
+                                                            <i class="fas fa-arrow-right"></i> Nâng cấp gói
+                                                        </a>
+                                                        
+                                                    </td>
                                                     <td>
                                                         <c:set var="found" value="false" />
                                                         <c:forEach items="${numberApply}" var="number">
@@ -317,7 +324,6 @@
                                     <tr>
                                         <th>Tiêu đề</th>
                                         <th>Ngày tạo</th>
-                                        <th>Ngày sửa</th>
                                         <th>Hành động</th>
                                     </tr>
                                 </thead>
@@ -333,20 +339,15 @@
                                                 <tr>
                                                     <td>
                                                         <a href="#" class="post-title">${post.title}</a>
-                                                        <div class="text-muted small">${post.categoryId}</div>
                                                     </td>
                                                     <td><fmt:formatDate value="${post.datePost}" pattern="dd/MM/yyyy"/></td>
-                                                    <td><fmt:formatDate value="${post.updatedAt}" pattern="dd/MM/yyyy"/></td>
-                                                    <td class="action-buttons">
-                                                        <a href="RecruiterPostController?action=edit&id=${post.postId}" class="btn btn-sm btn-outline-primary">
-                                                            <i class="fas fa-edit"></i> Tiếp tục
-                                                        </a>
-                                                        <button onclick="handlePostAction(${post.postId}, 'delete')" class="btn btn-sm btn-outline-danger">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                        <button onclick="handlePostAction(${post.postId}, 'submit')" class="btn btn-sm btn-outline-success">
-                                                            <i class="fas fa-paper-plane"></i>
-                                                        </button>
+                                                    <td>
+                                                        
+                                                        <form action="RecruiterListPostController" method="POST" >
+                                                            <input type="hidden" name="action" value="editPost">
+                                                            <input type="hidden" name="postID" value="${post.postId}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i>Tiếp tục</button>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                             </c:forEach>

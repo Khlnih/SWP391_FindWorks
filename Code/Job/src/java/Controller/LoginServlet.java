@@ -22,6 +22,7 @@ import DAO.NotificationDAO;
 import DAO.AccountTierDAO;
 import Model.AccountTier;
 import DAO.PostDAO;
+import DAO.RecruiterDAO;
 import Model.Post;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -47,7 +48,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        String action = request.getParameter("action");
         String userIdentifier = request.getParameter("usernameOrEmail");
         String passwordInput = request.getParameter("password");
 
@@ -57,8 +58,12 @@ public class LoginServlet extends HttpServlet {
             request.getRequestDispatcher("login.jsp").forward(request, response);
             return;
         }
-
+        
         loginDAO dao = new loginDAO();
+        
+        
+        
+        
         Jobseeker jobseeker = dao.loginUserByJobseeker(userIdentifier, passwordInput);
         Recruiter recruiter = dao.loginUserByRecruiter(userIdentifier, passwordInput);
         Admin admin = dao.loginUserByAdmin(userIdentifier, passwordInput);
@@ -162,9 +167,21 @@ public class LoginServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/index_recruiter.jsp");
         } else if (admin != null) {
             PostDAO postDAO = new PostDAO();
+            RecruiterDAO reDAO = new RecruiterDAO();
+            RecruiterTransactionDAO reTransaction = new RecruiterTransactionDAO();
+            JobseekerDAO jobDAO = new JobseekerDAO();
+            List<RecruiterTransaction> listTransactionRecruiter = reTransaction.getAllTransactionsByRecruiter();
+            List<RecruiterTransaction> listTransactionFreelancer = reTransaction.getAllTransactionsByFreelancer();
+            ArrayList<Recruiter> listRecruiter = reDAO.getAllRecruiters();
+            ArrayList<Jobseeker> listJobseeker = jobDAO.getAllJobSeeker();
             List<Post> post = postDAO.getAllPostsExceptApproved();
             session.setAttribute("post", post);
             session.setAttribute("admin", admin);
+            session.setAttribute("listRecruiter", listRecruiter);
+            session.setAttribute("listJobseeker", listJobseeker);
+            session.setAttribute("listTransactionRecruiter", listTransactionRecruiter);
+             session.setAttribute("listTransactionFreelancer", listTransactionFreelancer);
+            PrintWriter out = response.getWriter(); out.print(listTransactionFreelancer);
             response.sendRedirect(request.getContextPath() + "/admin.jsp");
         }
 

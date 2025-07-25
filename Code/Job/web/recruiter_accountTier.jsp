@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.util.ArrayList"%>
 <%@page import="Model.AccountTier"%>
 <%@page import="DAO.AccountTierDAO"%>
@@ -127,6 +128,7 @@
                 ${errorMessage}
             </div>
         </c:if>
+            
         <h2 class="section-title">Chọn Gói Dịch Vụ</h2>
         <div class="row justify-content-center">
             <jsp:useBean id="accountTierDAO" class="DAO.AccountTierDAO" scope="page" />

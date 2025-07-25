@@ -966,6 +966,7 @@
                                                 <c:choose>
                                                     <c:when test="${type == 'Recruiter'}">Recruiter</c:when>
                                                     <c:when test="${type == 'Jobseeker'}">Jobseeker</c:when>
+                                                    <c:when test="${type == 'Post'}">Post</c:when>
                                                     <c:otherwise>Both</c:otherwise>
                                                 </c:choose>
                                             </option>

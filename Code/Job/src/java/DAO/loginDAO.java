@@ -11,7 +11,7 @@ import Model.Admin;
 public class loginDAO extends DBContext{
 
     public Jobseeker loginUserByJobseeker(String username, String password){
-        String sql = "SELECT* FROM Freelancer WHERE username = ? OR email_contact = ? AND [password] = ?";
+        String sql = "SELECT* FROM Freelancer WHERE (username = ? OR email_contact = ? )AND [password] = ?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, username);

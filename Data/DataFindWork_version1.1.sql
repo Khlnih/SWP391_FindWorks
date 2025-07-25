@@ -335,7 +335,7 @@ CREATE TABLE [AccountTiers] (
 	[postlimit] [int] NULL,
     CONSTRAINT [PK_AccountTiers] PRIMARY KEY CLUSTERED ([tierID] ASC),
     CONSTRAINT [FK_AccountTiers_Admin] FOREIGN KEY ([adminID_managed_by]) REFERENCES [Admin]([adminID]),
-    CONSTRAINT [CK_AccountTiers_UserTypeScope] CHECK ([userTypeScope] IN ('Recruiter', 'Jobseeker', 'Any'))
+    CONSTRAINT [CK_AccountTiers_UserTypeScope] CHECK ([userTypeScope] IN ('Recruiter', 'Jobseeker', 'Post'))
 );
 GO
 
@@ -465,6 +465,49 @@ GO
 
 PRINT 'Bang [FreelancerTransaction] da duoc tao lai thanh cong voi day du cac rang buoc.';
 GO
+
+
+
+CREATE TABLE [dbo].[PostAccountTier] (
+    [postAccountTierID] [int] IDENTITY(1,1) NOT NULL,
+    [postID] [int] NOT NULL,
+    [tierID] [int] NOT NULL,
+    [purchaseDate] [datetime] NOT NULL DEFAULT GETDATE(), 
+    [expirationDate] [datetime] NULL, 
+    [isActive] [bit] NOT NULL DEFAULT 1, 
+
+    CONSTRAINT [PK_PostAccountTier] PRIMARY KEY CLUSTERED ([postAccountTierID] ASC),
+
+    -- Ràng buộc khóa ngoại đến bảng Post
+    -- ON DELETE CASCADE: Nếu một bài đăng bị xóa, các bản ghi liên quan trong bảng này cũng sẽ bị xóa.
+    CONSTRAINT [FK_PostAccountTier_Post] FOREIGN KEY ([postID]) REFERENCES [dbo].[Post]([postID]) ON DELETE CASCADE,
+
+    -- Ràng buộc khóa ngoại đến bảng AccountTiers
+    CONSTRAINT [FK_PostAccountTier_AccountTiers] FOREIGN KEY ([tierID]) REFERENCES [dbo].[AccountTiers]([tierID]),
+
+);
+GO
+
+PRINT 'Bảng [PostAccountTier] đã được tạo thành công.';
+GO
+
+CREATE TRIGGER trg_UpdateOldPostTiers_OnInsert
+ON PostAccountTier
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Cập nhật các bản ghi cũ của cùng postID thành isActive = 0 (trừ bản ghi vừa insert)
+    UPDATE p
+    SET p.isActive = 0
+    FROM PostAccountTier p
+    JOIN inserted i ON p.postID = i.postID
+    WHERE p.isActive = 1
+      AND p.postAccountTierID <> i.postAccountTierID;
+END
+GO
+
 
 
 

@@ -91,7 +91,7 @@
     <h2>Login to Your Account</h2>
     <form action="login" method="post">
         <input type="text" id="usernameOrEmail" name="usernameOrEmail" placeholder="Username or Email" required>
-
+        <input type="hidden" name="action" value="${param.action}" />
         <input type="password" id="password" name="password" placeholder="Password" required>
 
         <input type="submit" value="Login">
@@ -101,10 +101,25 @@
         </c:if>
     </form>
 
-    <div class="login-links">
-        <a href="register.jsp">Register</a>
-        <a href="forgotpassword.jsp">Forgot Password?</a>
-    </div>
+    
+    
+    <c:choose>
+    <c:when test="${param.action == 'recruiter'}">
+        <div class="login-links">
+            <a href="register.jsp">Register</a>
+            <a href="forgotpassword.jsp">Forgot Password?</a>
+        </div>
+    </c:when>
+    <c:when test="${param.action == 'jobseekr'}">
+        <div class="login-links">
+            <a href="registerjobseeker.jsp">Register</a>
+            <a href="forgotpassword.jsp">Forgot Password?</a>
+        </div>
+    </c:when>
+    <c:otherwise>
+        <p>No role selected.</p>
+    </c:otherwise>
+</c:choose>
 </div>
 
 </body>

@@ -797,6 +797,7 @@
                                                                 <input type="hidden" name="userID" value="${subscription.freelancerID}">
                                                                 <input type="hidden" name="subscriptionID" value="${subscription.subscriptionID}">
                                                                 <input type="hidden" name="statusInt" value="0">
+                                                                <input type="hidden" name="price" value="${subscription.price}">
                                                                 <input type="hidden" name="user" value="freelancer">
                                                                 <button type="submit" 
                                                                         class="btn btn-sm btn-success" 
@@ -813,6 +814,7 @@
                                                                 <input type="hidden" name="mess" value="Phần đăng ký của bạn chúng tôi không đồng ý">
                                                                 <input type="hidden" name="userID" value="${subscription.freelancerID}">
                                                                 <input type="hidden" name="subscriptionID" value="${subscription.subscriptionID}">
+                                                                <input type="hidden" name="price" value="${subscription.price}">
                                                                 <input type="hidden" name="statusInt" value="2">
                                                                 <input type="hidden" name="user" value="freelancer">
                                                                 <button type="submit" 
@@ -929,6 +931,7 @@
                                                                         <input type="hidden" name="mess" value="Cảm ơn bạn đã đăng ký">
                                                                         <input type="hidden" name="userID" value="${sub.recruiterID}">
                                                                         <input type="hidden" name="subscriptionID" value="${sub.subscriptionID}">
+                                                                        <input type="hidden" name="price" value="${sub.price}">
                                                                         <input type="hidden" name="statusInt" value="0">
                                                                         <input type="hidden" name="user" value="recruiter">
                                                                         <button type="submit" 
@@ -945,6 +948,7 @@
                                                                         <input type="hidden" name="mess" value="Phần đăng ký của bạn chúng tôi không đồng ý">
                                                                         <input type="hidden" name="userID" value="${sub.recruiterID}">
                                                                         <input type="hidden" name="subscriptionID" value="${sub.subscriptionID}">
+                                                                        <input type="hidden" name="price" value="${sub.price}">
                                                                         <input type="hidden" name="statusInt" value="2">
                                                                         <input type="hidden" name="user" value="recruiter">
                                                                         <button type="submit" 
